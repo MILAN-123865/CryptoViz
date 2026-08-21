@@ -110,4 +110,3 @@ describe("Worker Communication Suite", () => {
       await expect(loader()).rejects.toThrow();
     });
   });
-});

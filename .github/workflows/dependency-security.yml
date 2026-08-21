@@ -36,7 +36,7 @@ jobs:
       - name: Generate CycloneDX SBOM File
         # Acceptance Criteria: Auto-generates standard SPDX/CycloneDX bill-of-materials on release paths
         run: |
-          npx @cyclonedx/cyclonedx-npm --output-file public/sbom.json --output-format JSON
+          npx @cyclonedx/cyclonedx-npm --package-lock-only --output-file public/sbom.json --output-format JSON
       - name: Upload SBOM Artifact Bundle
         uses: actions/upload-artifact@v4
         with:
