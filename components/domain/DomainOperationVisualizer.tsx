@@ -237,10 +237,10 @@ export default function DomainOperationVisualizer() {
         } else {
           setGates((g) => ({ ...g, rbac: 'passed', execution: 'failed' }));
         }
-        throw new Error(err);
-      }
-    } catch (err: any) {
-      setErrorMsg(err.message || 'Operation failed');
+      );
+      setCurrentResult(res);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : 'Operation failed');
     } finally {
       setAuditLogsList(getAuditLogs());
       setLoading(false);
@@ -380,14 +380,21 @@ export default function DomainOperationVisualizer() {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Column: Client State & Control Panel */}
-        <div className="lg:col-span-5 space-y-4">
-          <div className="p-4 bg-zinc-900/50 rounded-lg border border-zinc-800 space-y-4">
-            <h3 className="text-sm font-bold text-zinc-200 flex items-center gap-2">
-              <Fingerprint className="w-4 h-4 text-teal-400" />
-              1. Client / Browser Request State
-            </h3>
+      {/* Configuration & Trigger Controls */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-zinc-900/50 rounded-lg border border-zinc-800">
+        <div>
+          <label className="block text-xs text-zinc-400 mb-1 font-medium">User Role (Authorization)</label>
+          <select
+            value={userRole}
+            onChange={(e) => setUserRole(e.target.value as "admin" | "operator" | "user" | "guest")}
+            className="w-full bg-zinc-950 border border-zinc-700 rounded-md px-3 py-1.5 text-xs text-white focus:ring-1 focus:ring-teal-500"
+          >
+            <option value="admin">Admin (Full Rights)</option>
+            <option value="operator">Operator (Category Rights)</option>
+            <option value="user">User (Standard)</option>
+            <option value="guest">Guest (Unauthorized)</option>
+          </select>
+        </div>
 
             <div>
               <label className="block text-xs text-zinc-400 mb-1 font-medium">1.1 Request User Role</label>
@@ -403,102 +410,19 @@ export default function DomainOperationVisualizer() {
               </select>
             </div>
 
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <label className="block text-xs text-zinc-400 font-medium">1.2 Authenticated Session Token (JWS / JWT-style)</label>
-                <button
-                  onClick={() => handleRequestToken(userRole)}
-                  className="text-[10px] text-teal-400 hover:text-teal-300 font-bold"
-                >
-                  Regenerate Token
-                </button>
-              </div>
-              <div className="bg-zinc-950 border border-zinc-800 p-2.5 rounded font-mono text-[10px] break-all leading-relaxed text-zinc-300 select-all max-h-24 overflow-y-auto">
-                {sentToken || 'No token generated.'}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <label className="block text-xs text-zinc-400 mb-1 font-medium">1.3 CSRF Header Token</label>
-                <input
-                  type="text"
-                  value={sentCsrfToken}
-                  onChange={(e) => setSentCsrfToken(e.target.value)}
-                  className="w-full bg-zinc-950 border border-zinc-700 rounded-md px-3 py-1.5 text-xs font-mono text-white focus:ring-1 focus:ring-teal-500"
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-zinc-400 mb-1 font-medium">1.4 Idempotency Key</label>
-                <input
-                  type="text"
-                  value={idempotencyKey}
-                  onChange={(e) => setIdempotencyKey(e.target.value)}
-                  className="w-full bg-zinc-950 border border-zinc-700 rounded-md px-3 py-1.5 text-xs font-mono text-white focus:ring-1 focus:ring-teal-500"
-                />
-              </div>
-            </div>
-
-            {/* Simulated Failures */}
-            <div>
-              <label className="block text-xs text-zinc-400 mb-1 font-medium">1.5 Sim. Settlement Failure State</label>
-              <select
-                value={simulateFailure}
-                onChange={(e) => setSimulateFailure(e.target.value as any)}
-                className="w-full bg-zinc-950 border border-zinc-700 rounded-md px-3 py-1.5 text-xs text-white focus:ring-1 focus:ring-teal-500"
-              >
-                <option value="NONE">None (Happy Path)</option>
-                <option value="REJECTED">REJECTED (Authorization/Validation)</option>
-                <option value="FAILED">FAILED (Execution Error)</option>
-                <option value="EXPIRED">EXPIRED (Pending Timeout)</option>
-                <option value="CANCELLED">CANCELLED (User Abort)</option>
-              </select>
-            </div>
-
-            {/* Tampering Switches */}
-            <div className="pt-2 border-t border-zinc-800 space-y-2">
-              <label className="block text-xs font-bold text-red-400">Security Tampering Demonstrations</label>
-              <div className="grid grid-cols-3 gap-1">
-                <button
-                  onClick={tamperSignature}
-                  className="px-2 py-1 text-[10px] bg-red-950/20 text-red-300 border border-red-900/40 rounded hover:bg-red-950/40 font-semibold"
-                >
-                  Tamper Token Sig
-                </button>
-                <button
-                  onClick={tamperCsrfToken}
-                  className="px-2 py-1 text-[10px] bg-red-950/20 text-red-300 border border-red-900/40 rounded hover:bg-red-950/40 font-semibold"
-                >
-                  Tamper CSRF
-                </button>
-                <button
-                  onClick={tamperExpiry}
-                  className="px-2 py-1 text-[10px] bg-red-950/20 text-red-300 border border-red-900/40 rounded hover:bg-red-950/40 font-semibold"
-                >
-                  Expire Token
-                </button>
-              </div>
-            </div>
-
-            {/* Run Button */}
-            <div className="flex gap-2 pt-2">
-              <button
-                onClick={handleRunOperation}
-                disabled={loading}
-                className="flex-1 bg-teal-600 hover:bg-teal-500 text-white font-semibold py-2 px-4 rounded-md text-xs transition-all flex items-center justify-center gap-2 shadow-lg"
-              >
-                {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
-                Submit request to API
-              </button>
-              <button
-                onClick={handleClearIdempotency}
-                title="Reset Idempotency Store"
-                className="p-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-md text-xs"
-              >
-                <RotateCcw className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
+        <div>
+          <label className="block text-xs text-zinc-400 mb-1 font-medium">Simulate Terminal Failure State</label>
+          <select
+            value={simulateFailure}
+            onChange={(e) => setSimulateFailure(e.target.value as "NONE" | "REJECTED" | "FAILED" | "EXPIRED" | "CANCELLED")}
+            className="w-full bg-zinc-950 border border-zinc-700 rounded-md px-3 py-1.5 text-xs text-white focus:ring-1 focus:ring-teal-500"
+          >
+            <option value="NONE">None (Happy Path)</option>
+            <option value="REJECTED">REJECTED (Authorization/Validation)</option>
+            <option value="FAILED">FAILED (Execution Error)</option>
+            <option value="EXPIRED">EXPIRED (Pending Timeout)</option>
+            <option value="CANCELLED">CANCELLED (User Abort)</option>
+          </select>
         </div>
 
         {/* Right Column: Server-Side Security Boundary Checkpoint Visualizer */}
