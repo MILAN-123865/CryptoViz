@@ -24,9 +24,6 @@ interface CancelMessage {
   requestId?: string
 }
 
-interface ParsedWorkerRequest extends WorkerRequest {
-  jobId: string
-}
 
 function postProgress(jobId: string, percent: number, currentMilestone: string, force = false) {
   const now = performance.now()
@@ -121,7 +118,7 @@ workerScope.addEventListener('message', async (event: MessageEvent<unknown>) => 
   }
 
   if (message.type === 'CANCEL') {
-    const { jobId, requestId } = message
+    const { jobId } = message
     const result = lifecycle.cancel(jobId)
     if (result === 'CANCELLING') {
       postProgress(jobId, 0, 'Cancellation requested', true)
