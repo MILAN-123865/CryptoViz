@@ -39,7 +39,6 @@ function sortObjectKeys(obj: Record<string, unknown>): Record<string, unknown> {
 }
 
 // Fast deterministic 64-bit hash (sync). Not cryptographic; used only for cache keys.
-// Based on splitmix64-style mixing; returned as unsigned hex string.
 function hash64(input: string): string {
   // FNV-1a seed + splitmix-like finalizer
   let h1 = 0xcbf29ce484222325n;
