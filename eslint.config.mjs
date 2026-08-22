@@ -7,7 +7,9 @@ const eslintConfig = defineConfig([
   ...nextTs,
   {
     rules: {
+      "@typescript-eslint/no-explicit-any": "error",
       "no-console": "warn",
+      "react/no-danger": "error",
     },
   },
   // Override default ignores of eslint-config-next.
@@ -16,6 +18,7 @@ const eslintConfig = defineConfig([
     ".next/**",
     "out/**",
     "build/**",
+    "dist/**",
     "next-env.d.ts",
   ]),
 ]);

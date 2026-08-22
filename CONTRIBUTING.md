@@ -26,6 +26,10 @@ Before writing any code, please complete the following steps:
 
 2. Read [Guidelines.md](./GUIDELINES.md) to understand the coding standards, rules, and guidelines we follow.
 
+3. Read [docs/contribution-checklists.md](./docs/contribution-checklists.md) and complete the checklist matching your contribution type (new cipher, new visualizer, or security-sensitive feature) before opening a PR.
+
+4. If your contribution involves reduced parameters, mocked peers, or synthetic data of any kind, read [docs/simulation-vs-live-data-policy.md](./docs/simulation-vs-live-data-policy.md). Contributors are prohibited from describing simulated operations as verified operations, in code, UI copy, or PR descriptions.
+
 ---
 
 ## 💻 Local Development Setup
@@ -129,13 +133,21 @@ Open `lib/workers/cipher.worker.ts` and add a dynamic import loader entry for yo
 ### Step 6: Configure Static Page Pre-rendering
 Open `app/visualizer/[cipher]/page.tsx` and ensure that your new cipher slug is returned by `generateStaticParams()` to allow Next.js to pre-render the page at build time.
 
-### Step 7: Run Final Verification
+### Step 7: Add Visualizer Component (if applicable)
+If your cipher requires custom visualization beyond the standard step-by-step display, create a visualizer component following the patterns in [docs/visualizer-development-guide.md](./docs/visualizer-development-guide.md). The guide provides:
+- Standard component props and interfaces
+- Rendering conventions for matrices, highlights, and tables
+- Styling guidelines with Tailwind v4 tokens
+- Accessibility requirements and ARIA attributes
+- A complete template component at `components/visualizers/TemplateVisualizer.tsx`
+
+### Step 8: Run Final Verification
 Verify your implementation passes all compilation check gates:
 ```bash
 npm lint && npm typecheck && npm test && npm build
 ```
 
-### Step 8: Verify Performance Budgets
+### Step 9: Verify Performance Budgets
 Verify that your cipher steps do not exceed the step budgets mapped in `GUIDELINES.md` (e.g., summary-mode limit for long inputs).
 
 ### Cipher PR Checklist
@@ -146,6 +158,7 @@ Verify that your cipher steps do not exceed the step budgets mapped in `GUIDELIN
 - [ ] No DOM APIs (`window`, `document`, `localStorage`) are used in the cipher module.
 - [ ] The cipher is registered in the Web Worker routing switch.
 - [ ] The cipher slug is configured in the static export `generateStaticParams`.
+- [ ] Custom visualizer (if applicable) follows the [visualizer development guide](./docs/visualizer-development-guide.md).
 - [ ] Bundle size change is measured and noted in the PR description.
 
 ---
@@ -232,7 +245,7 @@ interface Resource {
 
 ## 📥 Pull Request Process
 
-- **Branch Protection**: All pull requests must pass the automated GitHub checks (`pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`) before they can be merged.
+- **Branch Protection**: All pull requests must pass the required GitHub Actions check `CI Quality Gates / Merge Gate` before they can be merged. That gate aggregates typecheck, lint, unit tests, security tests, accessibility tests, production build, and the bundle budget check.
 - **Squash Merge**: All PRs are squash-merged into `main`. The final commit message will be set to the PR title.
 - **Review SLA**: Maintainers aim to review pull requests within 5 business days.
 - **PR Description Template**:

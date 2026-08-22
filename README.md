@@ -295,12 +295,17 @@ Ensure you have the following installed before launching:
    ```bash
    git clone https://github.com/csxark/CryptoViz.git
    cd CryptoViz
-   ```
+    ```
 
-2. **Install node dependencies**:
+2.  **Install node dependencies**:
    ```bash
    npm install
    ```
+
+   ![Successful npm install](./docs/screenshots/npm-install-success.png)
+
+   *Successful dependency installation using `npm install`.*
+
 
 3. **Configure Environment Variables** (Required for OG metadata):
    Create a `.env.local` file in the root directory:
@@ -312,8 +317,13 @@ Ensure you have the following installed before launching:
    ```bash
    npm run dev
    ```
+  ![Running development server](./docs/screenshots/npm-run-dev.png)
 
 Open `http://localhost:3000` in your web browser. You should see the CryptoViz landing page with the navigation bar and theme toggle fully functional.
+
+![CryptoViz landing page](./docs/screenshots/cryptoviz-landing-page.png)
+
+*CryptoViz running locally at `http://localhost:3000`.*
 
 ---
 
@@ -454,6 +464,14 @@ We welcome contributions to CryptoViz. Please read [CONTRIBUTING.md](./CONTRIBUT
 - **To add a new cipher**: Create a pure mathematical module, add tests, and update the Web Worker router.
 - **To add a new doc**: Add a `.mdx` file to the content path with the required Zod frontmatter fields.
 - **To add a resource**: Update the static resource array database with verified HTTPS URLs.
+
+### Constants Naming Convention
+
+CryptoViz enforces a lint-friendly, centralized naming convention for application constants:
+
+- **Central Module**: All shared constants (storage keys, collection limits, event names, performance thresholds, and schema versions) are defined in [`constants/index.ts`](file:///c:/Users/Rushabh%20Mahajan/Documents/GitHub/CryptoViz/constants/index.ts) and exported via `@/constants`.
+- **`CRYPTOVIZ_` Prefix**: All global constants use UPPER_SNAKE_CASE prefixed with **`CRYPTOVIZ_`** (e.g., `CRYPTOVIZ_BENCHMARK_HISTORY_KEY`, `CRYPTOVIZ_MAX_FAVORITE_CIPHERS`, `CRYPTOVIZ_SPEEDUP_THRESHOLD`).
+- **No Hard-coded Strings**: Modules across the codebase import constants directly from `@/constants` to ensure maintainability, avoid magic strings, and satisfy linter rules.
 
 
 ---

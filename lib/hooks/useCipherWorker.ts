@@ -357,9 +357,10 @@ export function useCipherWorker() {
           // Strip AbortSignal from options since it's not JSON serializable
           const { signal: __, ...serializableOptions } = options || {};
           const requestMessage: WorkerRequest = {
-            type: action,
+            type: "EXECUTE",
             requestId: id,
             payload: {
+              type: action,
               cipherId,
               input,
               key,

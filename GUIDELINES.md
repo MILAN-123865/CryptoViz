@@ -3,6 +3,8 @@
 
 This document defines all technical constraints, interfaces, coding conventions, and architectural budgets that apply to every contribution in the CryptoViz codebase. [README.md](./README.md) remains the primary developer reference; this document is the contributor-facing engineering specification.
 
+See [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) for the layer overview and a map of every release-grade contract document, including per-contribution-type checklists, the simulation-vs-live-data policy, and the error taxonomy.
+
 ---
 
 ## 🏛️ Architectural Non-Negotiables
@@ -165,6 +167,8 @@ Cipher engines run inside the Worker's isolated global context. They **must not*
 ## 🎨 Design System & Styling Rules
 
 All styling uses Tailwind CSS v4 utility classes and CSS custom properties defined in `app/globals.css`.
+
+For detailed visualizer component development patterns, including prop contracts, rendering conventions, and accessibility requirements, see the [Visualizer Development Guide](./docs/visualizer-development-guide.md).
 
 | Rule Category | Correct Approach | Incorrect Approach |
 | :--- | :--- | :--- |

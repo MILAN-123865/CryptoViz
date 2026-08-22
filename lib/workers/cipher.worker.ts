@@ -528,8 +528,12 @@ function isWorkerRequest(value: unknown): value is WorkerRequest {
   const candidate = value as Partial<WorkerRequest>;
   const payload = candidate.payload as Partial<WorkerRequest["payload"]> | undefined;
 
+  const type = (candidate.type as unknown) as string;
+  const payloadType = (payload?.type as unknown) as string;
+
   return (
-    (candidate.type === "encrypt" || candidate.type === "decrypt") &&
+    type === "EXECUTE" &&
+    (payloadType === "encrypt" || payloadType === "decrypt") &&
     typeof candidate.requestId === "string" &&
     !!payload &&
     typeof payload.cipherId === "string" &&
@@ -620,7 +624,7 @@ workerScope.addEventListener(
       jobStarted = true;
 
       const dispatcher = await getDispatcher(cipherId);
-      const handler = type === "encrypt" ? dispatcher.encrypt : dispatcher.decrypt;
+      const handler = payload.type === "encrypt" ? dispatcher.encrypt : dispatcher.decrypt;
       const result = (await handler(input, key, options)) as CipherResult;
 
       if (!result || typeof result !== "object") {

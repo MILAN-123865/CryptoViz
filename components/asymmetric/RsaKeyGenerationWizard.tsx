@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   DEFAULT_RSA_WIZARD_INPUT,
   RSA_DEMO_PRIMES,
@@ -9,25 +9,39 @@ import {
   getRecommendedPublicExponents,
   type RsaWizardInput,
 } from "../../lib/asymmetric/rsaKeyGenerationWizard";
+import { cryptoWorkerClient } from "../../lib/workers/cryptoWorkerClient";
+import Link from "next/link";
 
 export default function RsaKeyGenerationWizard() {
   const [input, setInput] = useState<RsaWizardInput>(DEFAULT_RSA_WIZARD_INPUT);
   const [activeStepIndex, setActiveStepIndex] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<{ value: ReturnType<typeof generateRsaWizard> | null; error: string | null }>({
+    value: null,
+    error: null,
+  });
 
-  const result = useMemo(() => {
-    try {
-      return { value: generateRsaWizard(input), error: null as string | null };
-    } catch (caught) {
-      return {
-        value: null,
-        error:
-          caught instanceof Error
-            ? caught.message
-            : "Unable to generate RSA key pair.",
-      };
-    }
+  useEffect(() => {
+    let active = true;
+    const calculate = async () => {
+      setLoading(true);
+      try {
+        const res = await cryptoWorkerClient.runCryptoOperation<ReturnType<typeof generateRsaWizard>>("rsaWizard", input);
+        if (active) setResult({ value: res, error: null });
+      } catch (caught) {
+        if (active) {
+          setResult({
+            value: null,
+            error: caught instanceof Error ? caught.message : "Unable to generate RSA key pair.",
+          });
+        }
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+    calculate();
+    return () => { active = false; };
   }, [input]);
-
   const recommendedExponents = useMemo(() => {
     const totient = (input.primeP - 1) * (input.primeQ - 1);
     return Number.isFinite(totient)
@@ -171,6 +185,13 @@ export default function RsaKeyGenerationWizard() {
                 )}
               </div>
             </div>
+
+            <Link
+              href="/modular-arithmetic"
+              className="mt-4 block w-full rounded-xl border border-teal-300/40 bg-teal-300/10 px-4 py-3 text-center text-sm font-bold text-teal-200 transition hover:bg-teal-300/20"
+            >
+              Verify p and q with Miller-Rabin
+            </Link>
 
             <button
               type="button"
