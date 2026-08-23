@@ -899,6 +899,16 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     ]
   },
   {
+    id: 'haraka',
+    name: 'Haraka',
+    category: 'hash',
+    description: 'Short-input hash function (v2). AES-based, optimized for 32 or 64 byte inputs. Used in SPHINCS+ Haraka parameter sets. Fixed-length inputs only.',
+    defaultKey: '',
+    defaultInput: '00'.repeat(32),
+    securityStatus: 'experimental',
+    options: [{ name: 'Variant', id: 'variant', type: 'select', default: 256, choices: [{ label: 'Haraka-256 (32 bytes)', value: 256 }, { label: 'Haraka-512 (64 bytes)', value: 512 }] }]
+  },
+  {
     id: "sha512",
     name: "SHA-512",
     category: "hash",
