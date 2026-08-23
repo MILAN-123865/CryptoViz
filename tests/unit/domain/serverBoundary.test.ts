@@ -11,10 +11,10 @@ import {
 import { globalIdempotencyStore } from '../../../lib/domain/domainOperationState';
 
 describe('Server-Side Security Boundary (#1316)', () => {
-  beforeEach(() => {
-    clearAuditLogs();
+  beforeEach(async () => {
+    await clearAuditLogs();
     resetRateLimits();
-    globalIdempotencyStore.clear();
+    await globalIdempotencyStore.clear();
   });
 
   const validSession: TrustedSession = {
@@ -99,7 +99,7 @@ describe('Server-Side Security Boundary (#1316)', () => {
       expect(response.success).toBe(false);
       expect(response.error).toContain('CSRF_MISMATCH');
 
-      const logs = getAuditLogs();
+      const logs = await getAuditLogs();
       expect(logs.length).toBe(1);
       expect(logs[0].status).toBe('REJECTED');
       expect(logs[0].details).toContain('CSRF_MISMATCH');
@@ -138,7 +138,7 @@ describe('Server-Side Security Boundary (#1316)', () => {
       expect(rateLimitedResponse.success).toBe(false);
       expect(rateLimitedResponse.error).toContain('RATE_LIMIT_EXCEEDED');
 
-      const logs = getAuditLogs();
+      const logs = await getAuditLogs();
       expect(logs[0].status).toBe('REJECTED');
       expect(logs[0].details.toLowerCase()).toContain('rate limit');
     });
@@ -163,7 +163,7 @@ describe('Server-Side Security Boundary (#1316)', () => {
       expect(response.success).toBe(false);
       expect(response.error).toContain('Insufficient privileges');
 
-      const logs = getAuditLogs();
+      const logs = await getAuditLogs();
       expect(logs.length).toBe(1);
       expect(logs[0].role).toBe('guest');
       expect(logs[0].status).toBe('REJECTED');
@@ -188,7 +188,7 @@ describe('Server-Side Security Boundary (#1316)', () => {
       expect(response.success).toBe(true);
       expect(response.result?.state).toBe('COMPLETED');
 
-      const logs = getAuditLogs();
+      const logs = await getAuditLogs();
       expect(logs.length).toBe(1);
       expect(logs[0].role).toBe('admin');
       expect(logs[0].status).toBe('SUCCESS');
