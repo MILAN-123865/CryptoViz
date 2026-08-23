@@ -1,5 +1,6 @@
 export type CipherOptionValue = string | number | boolean
-
+// Add to cipher registry definitions:
+// csidhDefinition,
 export interface CipherDefinition {
   id: string;
   name: string;
@@ -862,6 +863,17 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     options: [{ name: 'Mode', id: 'mode', type: 'select', default: 'cbc', choices: [{ label: 'CBC', value: 'cbc' }, { label: 'ECB', value: 'ecb' }] }]
   },
   {
+    id: 'midori',
+    name: 'MIDORI',
+    category: 'symmetric',
+    description: 'Energy-minimised lightweight block cipher (ASIACRYPT 2015). Bundle key schedule (k0, k1 alternated). Binary MixColumn (no GF multiplication). Lowest known energy-per-encryption.',
+    defaultKey: '00112233445566778899aabbccddeeff',
+    defaultInput: '0001020304050607',
+    securityStatus: 'secure',
+    keyPlaceholder: '32 hex characters (128-bit key)',
+    options: [{ name: 'Variant', id: 'variant', type: 'select', default: '64', choices: [{ label: 'MIDORI-64 (64-bit block)', value: '64' }, { label: 'MIDORI-128 (128-bit block)', value: '128' }] }]
+  },
+  {
     id: 'skinny',
     name: 'SKINNY-128',
     category: 'symmetric',
@@ -871,6 +883,17 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     securityStatus: 'secure',
     keyPlaceholder: '32/64/96 hex chars (128/256/384-bit tweakey)',
     options: [{ name: 'Parameter Set', id: 'paramSet', type: 'select', default: '128-256', choices: [{ label: 'SKINNY-128-128 (40 rounds)', value: '128-128' }, { label: 'SKINNY-128-256 (48 rounds)', value: '128-256' }, { label: 'SKINNY-128-384 (56 rounds)', value: '128-384' }] }]
+  },
+  {
+    id: 'led',
+    name: 'LED',
+    category: 'symmetric',
+    description: 'Ultra-lightweight block cipher (CHES 2011). NO key schedule; raw user key XOR\'d into state every 4 rounds. AES-inspired SPN with 4-bit S-box. LED-64 and LED-128 variants.',
+    defaultKey: '0011223344556677',
+    defaultInput: '0001020304050607',
+    securityStatus: 'legacy',
+    keyPlaceholder: '16 or 32 hex characters (64 or 128-bit key)',
+    options: [{ name: 'Key Size', id: 'keySize', type: 'select', default: '64', choices: [{ label: 'LED-64 (64-bit key)', value: '64' }, { label: 'LED-128 (128-bit key)', value: '128' }] }]
   },
   {
     id: "sha256",
@@ -886,6 +909,16 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     recommendedNext: ["hmac", "sha512", "bcrypt"],
   },
   {
+    id: 'bmw',
+    name: 'Blue Midnight Wish',
+    category: 'hash',
+    description: 'SHA-3 finalist. ARX double-pipe compression. No S-boxes, no MDS matrices, no field arithmetic. Supports 224/256/384/512-bit output.',
+    defaultKey: '',
+    defaultInput: '',
+    securityStatus: 'experimental',
+    options: [{ name: 'Output Bits', id: 'outputBits', type: 'select', default: 256, choices: [{ label: '256-bit', value: 256 }, { label: '384-bit', value: 384 }, { label: '512-bit', value: 512 }] }]
+  },
+  {
     id: 'cubehash',
     name: 'CubeHash',
     category: 'hash',
@@ -897,6 +930,16 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
       { name: 'Output Bits', id: 'outputBits', type: 'select', default: 256, choices: [{ label: '256-bit', value: 256 }, { label: '512-bit', value: 512 }] },
       { name: 'Rounds per Block (r)', id: 'rounds', type: 'number', default: 16 }
     ]
+  },
+  {
+    id: 'shabal',
+    name: 'Shabal',
+    category: 'hash',
+    description: 'SHA-3 finalist. Asymmetric permutation over a large rolling state (A, B, C registers). Stream-cipher-like update. Supports 192/224/256/384/512-bit output.',
+    defaultKey: '',
+    defaultInput: '',
+    securityStatus: 'experimental',
+    options: [{ name: 'Output Bits', id: 'outputBits', type: 'select', default: 256, choices: [{ label: '192-bit', value: 192 }, { label: '224-bit', value: 224 }, { label: '256-bit', value: 256 }, { label: '384-bit', value: 384 }, { label: '512-bit', value: 512 }] }]
   },
   {
     id: "sha512",
@@ -1785,5 +1828,15 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     securityStatus: 'secure',
     keyPlaceholder: '64 hex characters (32-byte seed)',
     options: [{ name: 'Winternitz Parameter (w)', id: 'w', type: 'select', default: 4, choices: [{ label: 'w=2', value: 2 }, { label: 'w=4', value: 4 }, { label: 'w=8', value: 8 }] }]
+  },
+  {
+    id: 'hqc',
+    name: 'HQC',
+    category: 'asymmetric',
+    description: 'NIST PQC Round 4 Alternate. Code-based KEM (QC-MDPC). Ring arithmetic over GF(2)[X]/(X^n - 1). Decryption failure probability is a core security parameter. SHAKE256-backed.',
+    defaultKey: '00'.repeat(32),
+    defaultInput: '48656c6c6f',
+    securityStatus: 'recommended',
+    keyPlaceholder: '64 hex characters (32-byte seed)',
   },
 ];
