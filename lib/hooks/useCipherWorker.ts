@@ -1,16 +1,22 @@
 
-'use client'
-import { useCallback, useEffect, useRef, useState } from 'react'
-import type { CipherResult } from '@/lib/cipher/types'
-import type { WorkerRequest, WorkerResponse } from '@/types/worker'
-import type { WorkerPriority } from '@/lib/workers/pool'
+"use client";
 
-const MAX_CACHE_SIZE = 200
-const resultCache = new Map<string, CipherResult>()
-export interface CipherWorkerProgress {
-  percent: number
-  currentMilestone: string
-  jobId: string
+import { useEffect, useRef, useState, useCallback } from "react";
+import type { CipherResult, CipherOptions } from "../cipher/types";
+import type { WorkerRequest, WorkerResponse } from "../../types/worker";
+import type { CipherErrorCode } from "../utils/errors";
+import {
+  validateWorkload,
+  resolveWorkloadLimits,
+} from "../security/workloadLimits";
+import { CipherError } from "../utils/errors";
+import { decodeCipherSteps } from "../workers/stepTransfer";
+
+const MAX_CACHE_SIZE = 200;
+const resultCache = new Map<string, CipherResult>();
+
+export function clearCipherWorkerCache() {
+  resultCache.clear();
 }
 export interface RunCipherOptions {
   signal?: AbortSignal
@@ -83,17 +89,51 @@ export function useCipherWorker() {
         request?.onProgress?.(p.percent, p.currentMilestone)
         return
       }
-      const requestId = data.requestId
-      const request = activeRequestsRef.current.get(requestId)
-      if (!request) return
-      if (request.timeoutId) clearTimeout(request.timeoutId)
-      if (request.signal && request.onAbort) request.signal.removeEventListener('abort', request.onAbort)
-      request.settled = true
-      if (data.success && data.payload?.result) {
-        if (request.cacheKey) cacheResult(request.cacheKey, data.payload.result)
-        request.resolve(data.payload.result)
-      } else {
-        request.reject(new Error(data.payload?.error || 'Unknown worker error'))
+
+      const request = activeRequestsRef.current.get(requestId);
+
+      if (request) {
+        if (request.timeoutId) {
+          clearTimeout(request.timeoutId);
+        }
+        if (request.signal && request.onAbort) {
+          request.signal.removeEventListener("abort", request.onAbort);
+        }
+
+        if (success && payload.result) {
+          try {
+            const result: CipherResult = payload.stepsBuffer
+              ? {
+                  ...payload.result,
+                  steps: decodeCipherSteps(payload.stepsBuffer),
+                }
+              : payload.result;
+            if (request.cacheKey) {
+              cacheResult(request.cacheKey, result);
+            }
+            request.resolve(result);
+          } catch (error) {
+            request.reject(
+              error instanceof Error ? error : new Error(String(error)),
+            );
+          }
+        } else {
+          const code = payload.errorCode;
+          if (code) {
+            request.reject(
+              Object.assign(
+                new Error(
+                  payload.errorMessage || payload.error || "Worker error",
+                ),
+                { code },
+              ),
+            );
+          } else {
+            request.reject(new Error(payload.error || "Worker error"));
+          }
+        }
+
+        activeRequestsRef.current.delete(requestId);
       }
       activeRequestsRef.current.delete(requestId)
       if (activeRequestsRef.current.size === 0) {

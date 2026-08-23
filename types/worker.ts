@@ -46,12 +46,13 @@ export interface WorkerProgressMessage {
   currentMilestone: string
 }
 
-export interface WorkerDoneMessage {
-  type: 'DONE'
-  jobId: string
-  payload: {
-    result: CipherResult
-  }
+export interface WorkerResponsePayload {
+  result?: CipherResult
+  /** Serialized trace for large results, transferred as an ArrayBuffer. */
+  stepsBuffer?: ArrayBuffer
+  error?: string
+  errorCode?: import('@/lib/utils/errors').CipherErrorCode | 'INVALID_WORKER_MESSAGE'
+  errorMessage?: string
 }
 
 export interface WorkerErrorMessage {
