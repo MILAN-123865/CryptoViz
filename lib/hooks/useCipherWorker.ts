@@ -15,6 +15,7 @@ import {
   resolveWorkloadLimits,
 } from "../security/workloadLimits";
 import { CipherError } from "../utils/errors";
+import { decodeCipherSteps } from "../workers/stepTransfer";
 
 const MAX_CACHE_SIZE = 200;
 const resultCache = new Map<string, CipherResult>();
@@ -182,10 +183,22 @@ export function useCipherWorker() {
         }
 
         if (success && payload.result) {
-          if (request.cacheKey) {
-            cacheResult(request.cacheKey, payload.result);
+          try {
+            const result: CipherResult = payload.stepsBuffer
+              ? {
+                  ...payload.result,
+                  steps: decodeCipherSteps(payload.stepsBuffer),
+                }
+              : payload.result;
+            if (request.cacheKey) {
+              cacheResult(request.cacheKey, result);
+            }
+            request.resolve(result);
+          } catch (error) {
+            request.reject(
+              error instanceof Error ? error : new Error(String(error)),
+            );
           }
-          request.resolve(payload.result);
         } else {
           const code = payload.errorCode;
           if (code) {

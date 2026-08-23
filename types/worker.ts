@@ -44,6 +44,8 @@ export interface WorkerProgressMessage {
 
 export interface WorkerResponsePayload {
   result?: CipherResult
+  /** Serialized trace for large results, transferred as an ArrayBuffer. */
+  stepsBuffer?: ArrayBuffer
   error?: string
   errorCode?: import('@/lib/utils/errors').CipherErrorCode | 'INVALID_WORKER_MESSAGE'
   errorMessage?: string
