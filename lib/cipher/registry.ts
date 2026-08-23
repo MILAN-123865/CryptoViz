@@ -1,5 +1,6 @@
 export type CipherOptionValue = string | number | boolean
-
+// Add to cipher registry definitions:
+// csidhDefinition,
 export interface CipherDefinition {
   id: string;
   name: string;
