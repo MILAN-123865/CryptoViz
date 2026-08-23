@@ -1776,6 +1776,16 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     keyPlaceholder: '64 hex characters (32-byte seed)',
   },
   {
+    id: 'ntruprime',
+    name: 'Streamlined NTRU Prime',
+    category: 'asymmetric',
+    description: 'NIST PQC Round 4 Candidate KEM. Ring: Z[x]/(x^761 - x - 1), Modulus q = 4591. Resistant to subfield attacks.',
+    defaultKey: '00',
+    defaultInput: '00',
+    securityStatus: 'experimental',
+    keyPlaceholder: 'Polynomial coefficients (hex)',
+  },
+  {
     id: 'wots',
     name: 'Winternitz OTS',
     category: 'asymmetric',
