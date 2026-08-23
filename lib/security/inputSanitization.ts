@@ -87,10 +87,32 @@ export function sanitizeCryptoInput(value: unknown, options: SanitizationOptions
 }
 
 export function sanitizePlainText(value: unknown, options: SanitizationOptions = {}): SanitizationResult {
-  return sanitizeCryptoInput(value, {
-    escapeHtml: options.escapeHtml ?? true,
+  const result = sanitizeCryptoInput(value, {
+    escapeHtml: false,
     ...options,
   });
+
+  let val = result.value;
+
+  // 1. Remove dangerous HTML tags completely
+  val = val.replace(/<\/?(script|img|svg|iframe|object|embed|body|form|input)[^>]*>/gi, "");
+
+  // 2. Remove dangerous event listener attributes
+  val = val.replace(/(on[a-z]+)\s*=\s*("[^"]*"|'[^']*'|[^>\s]*)/gi, "");
+
+  // 3. Neutralize dangerous URL protocols
+  val = val.replace(/(javascript|data|vbscript)\s*:/gi, "$1_blocked:");
+
+  // 4. Escape HTML if requested (default is true)
+  if (options.escapeHtml !== false) {
+    val = escapeHtml(val);
+  }
+
+  return {
+    ...result,
+    value: val,
+    changed: val !== normalizeInput(value),
+  };
 }
 
 export function sanitizeSearchQuery(value: unknown, maxLength = 160): SanitizationResult {
