@@ -1786,4 +1786,14 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     keyPlaceholder: '64 hex characters (32-byte seed)',
     options: [{ name: 'Winternitz Parameter (w)', id: 'w', type: 'select', default: 4, choices: [{ label: 'w=2', value: 2 }, { label: 'w=4', value: 4 }, { label: 'w=8', value: 8 }] }]
   },
+  {
+    id: 'csidh',
+    name: 'CSIDH',
+    category: 'asymmetric',
+    description: 'Commutative Supersingular Isogeny Diffie-Hellman (ASIACRYPT 2018). Post-quantum non-interactive key exchange. Ideal class group action over GF(p).',
+    defaultKey: '00',
+    defaultInput: '00',
+    securityStatus: 'experimental',
+    keyPlaceholder: '64 hex characters (512-bit padded)',
+  },
 ];
