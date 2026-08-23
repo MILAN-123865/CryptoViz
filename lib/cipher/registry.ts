@@ -873,6 +873,20 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     options: [{ name: 'Parameter Set', id: 'paramSet', type: 'select', default: '128-256', choices: [{ label: 'SKINNY-128-128 (40 rounds)', value: '128-128' }, { label: 'SKINNY-128-256 (48 rounds)', value: '128-256' }, { label: 'SKINNY-128-384 (56 rounds)', value: '128-384' }] }]
   },
   {
+    id: 'mantis',
+    name: 'MANTIS',
+    category: 'symmetric',
+    description: 'Tweakable low-latency block cipher (EUROCRYPT 2016). FKS reflection structure. Decryption is equivalent to encryption with swapped key halves. MANTIS-5 and MANTIS-7 variants.',
+    defaultKey: '00000000000000000000000000000000',
+    defaultInput: '0000000000000000',
+    securityStatus: 'secure',
+    keyPlaceholder: '32 hex characters (128-bit key)',
+    options: [
+      { name: 'Tweak', id: 'tweak', type: 'text', default: '0000000000000000' },
+      { name: 'Variant', id: 'variant', type: 'select', default: 7, choices: [{ label: 'MANTIS-5', value: 5 }, { label: 'MANTIS-7', value: 7 }] }
+    ]
+  },
+  {
     id: "sha256",
     name: "SHA-256",
     category: "hash",
