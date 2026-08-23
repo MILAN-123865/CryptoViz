@@ -1,11 +1,16 @@
 import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
+ feature/supply-chain-controls-1330
+
+
+ main
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
   {
     rules: {
+      "@typescript-eslint/no-explicit-any": "error",
       "no-console": "warn",
       "react/no-danger": "error",
       "@typescript-eslint/no-explicit-any": "warn",
@@ -32,6 +37,7 @@ const eslintConfig = defineConfig([
     ".next/**",
     "out/**",
     "build/**",
+    "dist/**",
     "next-env.d.ts",
   ]),
 ]);
