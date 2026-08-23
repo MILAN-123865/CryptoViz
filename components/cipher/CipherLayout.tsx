@@ -89,6 +89,275 @@ export default function CipherLayout({ cipher }: CipherLayoutProps) {
 
   const handleTraceImport = (trace: CipherTraceFile) => {
     setAutoCompute(false);
+
+    setAction(
+      cipher.id === "dh"
+        ? "encrypt"
+        : preset.direction,
+    );
+
+    setInput(preset.input);
+
+    if (preset.key !== undefined) {
+      setKey(preset.key);
+    }
+
+    if (
+      typeof preset.options.hexInput ===
+      "boolean"
+    ) {
+      setHexInput(
+        preset.options.hexInput,
+      );
+    }
+
+    if (
+      typeof preset.options.rounds ===
+      "number"
+    ) {
+      setRounds(
+        preset.options.rounds,
+      );
+    }
+
+    if (
+      typeof preset.options.demoMode ===
+      "boolean"
+    ) {
+      setDemoMode(
+        preset.options.demoMode,
+      );
+    }
+
+    if (
+      typeof preset.options.bobSecret ===
+      "string"
+    ) {
+      setBobSecret(
+        preset.options.bobSecret,
+      );
+    }
+
+    if (
+      typeof preset.options.padding ===
+      "boolean"
+    ) {
+      setPadding(
+        preset.options.padding,
+      );
+    }
+
+    setAnimationSpeed(
+      preset.animationSpeed,
+    );
+
+    setResult(null);
+    setCurrentStep(0);
+    setActiveTab("result");
+    setError(null);
+  };
+
+  const handleRun = async () => {
+    const cleanUrl =
+      updateStepInCurrentUrl(
+        window.location.href,
+        null,
+      );
+
+    router.replace(cleanUrl, {
+      scroll: false,
+    });
+
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    const controller =
+      new AbortController();
+
+    abortControllerRef.current =
+      controller;
+
+    setError(null);
+
+    try {
+      const options: CipherOptions = {
+        instrument: true,
+        signal: controller.signal,
+        ...optionsState,
+      };
+
+      if (
+        cipher.id === "des" ||
+        cipher.id === "3des" ||
+        cipher.id === "aes" ||
+        cipher.id === "camellia"
+      ) {
+        options.hexInput = hexInput;
+      }
+
+      if (
+        cipher.id === "aes" ||
+        cipher.id === "camellia"
+      ) {
+        options.mode = aesMode;
+      }
+
+      if (cipher.id === "bcrypt") {
+        options.rounds = rounds;
+      }
+
+      if (cipher.id === "rsa") {
+        options.mode = demoMode
+          ? "demo"
+          : "real";
+      }
+
+      if (cipher.id === "dh") {
+        options.mode = "demo";
+        options.bobSecret = bobSecret;
+      }
+
+      if (cipher.id === "camellia") {
+        options.padding = padding
+          ? "PKCS7"
+          : "None";
+      }
+
+      const currentAction =
+        cipher.id === "dh"
+          ? "encrypt"
+          : action;
+
+      const res = await runCipher(
+        currentAction,
+        cipher.id,
+        input,
+        key,
+        options,
+      );
+
+      if (!controller.signal.aborted) {
+        /*
+         * Preserve provenance returned by the cipher engine.
+         *
+         * Demo modes are explicitly simulated. We only assign "simulated"
+         * when the UI itself selected an educational simulation path.
+         */
+        const executionProvenance =
+          isSimulatedCipherExecution(
+            cipher.id,
+            { demoMode },
+          )
+            ? resolveProvenance({
+                provenance: "simulated",
+                source:
+                  "CryptoViz educational simulation",
+              } as DataProvenanceMetadata)
+            : resolveProvenance(
+                res.metadata?.provenance,
+              );
+
+        const resultWithProvenance: CipherResult =
+          {
+            ...res,
+            metadata: {
+              ...res.metadata,
+              provenance:
+                executionProvenance,
+            },
+          };
+
+        setResult(
+          resultWithProvenance,
+        );
+
+        const restoredStep =
+          pendingSharedStepRef.current;
+
+        setCurrentStep(
+          restoredStep === null
+            ? 0
+            : clampStepIndex(
+                restoredStep,
+                resultWithProvenance.steps
+                  ?.length ?? 0,
+              ),
+        );
+
+        pendingSharedStepRef.current =
+          null;
+
+        if (
+          resultWithProvenance.output !==
+          undefined
+        ) {
+          const entry: ConversionHistoryEntry =
+            {
+              id: `${Date.now()}-${Math.random()
+                .toString(36)
+                .slice(2, 8)}`,
+              cipherId: cipher.id,
+              input,
+              key,
+              action: currentAction,
+              output: String(
+                resultWithProvenance.output,
+              ),
+              timestamp:
+                new Date().toLocaleString(),
+            };
+
+          setHistory((prev) =>
+            saveConversionHistory(
+              cipher.id,
+              [entry, ...prev],
+            ),
+          );
+        }
+      }
+    } catch (err: unknown) {
+      if (
+        err instanceof Error &&
+        err.name === "AbortError"
+      ) {
+        return;
+      }
+
+      setError(
+        err instanceof Error
+          ? err.message
+          : "An error occurred during calculation.",
+      );
+
+      setResult(null);
+      
+      // Try to generate diagnostic for the error
+      if (err && typeof err === 'object' && 'code' in err) {
+        const diagnosticResult = diagnoseError(err, {
+          cipherId: cipher.id,
+          fieldName: 'key',
+          fieldValue: key,
+        });
+        setDiagnostic(diagnosticResult);
+      } else {
+        setDiagnostic(null);
+      }
+    } finally {
+      if (
+        abortControllerRef.current ===
+        controller
+      ) {
+        abortControllerRef.current = null;
+      }
+    }
+  };
+
+  const handleTraceImport = (
+    trace: CipherTraceFile,
+  ) => {
+    setAutoCompute(false);
+
     setInput(trace.input);
     setKey(trace.key);
     setAction(trace.direction);
