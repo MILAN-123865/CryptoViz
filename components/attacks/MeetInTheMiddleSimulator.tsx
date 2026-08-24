@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import { doubleDesEncrypt, meetInTheMiddleAttack, type MitmStep } from '@/lib/attacks/meetInTheMiddle'
-import { useAttackWorker } from '@/lib/hooks/useAttackWorker'
+import { useAttackWorker } from '@/hooks/useAttackWorker'
 import AttackControlBar from './AttackControlBar'
 import OracleQueryLogViewer from './OracleQueryLogViewer'
 

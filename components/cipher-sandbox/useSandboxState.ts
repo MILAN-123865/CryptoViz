@@ -3,7 +3,7 @@ import { useRouter } from 'next/navigation'
 import type { CipherDefinition, CipherOptionValue } from '../../lib/cipher/registry'
 import type { CipherResult } from '../../lib/cipher/types'
 import type { CipherErrorCode } from '../../lib/utils/errors'
-import { useCipherWorker } from '../../lib/hooks/useCipherWorker'
+import { useCipherWorker } from '@/hooks/useCipherWorker'
 import type { AnimationSpeed } from '../cipher/StepAnimator'
 import {
   loadConversionHistory,
