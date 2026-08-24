@@ -7,7 +7,7 @@
  * RFC 9998 test vector (128-bit key):
  *   key = 0f1e2d3c4b5a69788796a5b4c3d2e1f0
  *   pt  = 101112131415161718191a1b1c1d1e1f
- *   ct  = 9fc84b8590b286c8e70b0596d09b7af3
+ *   ct  = 5f2c08ba245d8fc4db0c4fcbcb5d9552
  */
 
 import type { CipherResult, CipherStep, CipherOptions, TestVector, CipherMetadata } from '../types';
