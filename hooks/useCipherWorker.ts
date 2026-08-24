@@ -6,6 +6,7 @@ import type { WorkerRequest, WorkerResponse } from '@/types/worker'
 import type { WorkerPriority } from '@/lib/workers/pool'
 import type { WorkerProgressMessage } from '@/lib/workers/cipher-worker-protocol'
 import { CipherError } from '@/lib/utils/errors'
+import { decodeCipherSteps } from '@/lib/workers/stepTransfer'
 
 const MAX_CACHE_SIZE = 200
 const WORKER_TIMEOUT_MS = 10000
@@ -111,12 +112,22 @@ export function useCipherWorker() {
       }
 
       if (success && payload?.result) {
-        const result: CipherResult = {
-          ...payload.result,
-          durationMs: timings?.durationMs ?? payload.result.durationMs ?? 0,
+        try {
+          const steps = payload.stepsBuffer
+            ? decodeCipherSteps(payload.stepsBuffer)
+            : payload.result.steps
+          const result: CipherResult = {
+            ...payload.result,
+            steps,
+            durationMs: timings?.durationMs ?? payload.result.durationMs ?? 0,
+          }
+          if (cacheKey) cacheResult(cacheKey, result)
+          resolve(result)
+        } catch (error) {
+          const errorMsg = error instanceof Error ? error.message : String(error)
+          setError(errorMsg)
+          reject(error)
         }
-        if (cacheKey) cacheResult(cacheKey, result)
-        resolve(result)
       } else {
         const errorMsg = payload?.error ?? 'Operation failed in worker'
         const code = payload?.errorCode

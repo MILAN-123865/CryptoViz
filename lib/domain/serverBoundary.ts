@@ -5,6 +5,7 @@ import {
   DomainOperationResult,
   executeDomainOperation,
 } from './domainOperationState';
+import { getPersistentRepositories } from './repository';
 
 export interface TrustedSession {
   userId: string;
@@ -92,12 +93,10 @@ export function verifyToken(token: string): TrustedSession {
   return session;
 }
 
-// In-memory stores for rate limiting and audit logging
+// In-memory stores for rate limiting
 const rateLimitStore = new Map<string, { count: number; windowStart: number }>();
 const MAX_REQUESTS = 5;
 const WINDOW_MS = 10000; // 10 seconds
-
-const auditLogs: AuditLogEntry[] = [];
 
 export function checkRateLimit(userId: string): { allowed: boolean; remaining: number } {
   const now = Date.now();
@@ -122,19 +121,22 @@ export function resetRateLimits(): void {
   rateLimitStore.clear();
 }
 
-export function logAuditEvent(entry: Omit<AuditLogEntry, 'timestamp'>): void {
-  auditLogs.unshift({
+export async function logAuditEvent(entry: Omit<AuditLogEntry, 'timestamp'>): Promise<void> {
+  const { auditLogRepository } = getPersistentRepositories();
+  await auditLogRepository.save({
     ...entry,
     timestamp: new Date().toISOString(),
   });
 }
 
-export function getAuditLogs(): AuditLogEntry[] {
-  return [...auditLogs];
+export async function getAuditLogs(): Promise<AuditLogEntry[]> {
+  const { auditLogRepository } = getPersistentRepositories();
+  return auditLogRepository.findAll();
 }
 
-export function clearAuditLogs(): void {
-  auditLogs.length = 0;
+export async function clearAuditLogs(): Promise<void> {
+  const { auditLogRepository } = getPersistentRepositories();
+  await auditLogRepository.clear();
 }
 
 export function verifyCsrfToken(session: TrustedSession, csrfHeaderToken: string): void {
@@ -181,7 +183,7 @@ export async function executePrivilegedOperation(
     const success = res.state === 'COMPLETED';
 
     // 6. Log success or validation/execution failure
-    logAuditEvent({
+    await logAuditEvent({
       correlationId,
       userId: session.userId,
       role: session.role,
@@ -213,7 +215,7 @@ export async function executePrivilegedOperation(
     } catch {}
 
     const errMsg = err.message || 'Server error';
-    logAuditEvent({
+    await logAuditEvent({
       correlationId,
       userId,
       role,

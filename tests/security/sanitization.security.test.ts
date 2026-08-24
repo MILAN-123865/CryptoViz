@@ -23,7 +23,7 @@ describe("security: sanitization", () => {
   });
   
   it("escapes HTML metacharacters", () => {
-    expect(escapeHtml(`<>&"'`)).toBe("&lt;&gt;&amp;&quot;&#39;&#96;");
+    expect(escapeHtml(`<>&"'\``)).toBe("&lt;&gt;&amp;&quot;&#39;&#96;");
   });
   
   it("removes control characters", () => {
