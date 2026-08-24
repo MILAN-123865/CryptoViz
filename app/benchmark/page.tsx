@@ -11,7 +11,7 @@ import type {
 } from "@/types/benchmark";
 import { BenchmarkEngine, isWebCryptoSupported, SCALING_PAYLOAD_SIZES, runScalingBenchmark, estimateComplexity } from "@/lib/utils/benchmark";
 import { getDeviceInfo } from "@/lib/utils/deviceInfo";
-import { useCipherWorker } from "@/lib/hooks/useCipherWorker";
+import { useCipherWorker } from "@/hooks/useCipherWorker";
 import {
   addBenchmarkSession,
   loadBenchmarkHistory,
