@@ -12,6 +12,28 @@ const eslintConfig = defineConfig([
       "react/no-danger": "error",
     },
   },
+  {
+    // Security-sensitive randomness must go through lib/random/cryptoRandom.ts
+    files: [
+      "lib/cipher/**/*.{ts,tsx}",
+      "lib/security/**/*.{ts,tsx}",
+      "lib/kdf/**/*.{ts,tsx}",
+      "lib/protocols/**/*.{ts,tsx}",
+      "lib/crypto/**/*.{ts,tsx}",
+    ],
+    ignores: ["**/*.test.ts", "**/*.test.tsx"],
+    rules: {
+      "no-restricted-properties": [
+        "error",
+        {
+          object: "Math",
+          property: "random",
+          message:
+            "Math.random() is not cryptographically secure. Use cryptoRandomBytes()/cryptoRandomInt() from lib/random/cryptoRandom.ts.",
+        },
+      ],
+    },
+  },
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:
