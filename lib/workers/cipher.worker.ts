@@ -15,6 +15,10 @@ import {
 import { CipherError, validateInput } from "../utils/errors";
 import type { WorkerRequest, WorkerResponse } from "../../types/worker";
 import type { CipherResult } from "../cipher/types";
+import {
+  encodeCipherSteps,
+  WORKER_STEP_TRANSFER_THRESHOLD,
+} from "./stepTransfer";
 
 
 type CipherHandler = (input: string, key: string, options?: any) => any;
@@ -649,14 +653,30 @@ workerScope.addEventListener(
         );
       }
 
-      const response: WorkerResponse = {
-        requestId,
-        success: true,
-        payload: { result },
-        timings: { durationMs },
-      };
+      if (result.steps.length >= WORKER_STEP_TRANSFER_THRESHOLD) {
+        const stepsBuffer = encodeCipherSteps(result.steps);
+        const transferable = stepsBuffer.buffer as ArrayBuffer;
+        const response: WorkerResponse = {
+          requestId,
+          success: true,
+          payload: {
+            result: { ...result, steps: [] },
+            stepsBuffer: transferable,
+          },
+          timings: { durationMs },
+        };
 
-      workerScope.postMessage(response);
+        workerScope.postMessage(response, [transferable]);
+      } else {
+        const response: WorkerResponse = {
+          requestId,
+          success: true,
+          payload: { result },
+          timings: { durationMs },
+        };
+
+        workerScope.postMessage(response);
+      }
     } catch (error: unknown) {
       const durationMs = performance.now() - startTime;
       const { code, message } = toErrorDetails(error);

@@ -32,7 +32,11 @@ export interface WorkerPingMessage {
   requestId?: string
 }
 
-export type WorkerMessage = WorkerExecuteMessage | WorkerCancelMessage | WorkerPingMessage
+export type WorkerMessage =
+  | WorkerExecuteMessage
+  | WorkerCancelMessage
+  | WorkerPingMessage
+
 export type WorkerRequest = WorkerExecuteMessage
 
 export interface WorkerProgressMessage {
@@ -44,19 +48,57 @@ export interface WorkerProgressMessage {
 
 export interface WorkerResponsePayload {
   result?: CipherResult
+  /** Serialized trace for large results, transferred as an ArrayBuffer. */
+  stepsBuffer?: ArrayBuffer
   error?: string
   errorCode?: import('@/lib/utils/errors').CipherErrorCode | 'INVALID_WORKER_MESSAGE'
   errorMessage?: string
 }
 
-export interface WorkerResponseTimings {
-  durationMs: number
+export interface WorkerErrorMessage {
+  type: 'ERROR'
+  jobId?: string
+  payload: {
+    message: string
+    error?: string
+  }
 }
 
-export interface WorkerResponse {
+export interface WorkerResponseSuccess {
   requestId: string
   jobId?: string
-  success: boolean
-  payload: WorkerResponsePayload
+  success: true
+  payload: {
+    result?: CipherResult
+    error?: never
+    errorCode?: never
+    errorMessage?: never
+  }
   timings?: WorkerResponseTimings
+}
+
+export interface WorkerResponseFailure {
+  requestId: string
+  jobId?: string
+  success: false
+  payload: {
+    result?: never
+    error?: string
+    errorCode?: import('@/lib/utils/errors').CipherErrorCode | 'INVALID_WORKER_MESSAGE'
+    errorMessage?: string
+  }
+  timings?: WorkerResponseTimings
+}
+
+export type WorkerResponse = WorkerResponseSuccess | WorkerResponseFailure
+
+export type WorkerProtocolMessage =
+  | WorkerMessage
+  | WorkerProgressMessage
+  | WorkerDoneMessage
+  | WorkerErrorMessage
+  | WorkerResponse
+
+export interface WorkerResponseTimings {
+  durationMs: number
 }
