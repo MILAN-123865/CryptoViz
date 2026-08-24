@@ -909,6 +909,16 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     recommendedNext: ["hmac", "sha512", "bcrypt"],
   },
   {
+    id: 'hamsi',
+    name: 'Hamsi',
+    category: 'hash',
+    description: 'SHA-3 finalist. Bitslice-parallel Serpent S7 sponge. Hamsi-256 and Hamsi-512 variants. Surpassed by BLAKE2 in practice.',
+    defaultKey: '',
+    defaultInput: '',
+    securityStatus: 'legacy',
+    options: [{ name: 'Output Bits', id: 'outputBits', type: 'select', default: 256, choices: [{ label: '256-bit', value: 256 }, { label: '512-bit', value: 512 }] }]
+  },
+  {
     id: 'bmw',
     name: 'Blue Midnight Wish',
     category: 'hash',
