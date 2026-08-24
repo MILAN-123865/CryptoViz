@@ -143,4 +143,3 @@ describe("Worker Communication Suite", () => {
     });
   });
 });
-
