@@ -885,6 +885,19 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     options: [{ name: 'Parameter Set', id: 'paramSet', type: 'select', default: '128-256', choices: [{ label: 'SKINNY-128-128 (40 rounds)', value: '128-128' }, { label: 'SKINNY-128-256 (48 rounds)', value: '128-256' }, { label: 'SKINNY-128-384 (56 rounds)', value: '128-384' }] }]
   },
   {
+    id: 'lblock',
+    name: 'LBlock',
+    category: 'symmetric',
+    description: 'Lightweight 64-bit Feistel block cipher (ICISC 2011). 80-bit key, 32 rounds. Uses 8 distinct 4-bit S-boxes (S0-S7) in round function, plus S8, S9 in key schedule. Strong provable security against differential/linear cryptanalysis.',
+    defaultKey: '00000000000000000000',
+    defaultInput: '0000000000000000',
+    securityStatus: 'secure',
+    keyPlaceholder: '20 hex characters (80-bit key)',
+    practicalUseCases: ['Ultra-low-resource symmetric encryption', 'RFID', 'Smart cards'],
+    prerequisites: ['present', 'gift', 'rectangle'],
+    recommendedNext: ['tea', 'xtea'],
+  },
+  {
     id: 'mantis',
     name: 'MANTIS',
     category: 'symmetric',
