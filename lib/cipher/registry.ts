@@ -1893,4 +1893,29 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     securityStatus: 'recommended',
     keyPlaceholder: '64 hex characters (32-byte seed)',
   },
+  {
+    id: 'sphincs-plus',
+    name: 'SPHINCS+ (SLH-DSA)',
+    category: 'asymmetric',
+    description: 'Stateless hash-based post-quantum signature scheme (NIST FIPS 205, 2024). Composed of WOTS+, FORS, and Hypertree layers. Security derives solely from SHA-256; no lattice or number-theoretic assumptions. Complements stateful XMSS/LMS.',
+    defaultKey: '',
+    defaultInput: 'Hello, post-quantum world!',
+    securityStatus: 'recommended',
+    practicalUseCases: ['Stateless post-quantum code signing', 'Certificate authorities', 'IoT firmware authentication'],
+    prerequisites: ['xmss', 'lms', 'ml-dsa'],
+    recommendedNext: ['ml-kem'],
+    options: [
+      {
+        name: 'Parameter Set',
+        id: 'paramSet',
+        type: 'select',
+        default: '128s',
+        choices: [
+          { label: 'SPHINCS+-SHA2-128s (slow sign, small sig)', value: '128s' },
+          { label: 'SPHINCS+-SHA2-192f (fast sign)', value: '192f' },
+          { label: 'SPHINCS+-SHA2-256f (fast sign)', value: '256f' }
+        ]
+      }
+    ]
+  },
 ];
