@@ -82,16 +82,3 @@ export function decrypt(input: string, key: string, options: CipherOptions = {})
 export const TEST_VECTORS: TestVector[] = [
     { input: '00', key: '00', expected: '00', description: 'CSIDH identity element' }
 ]
-    id: "csidh",
-    name: "CSIDH-512",
-    category: "asymmetric",
-    securityStatus: "experimental",
-    description: "Commutative Supersingular Isogeny Diffie-Hellman protocol based on the ideal class group action over GF(p).",
-    practicalUseCases: [
-        "Non-interactive post-quantum key exchange",
-        "Post-quantum analog of Diffie-Hellman",
-        "Academic study of group-action isogenies"
-    ],
-    prerequisites: ["sidh"],
-    recommendedNext: ["sphincs-plus"]
-};

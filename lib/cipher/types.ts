@@ -22,6 +22,12 @@ export interface CipherStep {
   highlight?: number[];
   matrix?: string[][];
   table?: { key: string; value: string }[];
+  sboxInspection?: {
+    family: string;
+    inputValue: string;
+    desIndex?: number;
+    serpentIndex?: number;
+  };
   note?: string;
   isMilestone?: boolean;
 }

@@ -96,6 +96,7 @@ export function useCipherWorker() {
         handler.onProgress?.(data.percent, data.currentMilestone)
         return
       }
+      if (!('requestId' in data)) return
 
       const { requestId, success, payload, timings } = data
       const handlers = activeRequestsRef.current.get(requestId)
@@ -131,7 +132,9 @@ export function useCipherWorker() {
       } else {
         const errorMsg = payload?.error ?? 'Operation failed in worker'
         const code = payload?.errorCode
-        const cipherErr = code ? new CipherError(code, errorMsg) : new Error(errorMsg)
+        const cipherErr = code && code !== 'INVALID_WORKER_MESSAGE'
+          ? new CipherError(code, errorMsg)
+          : new Error(errorMsg)
         setError(errorMsg)
         reject(cipherErr)
       }
@@ -266,11 +269,11 @@ export function useCipherWorker() {
 
         const { signal: _sig, priority: _prio, onProgress: _prog, bypassCache: _bpc, ...forwardOptions } = options || {}
         const requestMessage: WorkerRequest = {
-          type: action,
+          type: 'EXECUTE',
           requestId: id,
           jobId: id,
           priority: options?.priority ?? 'NORMAL',
-          payload: { cipherId, input, key, options: forwardOptions },
+          payload: { type: action, cipherId, input, key, options: forwardOptions },
         }
 
         try {

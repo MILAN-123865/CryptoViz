@@ -102,8 +102,9 @@ const ROUND_CONSTANTS = generateRoundConstants()
 const RHO_OFFSETS = generateRhoOffsets()
 
 // state[x + 5*y] holds lane (x,y). Mutates state in place.
-function keccakF1600(state: BigUint64Array, steps?: CipherStep[], stepLabelPrefix?: string): void {
-  for (let round = 0; round < 24; round++) {
+function keccakF1600(state: BigUint64Array, steps?: CipherStep[], stepLabelPrefix?: string, rounds = 24): void {
+  const firstRound = 24 - rounds
+  for (let round = firstRound; round < 24; round++) {
     // Theta: XOR each column's parity into every lane in that column's neighbors
     const C = new Array<bigint>(5)
     for (let x = 0; x < 5; x++) {
@@ -150,6 +151,12 @@ function keccakF1600(state: BigUint64Array, steps?: CipherStep[], stepLabelPrefi
       })
     }
   }
+}
+
+export function keccakP(state: bigint[], rounds: number): bigint[] {
+  const words = BigUint64Array.from(state.map((word) => BigInt.asUintN(64, word)))
+  keccakF1600(words, undefined, undefined, rounds)
+  return Array.from(words, (word) => BigInt.asUintN(64, word))
 }
 
 function padTenOne(inputBytes: Uint8Array): Uint8Array {

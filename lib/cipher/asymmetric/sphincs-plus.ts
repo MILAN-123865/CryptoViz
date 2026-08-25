@@ -13,8 +13,7 @@
  */
 import type { CipherResult, CipherStep, CipherOptions, TestVector, CipherMetadata } from '../types'
 import { CipherError } from '../../utils/errors'
-import { sha256 } from '@noble/hashes/sha256'
-import { sha512 } from '@noble/hashes/sha512'
+import { sha256, sha512 } from '@noble/hashes/sha2.js'
 
 const METADATA: CipherMetadata = {
     name: 'SPHINCS+ (SLH-DSA)',

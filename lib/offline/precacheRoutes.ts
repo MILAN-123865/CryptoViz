@@ -1,6 +1,6 @@
 /**
  * Auto-generated precache routes manifest.
- * Last Generated: 2026-08-25T11:46:43.552Z
+ * Last Generated: 2026-08-25T21:28:55.774Z
  */
 export const PRECACHE_ROUTES: string[] = [
   "/",
@@ -141,6 +141,7 @@ export const PRECACHE_ROUTES: string[] = [
   "/visualizer/atbash/",
   "/visualizer/avalanche-effect/",
   "/visualizer/bcrypt/",
+  "/visualizer/bike/",
   "/visualizer/blake/",
   "/visualizer/blake2s/",
   "/visualizer/bloom-filter/",
@@ -169,6 +170,7 @@ export const PRECACHE_ROUTES: string[] = [
   "/visualizer/e2/",
   "/visualizer/ecb-pattern/",
   "/visualizer/ecc/",
+  "/visualizer/echo/",
   "/visualizer/ecies/",
   "/visualizer/ed448/",
   "/visualizer/elgamal-signature/",
@@ -205,6 +207,7 @@ export const PRECACHE_ROUTES: string[] = [
   "/visualizer/kupyna/",
   "/visualizer/kuznyechik/",
   "/visualizer/lamport/",
+  "/visualizer/lblock/",
   "/visualizer/lea/",
   "/visualizer/led/",
   "/visualizer/lms/",
@@ -242,6 +245,7 @@ export const PRECACHE_ROUTES: string[] = [
   "/visualizer/railfence/",
   "/visualizer/rainbow/",
   "/visualizer/rc2/",
+  "/visualizer/rectangle/",
   "/visualizer/regev-lwe/",
   "/visualizer/ripemd128/",
   "/visualizer/ripemd256/",
@@ -278,6 +282,7 @@ export const PRECACHE_ROUTES: string[] = [
   "/visualizer/snefru/",
   "/visualizer/sosemanuk/",
   "/visualizer/speck/",
+  "/visualizer/sphincs-plus/",
   "/visualizer/sqisign/",
   "/visualizer/square/",
   "/visualizer/streebog/",

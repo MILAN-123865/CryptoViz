@@ -289,7 +289,7 @@ export default function CipherLayout({ cipher }: CipherLayoutProps) {
             >
               <strong>Execution Error</strong>
               <p className="mt-1">
-                {error || (typeof workerError === "string" ? workerError : workerError?.message) || "Unknown error"}
+                {error || workerError || "Unknown error"}
               </p>
             </div>
           )}
