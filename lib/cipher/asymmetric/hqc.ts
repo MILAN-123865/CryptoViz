@@ -9,11 +9,11 @@
  */
 import type { CipherResult, CipherStep, CipherOptions, TestVector, CipherMetadata } from '../types'
 import { CipherError } from '../../utils/errors'
-import { shake256 } from '@noble/hashes/shake256'
+import { shake256 } from '@noble/hashes/sha3.js'
 
 const METADATA: CipherMetadata = {
     name: 'HQC',
-    securityStatus: 'recommended',
+    securityStatus: 'secure',
     breakingComplexity: 'NIST PQC Round 4. Code-based (QC-MDPC). Decryption failure probability is a core security parameter.',
     yearDesigned: 2018,
     standardBody: 'NIST PQC',

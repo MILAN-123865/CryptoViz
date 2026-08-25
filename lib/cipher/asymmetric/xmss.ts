@@ -9,7 +9,7 @@ import { sha256 } from '@noble/hashes/sha256'
 
 const METADATA: CipherMetadata = {
     name: 'XMSS',
-    securityStatus: 'recommended',
+    securityStatus: 'secure',
     breakingComplexity: 'NIST SP 800-208. Quantum-safe via SHA-256. ⚠ Stateful: leaf index must never be reused.',
     yearDesigned: 2011,
     standardBody: 'RFC 8391',

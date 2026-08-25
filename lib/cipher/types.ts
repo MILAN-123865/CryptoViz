@@ -46,13 +46,15 @@ export interface CipherMetadata {
     | "legacy"
     | "deprecated"
     | "broken"
-    | "mock";
+    | "mock"
+    | "recommended"
+    | "experimental";
 
   breakingComplexity?: string;
   yearDesigned?: number;
   standardBody?: string;
   securityWarning?: string;
-  provenance: DataProvenanceMetadata;
+  provenance?: DataProvenanceMetadata;
 }
 
 export interface CipherOptions {
