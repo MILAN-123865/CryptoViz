@@ -923,6 +923,19 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     options: [{ name: 'Key Size', id: 'keySize', type: 'select', default: '64', choices: [{ label: 'LED-64 (64-bit key)', value: '64' }, { label: 'LED-128 (128-bit key)', value: '128' }] }]
   },
   {
+    id: 'rectangle',
+    name: 'RECTANGLE',
+    category: 'symmetric',
+    description: 'Ultra-lightweight 64-bit SPN block cipher (IEEE TIFS 2015). 4×16 bit-matrix state with bit-level W-layer row rotations [0, 1, 12, 13]. RECT80 (80-bit key) and RECT128 (128-bit key) variants, 25 rounds.',
+    defaultKey: '00000000000000000000',
+    defaultInput: '0000000000000000',
+    securityStatus: 'secure',
+    keyPlaceholder: '20 or 32 hex characters (80 or 128-bit key)',
+    practicalUseCases: ['IoT authentication', 'RFID', 'Ultra-low-resource embedded devices'],
+    prerequisites: ['present', 'gift'],
+    recommendedNext: ['lblock'],
+  },
+  {
     id: "sha256",
     name: "SHA-256",
     category: "hash",
