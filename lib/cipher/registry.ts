@@ -936,6 +936,30 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     recommendedNext: ["hmac", "sha512", "bcrypt"],
   },
   {
+    id: 'echo',
+    name: 'ECHO',
+    category: 'hash',
+    description: 'SHA-3 finalist (2008). BIG-AES compression paradigm: AES round components applied to 4×4 matrix of 128-bit (ECHO-256) or 256-bit (ECHO-512) words. Wide-pipe design with 2048/4096-bit internal state.',
+    defaultKey: '',
+    defaultInput: '',
+    securityStatus: 'legacy',
+    practicalUseCases: ['Academic study of AES-native hash constructions', 'Wide-pipe design pedagogy'],
+    prerequisites: ['sha3', 'grostl', 'jh'],
+    recommendedNext: ['blake2b'],
+    options: [
+      {
+        name: 'Output Bits',
+        id: 'outputBits',
+        type: 'select',
+        default: 256,
+        choices: [
+          { label: 'ECHO-256 (224/256-bit)', value: 256 },
+          { label: 'ECHO-512 (384/512-bit)', value: 512 }
+        ]
+      }
+    ]
+  },
+  {
     id: 'hamsi',
     name: 'Hamsi',
     category: 'hash',
