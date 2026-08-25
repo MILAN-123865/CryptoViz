@@ -203,6 +203,30 @@ export function parseBase64Url(value: string, options: Omit<Base64Options, 'urlS
 }
 
 /**
+ * Backwards-compatible string-to-byte adapter used by cipher implementations.
+ */
+export function toByteArray(value: string, encoding: 'hex' | 'utf8' | 'base64' | 'binary' = 'utf8'): Uint8Array {
+  switch (encoding) {
+    case 'hex': return parseHex(value);
+    case 'base64': return parseBase64(value);
+    case 'binary': return parseBinary(value);
+    case 'utf8': return new TextEncoder().encode(value);
+  }
+}
+
+/**
+ * Backwards-compatible byte-to-string adapter used by cipher implementations.
+ */
+export function fromByteArray(input: BinaryInput, encoding: 'hex' | 'utf8' | 'base64' | 'binary' = 'utf8'): string {
+  switch (encoding) {
+    case 'hex': return toHex(input);
+    case 'base64': return toBase64(input);
+    case 'binary': return toBinary(input);
+    case 'utf8': return new TextDecoder().decode(asBytes(input));
+  }
+}
+
+/**
  * Clone an input into a fresh Uint8Array.
  */
 export function asBytes(input: BinaryInput): Uint8Array {
