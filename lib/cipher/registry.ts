@@ -885,6 +885,19 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     options: [{ name: 'Parameter Set', id: 'paramSet', type: 'select', default: '128-256', choices: [{ label: 'SKINNY-128-128 (40 rounds)', value: '128-128' }, { label: 'SKINNY-128-256 (48 rounds)', value: '128-256' }, { label: 'SKINNY-128-384 (56 rounds)', value: '128-384' }] }]
   },
   {
+    id: 'lblock',
+    name: 'LBlock',
+    category: 'symmetric',
+    description: 'Lightweight 64-bit Feistel block cipher (ICISC 2011). 80-bit key, 32 rounds. Uses 8 distinct 4-bit S-boxes (S0-S7) in round function, plus S8, S9 in key schedule. Strong provable security against differential/linear cryptanalysis.',
+    defaultKey: '00000000000000000000',
+    defaultInput: '0000000000000000',
+    securityStatus: 'secure',
+    keyPlaceholder: '20 hex characters (80-bit key)',
+    practicalUseCases: ['Ultra-low-resource symmetric encryption', 'RFID', 'Smart cards'],
+    prerequisites: ['present', 'gift', 'rectangle'],
+    recommendedNext: ['tea', 'xtea'],
+  },
+  {
     id: 'mantis',
     name: 'MANTIS',
     category: 'symmetric',
@@ -910,6 +923,19 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     options: [{ name: 'Key Size', id: 'keySize', type: 'select', default: '64', choices: [{ label: 'LED-64 (64-bit key)', value: '64' }, { label: 'LED-128 (128-bit key)', value: '128' }] }]
   },
   {
+    id: 'rectangle',
+    name: 'RECTANGLE',
+    category: 'symmetric',
+    description: 'Ultra-lightweight 64-bit SPN block cipher (IEEE TIFS 2015). 4×16 bit-matrix state with bit-level W-layer row rotations [0, 1, 12, 13]. RECT80 (80-bit key) and RECT128 (128-bit key) variants, 25 rounds.',
+    defaultKey: '00000000000000000000',
+    defaultInput: '0000000000000000',
+    securityStatus: 'secure',
+    keyPlaceholder: '20 or 32 hex characters (80 or 128-bit key)',
+    practicalUseCases: ['IoT authentication', 'RFID', 'Ultra-low-resource embedded devices'],
+    prerequisites: ['present', 'gift'],
+    recommendedNext: ['lblock'],
+  },
+  {
     id: "sha256",
     name: "SHA-256",
     category: "hash",
@@ -921,6 +947,30 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     keySize: "None (hash function)",
     practicalUseCases: ["Data integrity verification", "Digital signatures", "Cryptographic commitments", "Password hashing (via HMAC/PBKDF2)"],
     recommendedNext: ["hmac", "sha512", "bcrypt"],
+  },
+  {
+    id: 'echo',
+    name: 'ECHO',
+    category: 'hash',
+    description: 'SHA-3 finalist (2008). BIG-AES compression paradigm: AES round components applied to 4×4 matrix of 128-bit (ECHO-256) or 256-bit (ECHO-512) words. Wide-pipe design with 2048/4096-bit internal state.',
+    defaultKey: '',
+    defaultInput: '',
+    securityStatus: 'legacy',
+    practicalUseCases: ['Academic study of AES-native hash constructions', 'Wide-pipe design pedagogy'],
+    prerequisites: ['sha3', 'grostl', 'jh'],
+    recommendedNext: ['blake2b'],
+    options: [
+      {
+        name: 'Output Bits',
+        id: 'outputBits',
+        type: 'select',
+        default: 256,
+        choices: [
+          { label: 'ECHO-256 (224/256-bit)', value: 256 },
+          { label: 'ECHO-512 (384/512-bit)', value: 512 }
+        ]
+      }
+    ]
   },
   {
     id: 'hamsi',
@@ -1884,6 +1934,31 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     keyPlaceholder: '64 hex characters (512-bit padded)',
   },
   {
+    id: 'bike',
+    name: 'BIKE',
+    category: 'asymmetric',
+    description: 'NIST PQC Round 4 candidate KEM based on QC-MDPC codes with BGF decoder. Code-based security (no lattice or number-theoretic assumptions). Compact key sizes compared to Classic McEliece.',
+    defaultKey: '',
+    defaultInput: 'test',
+    securityStatus: 'experimental',
+    practicalUseCases: ['Post-quantum key exchange', 'Hybrid TLS key exchange', 'Code-based cryptography'],
+    prerequisites: ['ml-kem', 'mceliece'],
+    recommendedNext: ['sphincs-plus'],
+    options: [
+      {
+        name: 'Security Level',
+        id: 'level',
+        type: 'select',
+        default: 'L1',
+        choices: [
+          { label: 'BIKE-L1 (r=12323, AES-128)', value: 'L1' },
+          { label: 'BIKE-L3 (r=24659, AES-192)', value: 'L3' },
+          { label: 'BIKE-L5 (r=40973, AES-256)', value: 'L5' }
+        ]
+      }
+    ]
+  },
+  {
     id: 'hqc',
     name: 'HQC',
     category: 'asymmetric',
@@ -1892,5 +1967,30 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     defaultInput: '48656c6c6f',
     securityStatus: 'recommended',
     keyPlaceholder: '64 hex characters (32-byte seed)',
+  },
+  {
+    id: 'sphincs-plus',
+    name: 'SPHINCS+ (SLH-DSA)',
+    category: 'asymmetric',
+    description: 'Stateless hash-based post-quantum signature scheme (NIST FIPS 205, 2024). Composed of WOTS+, FORS, and Hypertree layers. Security derives solely from SHA-256; no lattice or number-theoretic assumptions. Complements stateful XMSS/LMS.',
+    defaultKey: '',
+    defaultInput: 'Hello, post-quantum world!',
+    securityStatus: 'recommended',
+    practicalUseCases: ['Stateless post-quantum code signing', 'Certificate authorities', 'IoT firmware authentication'],
+    prerequisites: ['xmss', 'lms', 'ml-dsa'],
+    recommendedNext: ['ml-kem'],
+    options: [
+      {
+        name: 'Parameter Set',
+        id: 'paramSet',
+        type: 'select',
+        default: '128s',
+        choices: [
+          { label: 'SPHINCS+-SHA2-128s (slow sign, small sig)', value: '128s' },
+          { label: 'SPHINCS+-SHA2-192f (fast sign)', value: '192f' },
+          { label: 'SPHINCS+-SHA2-256f (fast sign)', value: '256f' }
+        ]
+      }
+    ]
   },
 ];
