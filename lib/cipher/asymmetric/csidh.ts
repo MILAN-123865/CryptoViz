@@ -82,17 +82,6 @@ export function decrypt(input: string, key: string, options: CipherOptions = {})
 export const TEST_VECTORS: TestVector[] = [
     { input: '00', key: '00', expected: '00', description: 'CSIDH identity element' }
 ]
-    const msgBytes = Buffer.from(messageHex, 'hex');
-    const keyBuffer = Buffer.from(keyBytes, 'hex');
-    const decrypted = Buffer.alloc(msgBytes.length);
-    
-    for (let i = 0; i < msgBytes.length; i++) {
-        decrypted[i] = msgBytes[i] ^ keyBuffer[i % keyBuffer.length];
-    }
-    return decrypted.toString('utf8');
-}
-
-export const csidhDefinition: CipherDefinition = {
     id: "csidh",
     name: "CSIDH-512",
     category: "asymmetric",
