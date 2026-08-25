@@ -1884,6 +1884,31 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     keyPlaceholder: '64 hex characters (512-bit padded)',
   },
   {
+    id: 'bike',
+    name: 'BIKE',
+    category: 'asymmetric',
+    description: 'NIST PQC Round 4 candidate KEM based on QC-MDPC codes with BGF decoder. Code-based security (no lattice or number-theoretic assumptions). Compact key sizes compared to Classic McEliece.',
+    defaultKey: '',
+    defaultInput: 'test',
+    securityStatus: 'experimental',
+    practicalUseCases: ['Post-quantum key exchange', 'Hybrid TLS key exchange', 'Code-based cryptography'],
+    prerequisites: ['ml-kem', 'mceliece'],
+    recommendedNext: ['sphincs-plus'],
+    options: [
+      {
+        name: 'Security Level',
+        id: 'level',
+        type: 'select',
+        default: 'L1',
+        choices: [
+          { label: 'BIKE-L1 (r=12323, AES-128)', value: 'L1' },
+          { label: 'BIKE-L3 (r=24659, AES-192)', value: 'L3' },
+          { label: 'BIKE-L5 (r=40973, AES-256)', value: 'L5' }
+        ]
+      }
+    ]
+  },
+  {
     id: 'hqc',
     name: 'HQC',
     category: 'asymmetric',
