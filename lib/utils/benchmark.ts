@@ -335,7 +335,7 @@ export async function runScalingBenchmark(
           ...options,
           bypassCache: true,
         })
-        cipherMeasurements.push(BenchmarkEngine.measureCipherTime(result))
+        if (result) cipherMeasurements.push(BenchmarkEngine.measureCipherTime(result))
       } catch (iterationError) {
         console.error(
           `Iteration ${iteration + 1} failed for ${cipherId} at ${payloadSize} bytes:`,

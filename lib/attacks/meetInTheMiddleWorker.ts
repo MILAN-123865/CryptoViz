@@ -9,7 +9,7 @@ ctx.onmessage = async (event: MessageEvent<WorkerTask>) => {
   
   if (task.type === 'MEET_IN_THE_MIDDLE' || task.type === 'BRUTE_FORCE') {
     const scheduler = new CryptoTaskScheduler();
-    const { startIdx, endIdx } = task.payload;
+    const { startIdx, endIdx } = task.payload as { startIdx: number; endIdx: number };
     const total = endIdx - startIdx;
     
     try {

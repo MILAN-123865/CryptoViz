@@ -88,6 +88,12 @@ function asconPermute(s: BigInt64Array, numRounds: number): void {
     for (let i = 0; i < 5; i++) s[i] = BigInt.asIntN(64, S[i])
 }
 
+export function asconPermutation(state: bigint[], numRounds: number): bigint[] {
+    const words = BigInt64Array.from(state.map((word) => BigInt.asIntN(64, word)))
+    asconPermute(words, numRounds)
+    return Array.from(words, (word) => BigInt.asUintN(64, word))
+}
+
 // ── Byte/hex helpers ──────────────────────────────────────────────────────────
 function parseHex(s: string, label: string): Uint8Array {
     const c = s.replace(/\s+/g, '').toLowerCase()

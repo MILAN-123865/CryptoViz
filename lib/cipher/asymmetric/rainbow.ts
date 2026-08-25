@@ -76,7 +76,7 @@ function invertAffine(map: AffineMap, y: number[]): number[] {
         }
         if (match) return x
     }
-    throw new CipherError('INTERNAL_ERROR', 'Affine map not invertible for given y')
+    throw new CipherError('INVALID_INPUT', 'Affine map not invertible for given y')
 }
 
 // Random affine map generation
@@ -246,7 +246,7 @@ function rainbowCore(input: string, key: string, doDecrypt: boolean, instrument:
         const evaluated = applyAffine(pub, sigVec.slice(0, M_EQS))
         const valid = evaluated.length === M_EQS
 
-        if (!valid) throw new CipherError('VERIFICATION_FAILED', 'Rainbow signature invalid')
+        if (!valid) throw new CipherError('INVALID_INPUT', 'Rainbow signature invalid')
 
         outHex = '01'
 

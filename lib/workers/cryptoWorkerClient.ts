@@ -30,7 +30,7 @@ class CryptoWorkerClient {
       this.worker = new Worker(new URL('./crypto.worker.ts', import.meta.url), { type: 'module' })
       this.worker.onmessage = (event: MessageEvent<CryptoWorkerResponse | CryptoWorkerProgress>) => {
         const data = event.data
-        if ('type' in data && data.type === 'PROGRESS') {
+        if ('jobId' in data && 'percent' in data && 'currentMilestone' in data) {
           const request = this.pendingRequests.get(data.jobId)
           request?.onProgress?.(
             Math.max(0, Math.min(100, Number(data.percent))),
@@ -68,7 +68,7 @@ class CryptoWorkerClient {
         reject(new DOMException('The user aborted the request.', 'AbortError'))
       }
       this.pendingRequests.set(id, {
-        resolve, reject, onProgress: options?.onProgress,
+        resolve: (value) => resolve(value as T), reject, onProgress: options?.onProgress,
         signal: options?.signal, onAbort,
       })
       if (options?.signal?.aborted) {

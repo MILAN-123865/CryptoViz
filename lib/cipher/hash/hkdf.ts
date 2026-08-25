@@ -10,9 +10,6 @@ import type {
   CipherOptions,
   TestVector,
 } from '../types'
-if (options?.hexInput) {
-  // handling hex input directly without casting
-}
 
 const METADATA: CipherMetadata = {
   name: 'HKDF (HMAC Key Derivation)',

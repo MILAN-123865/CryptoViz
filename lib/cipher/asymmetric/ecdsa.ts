@@ -64,7 +64,7 @@ function signCore(message: string, privateKeyHex: string, instrument: boolean): 
 
   const pubKey = secp256k1.getPublicKey(privKey)
   const msgHash = sha256(toByteArray(message, 'utf8'))
-  const sig: NobleSignature = secp256k1.sign(msgHash, privKey)
+  const sig = secp256k1.sign(msgHash, privKey) as unknown as NobleSignature
   
   let sigHex: string
   if (typeof sig.toCompactHex === 'function') {
