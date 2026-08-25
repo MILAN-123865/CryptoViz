@@ -8,7 +8,8 @@
  * Tiger("abc") = 2aab1484e8c158f2bfb8c5ff41b57a525129131c957b5f93
  */
 import type { CipherResult, CipherStep, CipherOptions, TestVector, CipherMetadata } from '../types'
-import { CipherError, validateInput } from '../../utils'
+import { CipherError } from '../../utils'
+import { validateHashInput } from './sha256'
 
 const METADATA: CipherMetadata = {
     name: 'Tiger',
@@ -149,8 +150,8 @@ function tigerCore(input: string, instrument: boolean): CipherResult {
     return { output: toHex(out), outputEncoding: 'hex', steps, metadata: METADATA, durationMs: performance.now() - start }
 }
 
-export function encrypt(input: string, key: string, options: CipherOptions = {}): CipherResult {
-    validateInput(input)
+export function encrypt(input: string, key: string = '', options: CipherOptions = {}): CipherResult {
+    validateHashInput(input)
     return tigerCore(input, !!options.instrument)
 }
 

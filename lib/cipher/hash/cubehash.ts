@@ -117,9 +117,9 @@ function cubehashCore(input: string, outputBits: number, r: number, instrument: 
     return { output: outBytes.map(b => b.toString(16).padStart(2, '0')).join(''), outputEncoding: 'hex', steps, metadata: METADATA, durationMs: performance.now() - start }
 }
 
-export function encrypt(input: string, key: string, options: CipherOptions = {}): CipherResult {
+export function encrypt(input: string, key: string = '', options: CipherOptions = {}): CipherResult {
     const bits = (options.outputBits as number) || 256
-    const r = (options.rounds as number) || 16
+    const r = options.rounds !== undefined ? (options.rounds as number) : 16
     if (r <= 0) throw new CipherError('INVALID_INPUT', 'Rounds must be > 0.')
     return cubehashCore(input, bits, r, !!options.instrument)
 }

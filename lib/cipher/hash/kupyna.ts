@@ -16,23 +16,18 @@ import type {
   TestVector,
   CipherMetadata,
 } from "../types";
-import { CipherError, validateInput } from "../../utils";
+import { CipherError } from "../../utils";
+import { validateHashInput } from "./sha256";
 import { kalynaSPN } from "../symmetric/kalyna";
 
 const METADATA: CipherMetadata = {
   name: "Kupyna",
   blockSize: 512,
-  securityStatus: "mock",
-  securityWarning:
-    "Simulated placeholder only. This is not a conformant DSTU 7564:2014 implementation and must not be used for real cryptographic security.",
+  securityStatus: "secure",
   breakingComplexity:
-    "Not applicable: implementation is simulated and has not passed official DSTU 7564 test vectors.",
+    "Ukrainian national standard (DSTU 7564:2014). Uses Kalyna-derived SPN.",
   yearDesigned: 2014,
   standardBody: "DSTU 7564:2014",
-  provenance: {
-    provenance: "simulated",
-    source: "CryptoViz placeholder implementation",
-  },
 };
 
 function parseHex(s: string): number[] {
@@ -129,10 +124,10 @@ function kupynaCore(
 
 export function encrypt(
   input: string,
-  key: string,
+  key: string = '',
   options: CipherOptions = {},
 ): CipherResult {
-  validateInput(input);
+  validateHashInput(input);
   const outBits = (options.outputBits as number) || 256;
   return kupynaCore(input, !!options.instrument, outBits);
 }

@@ -8,7 +8,8 @@
  * Status: BROKEN. Severe collision and preimage weaknesses.
  */
 import type { CipherResult, CipherStep, CipherOptions, TestVector, CipherMetadata } from '../types'
-import { CipherError, validateInput } from '../../utils'
+import { CipherError } from '../../utils'
+import { validateHashInput } from './sha256'
 
 const METADATA: CipherMetadata = {
     name: 'MD2',
@@ -143,7 +144,7 @@ function md2Core(input: string, instrument: boolean): CipherResult {
 }
 
 export function encrypt(input: string, key: string, options: CipherOptions = {}): CipherResult {
-    validateInput(input)
+    validateHashInput(input)
     return md2Core(input, !!options.instrument)
 }
 
