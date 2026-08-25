@@ -7,7 +7,7 @@
  */
 import type { CipherResult, CipherStep, CipherOptions, TestVector, CipherMetadata } from '../types'
 import { CipherError } from '../../utils/errors'
-import { sha256 } from '@noble/hashes/sha256'
+import { sha256 } from '@noble/hashes/sha2.js'
 
 const METADATA_LAMPORT: CipherMetadata = {
     name: 'Lamport OTS',
