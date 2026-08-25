@@ -75,25 +75,25 @@ export function useCipherWorker() {
   const [fatalError, setFatalError] = useState<Error | null>(null)
   const activeRequestsRef = useRef<Map<string, RequestHandlers>>(new Map())
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return
+  const createWorkerInstance = useCallback(() => {
+    if (typeof window === 'undefined') return null
 
     const worker = new Worker(
       new URL('../lib/workers/cipher.worker.ts', import.meta.url),
       { type: 'module' },
     )
-    workerRef.current = worker
 
     const handleMessage = (event: MessageEvent<WorkerResponse | WorkerProgressMessage>) => {
       const data = event.data
       if (data.type === 'PROGRESS') {
+        const handler = activeRequestsRef.current.get(data.jobId)
+        if (!handler) return
         setProgress({
           percent: data.percent,
           currentMilestone: data.currentMilestone,
           jobId: data.jobId,
         })
-        const handler = activeRequestsRef.current.get(data.jobId)
-        handler?.onProgress?.(data.percent, data.currentMilestone)
+        handler.onProgress?.(data.percent, data.currentMilestone)
         return
       }
 
@@ -149,21 +149,31 @@ export function useCipherWorker() {
       activeRequestsRef.current.clear()
     }
 
-    worker.addEventListener('message', handleMessage)
-    worker.addEventListener('error', handleError)
+    if (typeof worker.addEventListener === 'function') {
+      worker.addEventListener('message', handleMessage)
+      worker.addEventListener('error', handleError)
+    } else {
+      worker.onmessage = handleMessage
+      worker.onerror = handleError
+    }
+
+    return worker
+  }, [])
+
+  useEffect(() => {
+    workerRef.current = createWorkerInstance()
 
     return () => {
-      worker.removeEventListener('message', handleMessage)
-      worker.removeEventListener('error', handleError)
-      worker.terminate()
-      workerRef.current = null
+      if (workerRef.current) {
+        workerRef.current.terminate()
+        workerRef.current = null
+      }
       for (const [, handlers] of activeRequestsRef.current) {
         clearTimeout(handlers.timeoutId)
-        handlers.reject(new DOMException('The worker was terminated.', 'AbortError'))
       }
       activeRequestsRef.current.clear()
     }
-  }, [])
+  }, [createWorkerInstance])
 
   const runCipher = useCallback(
     async (
@@ -179,7 +189,24 @@ export function useCipherWorker() {
       }
 
       if (fatalError) throw fatalError
+      if (!workerRef.current) {
+        workerRef.current = createWorkerInstance()
+      }
       if (!workerRef.current) throw new Error('Worker is not available in SSR context.')
+
+      // Automatically abort prior in-flight requests and restart worker instance to avoid race conditions
+      if (activeRequestsRef.current.size > 0) {
+        for (const [priorId, priorHandlers] of activeRequestsRef.current) {
+          clearTimeout(priorHandlers.timeoutId)
+          if (priorHandlers.signal && priorHandlers.onAbort) {
+            priorHandlers.signal.removeEventListener('abort', priorHandlers.onAbort)
+          }
+          priorHandlers.reject(new DOMException('The user aborted the request.', 'AbortError'))
+        }
+        activeRequestsRef.current.clear()
+        workerRef.current.terminate()
+        workerRef.current = createWorkerInstance()
+      }
 
       return new Promise<CipherResult>((resolve, reject) => {
         const id = crypto.randomUUID()
@@ -187,7 +214,7 @@ export function useCipherWorker() {
 
         const onAbort = () => {
           if (workerRef.current) {
-            workerRef.current.postMessage({ type: 'CANCEL', jobId: id })
+            workerRef.current.postMessage({ type: 'CANCEL', requestId: id, jobId: id })
           }
           const handlers = activeRequestsRef.current.get(id)
           if (handlers) {
@@ -202,7 +229,7 @@ export function useCipherWorker() {
         }
 
         if (signal?.aborted) {
-          onAbort()
+          reject(new DOMException('The user aborted the request.', 'AbortError'))
           return
         }
 
@@ -212,11 +239,16 @@ export function useCipherWorker() {
 
         const timeoutId = setTimeout(() => {
           activeRequestsRef.current.delete(id)
+          if (workerRef.current) {
+            workerRef.current.terminate()
+            workerRef.current = createWorkerInstance()
+          }
+          setError('WORKER_TIMEOUT')
           if (activeRequestsRef.current.size === 0) {
             setLoading(false)
             setProgress(null)
           }
-          reject(new CipherError('WORKER_TIMEOUT', `Cipher operation timed out after ${WORKER_TIMEOUT_MS}ms`))
+          reject(new Error('WORKER_TIMEOUT'))
         }, WORKER_TIMEOUT_MS)
 
         activeRequestsRef.current.set(id, {
@@ -251,8 +283,9 @@ export function useCipherWorker() {
         }
       })
     },
-    [fatalError]
+    [fatalError, createWorkerInstance]
   )
 
   return { runCipher, loading, error, progress }
 }
+
