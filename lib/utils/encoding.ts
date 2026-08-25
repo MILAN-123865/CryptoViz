@@ -306,3 +306,41 @@ function encodeBase64Fallback(binary: string): string {
 
   return output;
 }
+
+/**
+ * Universal conversion from supported encodings ('utf8' | 'hex' | 'base64' | 'binary') to Uint8Array.
+ */
+export function toByteArray(input: string, encoding: 'utf8' | 'hex' | 'base64' | 'binary' = 'utf8'): Uint8Array {
+  if (typeof input !== 'string') {
+    throw new Error('Input must be a string.');
+  }
+  switch (encoding) {
+    case 'hex':
+      return parseHex(input);
+    case 'base64':
+      return parseBase64(input);
+    case 'binary':
+      return parseBinary(input);
+    case 'utf8':
+    default:
+      return new TextEncoder().encode(input);
+  }
+}
+
+/**
+ * Universal conversion from Uint8Array to string in the specified encoding.
+ */
+export function fromByteArray(input: BinaryInput, encoding: 'utf8' | 'hex' | 'base64' | 'binary' = 'hex'): string {
+  const bytes = asBytes(input);
+  switch (encoding) {
+    case 'hex':
+      return toHex(bytes);
+    case 'base64':
+      return toBase64(bytes);
+    case 'binary':
+      return toBinary(bytes);
+    case 'utf8':
+    default:
+      return new TextDecoder().decode(bytes);
+  }
+}
