@@ -9,8 +9,8 @@
  */
 import type { CipherResult, CipherStep, CipherOptions, TestVector, CipherMetadata } from '../types'
 import { CipherError } from '../../utils/errors'
-import { sha384 } from '@noble/hashes/sha512'
-import { shake256 } from '@noble/hashes/shake256'
+import { sha384 } from '@noble/hashes/sha2.js'
+import { shake256 } from '@noble/hashes/sha3.js'
 
 const METADATA: CipherMetadata = {
     name: 'BIKE',
@@ -176,8 +176,8 @@ function bgfDecode(syndrome: PackedPoly, h0: number[], h1: number[], r: number, 
     }
 
     // Check weight
-    const weight = e0.reduce((acc, w) => acc + w.toString(2).split('').filter(b => b === '1').length, 0) +
-        e1.reduce((acc, w) => acc + w.toString(2).split('').filter(b => b === '1').length, 0)
+    const weight = e0.reduce((acc, w) => acc + w.toString(2).split('').filter((b: string) => b === '1').length, 0) +
+        e1.reduce((acc, w) => acc + w.toString(2).split('').filter((b: string) => b === '1').length, 0)
     if (weight > t) return null // Decapsulation failure
 
     return polyXor(e0, e1)

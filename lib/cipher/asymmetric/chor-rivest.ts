@@ -150,7 +150,7 @@ function discreteLog(g: GFElement, target: GFElement): number {
         if (match) return k
         current = gfMul(current, g)
     }
-    throw new CipherError('INTERNAL_ERROR', 'Discrete log not found')
+    throw new CipherError('INVALID_INPUT', 'Discrete log not found')
 }
 
 interface ChorRivestKeys {
@@ -174,7 +174,6 @@ function keygen(): ChorRivestKeys {
     for (let i = 0; i < MSG_LEN; i++) {
         const element: GFElement = new Array(H).fill(0);
         element[i % H] = (Math.floor(i / H) + 1) % P;
-        if (element.every(c => c === 0)) element[0] = 1;
         const log = discreteLog(g, element);
         structuredWeights.push(log);
     }

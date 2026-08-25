@@ -159,6 +159,12 @@ export function keccakF1600(state: BigUint64Array, steps?: CipherStep[], stepLab
   keccakP(state, 24, steps, stepLabelPrefix)
 }
 
+export function keccakP(state: bigint[], rounds: number): bigint[] {
+  const words = BigUint64Array.from(state.map((word) => BigInt.asUintN(64, word)))
+  keccakF1600(words, undefined, undefined, rounds)
+  return Array.from(words, (word) => BigInt.asUintN(64, word))
+}
+
 function padTenOne(inputBytes: Uint8Array): Uint8Array {
   const numBlocks = Math.floor(inputBytes.length / RATE_BYTES) + 1
   const paddedLen = numBlocks * RATE_BYTES

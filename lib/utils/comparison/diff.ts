@@ -150,7 +150,7 @@ export function computeSessionComparison(
     .filter((v): v is number => v !== undefined);
 
   const meanMemA = memA.length ? memA.reduce((sum, v) => sum + v, 0) / memA.length : 0;
-  const meanMemB = memB.length ? meanMemB.reduce((sum, v) => sum + v, 0) / memB.length : 0;
+  const meanMemB: number = memB.length ? memB.reduce((sum: number, v: number) => sum + v, 0) / memB.length : 0;
 
   const memoryDeltaBytes = meanMemB - meanMemA;
 

@@ -4,6 +4,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import type { CipherResult, CipherOptions } from "../cipher/types";
 import type { WorkerRequest, WorkerResponse } from "../../types/worker";
+import type { WorkerPriority } from "../workers/pool";
 import type { CipherErrorCode } from "../utils/errors";
 import {
   validateWorkload,
@@ -14,6 +15,12 @@ import { decodeCipherSteps } from "../workers/stepTransfer";
 
 const MAX_CACHE_SIZE = 200;
 const resultCache = new Map<string, CipherResult>();
+
+interface CipherWorkerProgress {
+  percent: number;
+  currentMilestone: string;
+  jobId: string;
+}
 
 export function clearCipherWorkerCache() {
   resultCache.clear();
@@ -41,8 +48,6 @@ function cacheResult(key: string, result: CipherResult) {
   }
   resultCache.set(key, result)
 }
-export function clearCipherWorkerCache() { resultCache.clear() }
-
 export function useCipherWorker() {
   const workerRef = useRef<Worker | null>(null)
   const [loading, setLoading] = useState(false)
@@ -90,7 +95,8 @@ export function useCipherWorker() {
         return
       }
 
-      const request = activeRequestsRef.current.get(requestId);
+      const { requestId, success, payload } = data
+      const request = activeRequestsRef.current.get(requestId)
 
       if (request) {
         if (request.timeoutId) {
@@ -133,7 +139,6 @@ export function useCipherWorker() {
           }
         }
 
-        activeRequestsRef.current.delete(requestId);
       }
       activeRequestsRef.current.delete(requestId)
       if (activeRequestsRef.current.size === 0) {

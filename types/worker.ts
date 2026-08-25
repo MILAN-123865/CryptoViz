@@ -70,6 +70,7 @@ export interface WorkerResponseSuccess {
   success: true
   payload: {
     result?: CipherResult
+    stepsBuffer?: ArrayBuffer
     error?: never
     errorCode?: never
     errorMessage?: never

@@ -111,18 +111,7 @@ function signCore(message: string, privateKeyHex: string, instrument: boolean): 
 
   const pubKey = secp256k1.getPublicKey(privKey)
   const msgHash = sha256(toByteArray(message, 'utf8'))
-  const sig: NobleSignature = secp256k1.sign(msgHash, privKey)
-  
-  let sigHex: string
-  if (typeof sig.toCompactHex === 'function') {
-    sigHex = sig.toCompactHex()
-  } else if (typeof sig.toCompactBytes === 'function') {
-    sigHex = fromByteArray(sig.toCompactBytes(), 'hex')
-  } else if (sig.r && sig.s) {
-    sigHex = sig.r.toString(16).padStart(64, '0') + sig.s.toString(16).padStart(64, '0')
-  } else {
-    throw new CipherError('INVALID_INPUT', 'Unsupported signature format returned by secp256k1.sign')
-  }
+  const sigHex = normalizeSignature(secp256k1.sign(msgHash, privKey))
 
   if (instrument) {
     steps.push({

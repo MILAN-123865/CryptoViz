@@ -67,8 +67,8 @@ function sqisignCore(input: string, key: string, doDecrypt: boolean, instrument:
 
         // Signature = (Commitment Curve j-invariant, Response Isogeny Degree)
         const sigBytes = [
-            Number((commitment >> 8n) & 0xFF), Number(commitment & 0xFF),
-            Number((response >> 8n) & 0xFF), Number(response & 0xFF)
+            Number((commitment >> 8n) & 0xFFn), Number(commitment & 0xFFn),
+            Number((response >> 8n) & 0xFFn), Number(response & 0xFFn)
         ]
 
         outHex = toHex(sigBytes)
@@ -88,7 +88,7 @@ function sqisignCore(input: string, key: string, doDecrypt: boolean, instrument:
         // curve to the public curve EA, matching the hash challenge.
         const isValid = response > 0n && commitment > 0n
 
-        if (!isValid) throw new CipherError('VERIFICATION_FAILED', 'SQIsign proof-of-knowledge invalid.')
+        if (!isValid) throw new CipherError('INVALID_INPUT', 'SQIsign proof-of-knowledge invalid.')
 
         outHex = '01' // Success
 

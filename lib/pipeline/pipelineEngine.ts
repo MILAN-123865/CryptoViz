@@ -76,8 +76,6 @@ export function createPipelineStage(cipherId: string, index = 0): PipelineStage 
  * Executes a single pipeline stage synchronously, supporting worker fallback and direct dispatch.
  */
 export function executeStage(input: string, stage: PipelineStage): string {
-  const cipher = CIPHER_REGISTRY.find((c) => c.id === stage.cipherId)
-  
   // Direct registry execution fallback if sync execution is requested or worker is unavailable
   switch (stage.cipherId.toLowerCase()) {
     case 'base64-encode':
@@ -103,12 +101,6 @@ export function executeStage(input: string, stage: PipelineStage): string {
       return crypto.createHash(algorithm).update(input).digest('hex')
     }
     default:
-      if (cipher && typeof cipher.transform === 'function') {
-        const options: CipherOptions = Object.fromEntries(
-          Object.entries(stage.params).map(([k, v]) => [k, /^\d+(?:\.\d+)?$/.test(v) ? Number(v) : v])
-        )
-        return cipher.transform(input, options)
-      }
       throw new Error(`Stage execution failed: Cipher "${stage.cipherId}" lacks a synchronous transform implementation.`)
   }
 }

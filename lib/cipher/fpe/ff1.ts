@@ -22,13 +22,13 @@ import { expandKey, processBlock } from '../symmetric/aes'
 const BLOCK = 16
 
 /** AES single-block encryption (ECB core), used to build the FF1 PRF. */
-function aesBlock(roundKeys: Uint8Array[], block: Uint8Array): Uint8Array {
+function aesBlock(roundKeys: Uint8Array[], block: Uint8Array): Uint8Array<ArrayBufferLike> {
   return processBlock(block, roundKeys, false)
 }
 
 /** PRF = AES-CBC-MAC with a zero IV over a byte string that is a multiple of 16. */
-function prf(roundKeys: Uint8Array[], data: Uint8Array): Uint8Array {
-  let y = new Uint8Array(BLOCK)
+function prf(roundKeys: Uint8Array[], data: Uint8Array): Uint8Array<ArrayBufferLike> {
+  let y: Uint8Array<ArrayBufferLike> = new Uint8Array(BLOCK)
   for (let i = 0; i < data.length; i += BLOCK) {
     const x = new Uint8Array(BLOCK)
     for (let j = 0; j < BLOCK; j++) x[j] = y[j] ^ data[i + j]
@@ -145,8 +145,8 @@ function buildP(radix: number, u: number, n: number, t: number): Uint8Array {
  * Derive S (the round-function output block, length d) from the PRF block R by
  * counter-mode extension: S = (R ‖ AES(R⊕1) ‖ AES(R⊕2) ‖ …) truncated to d.
  */
-function deriveS(roundKeys: Uint8Array[], R: Uint8Array, d: number): Uint8Array {
-  let S = new Uint8Array(R)
+function deriveS(roundKeys: Uint8Array[], R: Uint8Array, d: number): Uint8Array<ArrayBufferLike> {
+  let S: Uint8Array<ArrayBufferLike> = new Uint8Array(R)
   for (let j = 1; S.length < d; j++) {
     const blk = new Uint8Array(R)
     const jb = beBytes(BigInt(j), BLOCK)
