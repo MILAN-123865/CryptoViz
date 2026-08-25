@@ -23,7 +23,7 @@ const executeCipher = useCallback(() => {
     // Feed the CipherError into your existing diagnostic engine
     if (err instanceof Error && err.name === 'CipherError') {
       const diagnosis = diagnoseError(err, {
-        cipherId: currentCipherType,
+        // TODO: Add cipherId when available in component state
         // Optional: Map your current state variables here based on the cipher 
         // to help your diagnostic engine (e.g., fieldName, fieldValue)
         fieldValue: typeof key === 'string' ? key : undefined 
@@ -35,7 +35,7 @@ const executeCipher = useCallback(() => {
     
     setResult(null);
   }
-}, [input, key, options, currentCipherType]);
+}, [input, key, options]);
 
 // Handler to apply the fix from the banner
 const handleApplyFix = (fix: RemediationOption) => {

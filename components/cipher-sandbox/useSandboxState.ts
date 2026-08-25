@@ -65,7 +65,7 @@ interface UseSandboxStateResult {
   setHistory: (value: ConversionHistoryEntry[]) => void
   // Derived
   loading: boolean
-  workerError: { code: CipherErrorCode; message?: string } | null
+  workerError: string | null
   workspaceOptions: Record<string, unknown>
   traceOptions: Record<string, unknown>
   // Actions

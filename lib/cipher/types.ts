@@ -9,6 +9,8 @@ import type { DataProvenanceMetadata } from "../provenance";
 
 export type Encoding = "utf8" | "hex" | "base64" | "binary";
 
+export type CipherName = string;
+
 export type CipherDirection = "encrypt" | "decrypt";
 
 export interface CipherStep {
@@ -55,7 +57,7 @@ export interface CipherMetadata {
 
 export interface CipherOptions {
   mode?: string;
-  padding?: string;
+  padding?: boolean | string;
   encoding?: Encoding;
   iv?: string;
   hash?: string;

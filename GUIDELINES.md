@@ -212,7 +212,7 @@ For detailed visualizer component development patterns, including prop contracts
 | **Key Clearance** | Ensure sensitive keys are cleared on component unmount. | Validated in manual code review. |
 | **No Unsafe Logic** | Verify zero usage of `eval`, `innerHTML`, and constructor functions. | Checked by static analysis rules. |
 | **CSP Compliance** | Verify `worker-src blob:` and security nonces in `vercel.json`. | Checked by E2E security tests. |
-| **Dependency Scans** | Run dependency auditing to check for known CVEs. | `pnpm audit` runs on pull requests. |
+| **Dependency Scans** | Run dependency auditing to check for known CVEs. | `npm audit` runs on pull requests. |
 | **Secure Input Limits** | Ensure input size is restricted to a maximum of 4096 bytes. | Validated in unit test suite. |
 
 ---
@@ -221,7 +221,7 @@ For detailed visualizer component development patterns, including prop contracts
 
 | Metric | Budget | Fail Threshold | How Measured |
 | :--- | :--- | :--- | :--- |
-| **Main JS Bundle** | < 120 KB gzipped | > 150 KB gzipped | `pnpm analyze` |
+| **Main JS Bundle** | < 120 KB gzipped | > 150 KB gzipped | `npm run check:budgets` |
 | **LCP (Largest Contentful Paint)** | < 1.2s | > 2.5s | Playwright Core Web Vitals |
 | **CLS (Cumulative Layout Shift)**| < 0.05 | > 0.1 | Playwright Core Web Vitals |
 | **INP (Interaction to Next Paint)**| < 100ms | > 200ms | Playwright Core Web Vitals |
