@@ -919,7 +919,7 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     defaultInput: "abc",
     securityStatus: "recommended",
     keySize: "None (hash function)",
-    practicalUseCases: ["Data integrity verification", "Digital signatures", "Blockchain proof-of-work", "Password hashing (via HMAC/PBKDF2)"],
+    practicalUseCases: ["Data integrity verification", "Digital signatures", "Cryptographic commitments", "Password hashing (via HMAC/PBKDF2)"],
     recommendedNext: ["hmac", "sha512", "bcrypt"],
   },
   {
@@ -1726,7 +1726,7 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     id: 'bls',
     name: 'BLS',
     category: 'asymmetric',
-    description: 'Pairing-based digital signatures (2001). Defining feature: Signature Aggregation. Multiple signatures can be combined into one compact signature verifiable against all original public keys. Used in Ethereum validator layer. (Toy pairing model for visualizer).',
+    description: 'Pairing-based digital signatures (2001). Defining feature: Signature Aggregation. Multiple signatures can be combined into one compact signature verifiable against all original public keys. Used in multi-party consensus protocols and aggregate signatures. (Toy pairing model for visualizer).',
     defaultKey: '1234567890abcdef',
     defaultInput: 'message',
     securityStatus: 'secure',
@@ -1883,6 +1883,7 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     securityStatus: 'experimental',
     keyPlaceholder: '64 hex characters (512-bit padded)',
   },
+  {
     id: 'hqc',
     name: 'HQC',
     category: 'asymmetric',

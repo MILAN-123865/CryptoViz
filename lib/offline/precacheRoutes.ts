@@ -1,6 +1,6 @@
 /**
  * Auto-generated precache routes manifest.
- * Last Generated: 2026-08-25T07:54:25.143Z
+ * Last Generated: 2026-08-25T08:13:34.516Z
  */
 export const PRECACHE_ROUTES: string[] = [
   "/",
@@ -29,7 +29,6 @@ export const PRECACHE_ROUTES: string[] = [
   "/avalanche/",
   "/benchmark/",
   "/benchmarks/history/",
-  "/blockchain/",
   "/bloom-filter/",
   "/case-studies/",
   "/case-studies/debian-openssl/",
@@ -49,8 +48,6 @@ export const PRECACHE_ROUTES: string[] = [
   "/collections/",
   "/compare/",
   "/cryptanalysis/sbox/",
-  "/crypto-cross-chain-bridge-analytics/",
-  "/crypto-real-world-asset-rwa-tokenization-analytics/",
   "/dashboard/",
   "/demo/reed-solomon/",
   "/docs/",
@@ -60,7 +57,6 @@ export const PRECACHE_ROUTES: string[] = [
   "/docs/tls13-handshake/",
   "/docs/visualization-development-guide/",
   "/docs/worker-architecture/",
-  "/domain-operations/",
   "/drbg-visualizer/",
   "/ecc-playground/",
   "/emv/",

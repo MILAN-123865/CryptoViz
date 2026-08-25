@@ -95,7 +95,6 @@ export type WorkerResponse = WorkerResponseSuccess | WorkerResponseFailure
 export type WorkerProtocolMessage =
   | WorkerMessage
   | WorkerProgressMessage
-  | WorkerDoneMessage
   | WorkerErrorMessage
   | WorkerResponse
 

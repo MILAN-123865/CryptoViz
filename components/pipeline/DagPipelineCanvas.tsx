@@ -64,3 +64,5 @@ export const DagPipelineCanvas = () => {
     </section>
   )
 }
+
+export default DagPipelineCanvas;

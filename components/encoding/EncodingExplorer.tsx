@@ -119,8 +119,8 @@ export default function EncodingExplorer() {
     </li>
 
     <li>
-      <strong>Base58:</strong> Avoids visually similar characters and is widely
-      used in Bitcoin addresses and cryptocurrency applications.
+      <strong>Base58:</strong> Avoids visually similar characters (such as 0, O, I, and l)
+      for compact and unambiguous binary-to-text representation.
     </li>
 
     <li>

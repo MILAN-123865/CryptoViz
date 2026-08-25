@@ -17,9 +17,7 @@
 
 import type { CipherResult, CipherStep, CipherOptions, TestVector, CipherMetadata } from '../types'
 import { CipherError, validateInput, validateKey } from '../../utils'
-import { getSecureRandomValues } from '@/lib/utils/secureRandom';
 
-const ivBytes = getSecureRandomValues(16);
 const METADATA: CipherMetadata = {
     name: 'Trivium',
     keySize: 80,
