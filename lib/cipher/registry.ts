@@ -2071,4 +2071,29 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
       }
     ]
   },
+  {
+    id: 'saber',
+    name: 'SABER',
+    category: 'asymmetric',
+    description: 'NIST PQC Round 3 finalist KEM. Module-LWR over Z_{2^13}[x]/(x^256+1). Eliminates NTT and Gaussian sampling via power-of-2 moduli. LightSaber, Saber, FireSaber parameter sets.',
+    defaultKey: '',
+    defaultInput: 'test',
+    securityStatus: 'experimental',
+    practicalUseCases: ['Post-quantum key exchange', 'Non-NTT alternative to ML-KEM'],
+    prerequisites: ['ml-kem', 'frodokem'],
+    recommendedNext: ['bike', 'hqc'],
+    options: [
+      {
+        name: 'Parameter Set',
+        id: 'paramSet',
+        type: 'select',
+        default: 'Saber',
+        choices: [
+          { label: 'LightSaber (l=2)', value: 'LightSaber' },
+          { label: 'Saber (l=3)', value: 'Saber' },
+          { label: 'FireSaber (l=4)', value: 'FireSaber' }
+        ]
+      }
+    ]
+  },
 ];
