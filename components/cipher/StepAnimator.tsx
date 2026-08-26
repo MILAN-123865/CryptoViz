@@ -428,7 +428,8 @@ const StepAnimator = memo(function StepAnimator({
         <div className="mb-1 flex items-center justify-between gap-2 text-2xs text-zinc-400 dark:text-zinc-500">
           <span>Timeline</span>
           <span>
-            Step {safeCurrentStep + 1} / {steps.length} ({Math.round(progressPercent)}%)
+            <span>Step {safeCurrentStep + 1} / {steps.length}</span>
+            <span> ({Math.round(progressPercent)}%)</span>
           </span>
         </div>
 
