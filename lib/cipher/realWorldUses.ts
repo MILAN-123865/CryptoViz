@@ -58,10 +58,10 @@ export const REAL_WORLD_USES: Record<string, UseCategory[]> = {
 
   sha256: [
     {
-      title: "⛓ Blockchain",
+      title: "🔒 Data Integrity & Systems",
       items: [
-        "Bitcoin",
-        "Git",
+        "Git Commit Hashes",
+        "Package Verification",
         "Certificate Fingerprints",
         "Password Hashing",
       ],

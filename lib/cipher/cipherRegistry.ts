@@ -1,5 +1,4 @@
 import { KalynaEngine } from './kalyna/kalynaEngine';
-import { KupynaEngine } from './kupyna/kupynaEngine';
 import { BaseCipher } from './baseCipher';
 
 export class CipherRegistry {
@@ -7,7 +6,6 @@ export class CipherRegistry {
 
   constructor() {
     this.register('kalyna', new KalynaEngine());
-    this.register('kupyna', new KupynaEngine());
   }
 
   register(name: string, instance: BaseCipher): void {

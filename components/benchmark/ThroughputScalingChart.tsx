@@ -209,9 +209,9 @@ export default React.memo(function ThroughputScalingChart({
             <Tooltip content={<CustomTooltip />} />
             <Legend
               wrapperStyle={{ paddingTop: '20px' }}
-              formatter={(value, entry: { payload?: Record<string, unknown> }) => (
+              formatter={(value, entry) => (
                 <span style={{ color: textColor, fontSize: 12 }}>
-                  {String(entry?.payload?.[`${value}_name`] || value)}
+                  {String((entry?.payload as Record<string, unknown> | undefined)?.[`${value}_name`] || value)}
                 </span>
               )}
             />

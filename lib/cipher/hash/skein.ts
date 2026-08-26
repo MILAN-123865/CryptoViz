@@ -7,7 +7,7 @@
  * UBI step: Threefish256(key=chainState, tweak, block) XOR block.
  *
  * Tweak T[1] bit layout (Skein v1.3 spec §2.1.1):
- *   bits 24-29: type field (Config=4, Message=48, Output=63)
+ *   bits 56-61: type field (Config=4, Message=48, Output=63)
  *   bit 62: isFirst block flag
  *   bit 63: isFinal block flag
  *
@@ -22,7 +22,7 @@
  */
 
 import type { CipherResult, CipherStep, CipherOptions, TestVector, CipherMetadata } from '../types'
-import { CipherError, validateInput, validateKey } from '../../utils'
+import { CipherError } from '../../utils'
 
 const METADATA: CipherMetadata = {
     name: 'Skein-256',
@@ -126,7 +126,7 @@ function ubi(G: bigint[], msg: Uint8Array, type: number): bigint[] {
         if (take > 0) chunk.set(msg.slice(off, off + take))
 
         const t0 = BigInt(off + take)  // cumulative byte count
-        const t1 = (BigInt(type) << 24n)
+        const t1 = (BigInt(type) << 56n)
             | (isFirst ? (1n << 62n) : 0n)
             | (isLast ? (1n << 63n) : 0n)
 
@@ -209,12 +209,16 @@ function skeinCore(input: string, instrument: boolean): CipherResult {
 }
 
 // key param unused for plain hash; both encrypt and decrypt compute the hash
-export function encrypt(input: string, _key: string, options: CipherOptions = {}): CipherResult {
-    validateInput(input)
+export function encrypt(input: string, _key: string = '', options: CipherOptions = {}): CipherResult {
+    if (input === null || input === undefined) {
+        throw new CipherError('INPUT_REQUIRED', 'Input text is required.')
+    }
     return skeinCore(input, !!options.instrument)
 }
-export function decrypt(input: string, _key: string, options: CipherOptions = {}): CipherResult {
-    validateInput(input)
+export function decrypt(input: string, _key: string = '', options: CipherOptions = {}): CipherResult {
+    if (input === null || input === undefined) {
+        throw new CipherError('INPUT_REQUIRED', 'Input text is required.')
+    }
     return skeinCore(input, !!options.instrument)
 }
 

@@ -58,7 +58,7 @@ export function xorBlocks(a: Block, b: Block): Block {
  */
 export function gfMul(X: Block, Y: Block): Block {
   const Z = block()
-  const V = new Uint8Array(Y)
+  const V = Y.slice()
   for (let i = 0; i < 128; i++) {
     if ((X[i >> 3] >> (7 - (i & 7))) & 1) {
       for (let j = 0; j < BLOCK_SIZE; j++) Z[j] ^= V[j]
@@ -80,8 +80,8 @@ export const GF_ONE: Block = (() => {
 
 /** Fast exponentiation aᵉ in GF(2¹²⁸). */
 function gfPow(a: Block, exponent: bigint): Block {
-  let result = new Uint8Array(GF_ONE)
-  let base = new Uint8Array(a)
+  let result: Block = GF_ONE.slice()
+  let base: Block = a.slice()
   let e = exponent
   while (e > 0n) {
     if (e & 1n) result = gfMul(result, base)
@@ -107,7 +107,7 @@ export function gfInverse(a: Block): Block {
  * single-block attack recovers H uniquely with no factoring.
  */
 export function gfSqrt(a: Block): Block {
-  let r = new Uint8Array(a)
+  let r: Block = a.slice()
   for (let i = 0; i < 127; i++) r = gfMul(r, r)
   return r
 }

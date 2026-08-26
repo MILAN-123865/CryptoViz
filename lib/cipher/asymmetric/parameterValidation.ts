@@ -153,7 +153,7 @@ export const CURVE_PRESETS: CurvePreset[] = [
     gy: BigInt("32670510020758816978083085130507043184471273380659243275938904335757337482424"),
     order: BigInt("0xfffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"),
     privateKey: "0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20",
-    description: "Bitcoin/ECDSA curve with y² = x³ + 7 over a prime field.",
+    description: "Koblitz curve with y² = x³ + 7 over a 256-bit prime field.",
   },
   {
     id: "ed25519",

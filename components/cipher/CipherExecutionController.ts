@@ -15,7 +15,7 @@ interface Params {
   key: string;
   action: "encrypt" | "decrypt";
   autoCompute: boolean;
-  options: { hexInput: boolean; rounds: number; demoMode: boolean; bobSecret: string; aesMode: string; padding: boolean; autoCompute: boolean };
+  options: CipherOptions;
   demoMode: boolean;
   onResult: (result: CipherResult) => void;
   onStepRestore: (step: number) => void;
@@ -37,11 +37,20 @@ export function buildCipherWorkerOptions(
     signal: undefined,
     ...options,
   };
-  if (["des", "3des", "aes", "camellia"].includes(cipherId)) workerOptions.hexInput = options.hexInput;
-  if (["aes", "camellia"].includes(cipherId)) workerOptions.mode = options.aesMode;
-  if (cipherId === "bcrypt") workerOptions.rounds = options.rounds;
+  if (["des", "3des", "aes", "camellia"].includes(cipherId)) {
+    workerOptions.hexInput = typeof options.hexInput === "boolean" ? options.hexInput : true;
+  }
+  if (["aes", "camellia"].includes(cipherId)) {
+    workerOptions.mode = typeof options.aesMode === "string" ? options.aesMode : "ECB";
+  }
+  if (cipherId === "bcrypt") {
+    workerOptions.rounds = typeof options.rounds === "number" ? options.rounds : 4;
+  }
   if (cipherId === "rsa") workerOptions.mode = demoMode ? "demo" : "real";
-  if (cipherId === "dh") { workerOptions.mode = "demo"; workerOptions.bobSecret = options.bobSecret; }
+  if (cipherId === "dh") {
+    workerOptions.mode = "demo";
+    workerOptions.bobSecret = typeof options.bobSecret === "string" ? options.bobSecret : "15";
+  }
   if (cipherId === "camellia") workerOptions.padding = options.padding ? "PKCS7" : "None";
   return workerOptions;
 }

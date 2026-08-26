@@ -95,7 +95,7 @@ function modInverse(a: bigint, m: bigint): bigint {
         const quotient = r / newr
         t = t - quotient * newt
         r = r - quotient * newr;
-        [t, newt] = [newt, t]
+        [t, newt] = [newt, t];
         [r, newr] = [newr, r]
     }
     return mod(t, m)

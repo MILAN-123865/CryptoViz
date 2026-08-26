@@ -19,7 +19,8 @@
  * Status: SECURE.
  */
 import type { CipherResult, CipherStep, CipherOptions, TestVector, CipherMetadata } from '../types'
-import { CipherError, validateInput } from '../../utils'
+import { CipherError } from '../../utils'
+import { validateHashInput } from './sha256'
 
 const METADATA: CipherMetadata = {
     name: 'RadioGatun',
@@ -218,8 +219,8 @@ function radiogatunCore(input: string, instrument: boolean, outputBits: number =
     return { output: toHex(outBytes), outputEncoding: 'hex', steps, metadata: METADATA, durationMs: performance.now() - start }
 }
 
-export function encrypt(input: string, key: string, options: CipherOptions = {}): CipherResult {
-    validateInput(input)
+export function encrypt(input: string, key: string = '', options: CipherOptions = {}): CipherResult {
+    validateHashInput(input)
     const outBits = (options.outputBits as number) || 256
     return radiogatunCore(input, !!options.instrument, outBits)
 }

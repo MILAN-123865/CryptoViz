@@ -97,7 +97,7 @@ export const ALGORITHM_MATRIX_DATA: MatrixEntry[] = [
     keySize: 'N/A',
     securityStatus: 'secure',
     speed: 'Fast',
-    applications: ['Digital Signatures', 'Certificates', 'Blockchain'],
+    applications: ['Digital Signatures', 'Certificates', 'Data Integrity'],
   },
   {
     id: 'sha512',

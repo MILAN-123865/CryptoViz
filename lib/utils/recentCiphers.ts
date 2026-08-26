@@ -62,5 +62,5 @@ export function recordRecentCipher(
 }
 
 export function clearRecentCipherIds(): void {
-  safeRemoveItem(RECENT_CIPHERS_STORAGE_KEY);
+  removeItem(RECENT_CIPHERS_STORAGE_KEY);
 }

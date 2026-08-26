@@ -9,7 +9,8 @@
  * Hash = 00557be5e584fd52a449b16b0251d05d27f94ab76cbaa6da890b59d8ef1e159d
  */
 import type { CipherResult, CipherStep, CipherOptions, TestVector, CipherMetadata } from '../types'
-import { CipherError, validateInput } from '../../utils'
+import { CipherError } from '../../utils'
+import { validateHashInput } from './sha256'
 
 const METADATA: CipherMetadata = {
     name: 'Streebog-256',
@@ -75,7 +76,7 @@ function l_word(b: Uint8Array, offset: number): bigint {
     }
     let c_val = 0n
     for (let j = 0; j < 64; j++) {
-        if ((b_val >> BigInt(j)) & 1n) {
+        if ((b_val >> BigInt(63 - j)) & 1n) {
             c_val ^= A_rows[j]
         }
     }
@@ -268,8 +269,8 @@ function streebogCore(input: string, instrument: boolean): CipherResult {
     return { output: toHex(finalHash), outputEncoding: 'hex', steps, metadata: METADATA, durationMs: performance.now() - start }
 }
 
-export function encrypt(input: string, key: string, options: CipherOptions = {}): CipherResult {
-    validateInput(input)
+export function encrypt(input: string, key: string = '', options: CipherOptions = {}): CipherResult {
+    validateHashInput(input)
     return streebogCore(input, !!options.instrument)
 }
 

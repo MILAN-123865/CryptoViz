@@ -69,7 +69,7 @@ self.onmessage = async (event: MessageEvent<CryptoWorkerRequest>) => {
         const changed = hexToBytes(ciphertextHex(mode, flipped))
         const diff = original.map((b: string, i: number) => b !== changed[i])
         const changedCount = diff.filter(Boolean).length
-        result.push({ modeId: mode, changed, diff, changedCount, total: changed.length })
+        ;(result as unknown[]).push({ modeId: mode, changed, diff, changedCount, total: changed.length })
         progress(jobId, ((index + 1) / modes.length) * 100, `Processed ${mode}`)
         // Yield to the event loop between modes so CANCEL and higher-priority UI work can be observed.
         await new Promise<void>((resolve) => setTimeout(resolve, 0))

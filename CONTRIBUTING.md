@@ -195,7 +195,7 @@ updatedAt: 2026-06-12
   ```
 
 ### Step 4: Validate and Compile
-Run `pnpm build`. The frontmatter is validated via Zod schemas at build time. Any missing or malformed fields will trigger a build compilation failure.
+Run `npm run build`. The frontmatter is validated via Zod schemas at build time. Any missing or malformed fields will trigger a build compilation failure.
 
 ### Docs PR Checklist
 - [ ] Frontmatter block is complete and conforms to the Zod schema.
