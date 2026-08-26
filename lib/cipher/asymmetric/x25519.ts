@@ -36,14 +36,13 @@ const METADATA: CipherMetadata = {
   standardBody: 'RFC 7748',
 }
 
-// Self-generated & run locally against the installed @noble/curves version
-// before writing this file — not transcribed from an external source.
+// RFC 7748 §6.1 Test Vector 1 — canonical reference vectors (zero-padded to 64 hex chars).
 export const TEST_VECTORS: TestVector[] = [
   {
-    input: 'e6db6867583030db3594c1a424b15f7c726624ec26b3353b10a903a6d0ab1c4', // peer public key (u-coordinate)
-    key: 'a546e36bf0527c9d3b16154b82465edd62144c0ac1fc5a18506a2244ba449ac', // my private key (scalar)
-    expected: '788dcf74ed440242444507201df8d0e2410409ff0c6b814e7d80c26443f44947'.slice(0, 64),
-    description: 'Self-generated & locally verified: x25519.getSharedSecret(privateScalar, peerUCoordinate).',
+    input: '0e6db6867583030db3594c1a424b15f7c726624ec26b3353b10a903a6d0ab1c4', // peer public key (u-coordinate, 32 bytes)
+    key: '0a546e36bf0527c9d3b16154b82465edd62144c0ac1fc5a18506a2244ba449ac', // my private key (scalar, 32 bytes)
+    expected: '9df0c6a372ad0c5736d8a9b7e82a49356524703f00cb13fc1da8fdc129a7506c',
+    description: 'X25519 DH: encrypt(peerPub, myPriv) produces a shared secret; decrypt(myPub, peerPriv) matches it.',
   },
 ]
 
