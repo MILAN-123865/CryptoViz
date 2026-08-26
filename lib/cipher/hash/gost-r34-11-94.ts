@@ -6,7 +6,8 @@
  * compression primitive, with a distinctive key-mixing P-transformation.
  */
 import type { CipherResult, CipherStep, CipherOptions, TestVector, CipherMetadata } from '../types'
-import { CipherError, validateInput } from '../../utils'
+import { CipherError } from '../../utils'
+import { validateHashInput } from './sha256'
 import { encrypt as gostEncrypt } from '../symmetric/gost'
 
 const METADATA: CipherMetadata = {
@@ -127,8 +128,8 @@ function gost94Core(input: string, instrument: boolean): CipherResult {
     return { output: toHex(h), outputEncoding: 'hex', steps, metadata: METADATA, durationMs: performance.now() - start }
 }
 
-export function encrypt(input: string, key: string, options: CipherOptions = {}): CipherResult {
-    validateInput(input)
+export function encrypt(input: string, key: string = '', options: CipherOptions = {}): CipherResult {
+    validateHashInput(input)
     return gost94Core(input, !!options.instrument)
 }
 

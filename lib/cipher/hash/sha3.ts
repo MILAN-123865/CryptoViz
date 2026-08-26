@@ -101,10 +101,11 @@ function generateRhoOffsets(): number[][] {
 const ROUND_CONSTANTS = generateRoundConstants()
 const RHO_OFFSETS = generateRhoOffsets()
 
-// state[x + 5*y] holds lane (x,y). Mutates state in place.
-function keccakF1600(state: BigUint64Array, steps?: CipherStep[], stepLabelPrefix?: string, rounds = 24): void {
-  const firstRound = 24 - rounds
-  for (let round = firstRound; round < 24; round++) {
+// Keccak-p[1600, n_r] permutation where n_r defaults to 24.
+// For KangarooTwelve, n_r = 12 (the last 12 rounds: 24 - 12 = 12..23).
+export function keccakP(state: BigUint64Array, rounds: number = 24, steps?: CipherStep[], stepLabelPrefix?: string): BigUint64Array {
+  const startRound = 24 - rounds
+  for (let round = startRound; round < 24; round++) {
     // Theta: XOR each column's parity into every lane in that column's neighbors
     const C = new Array<bigint>(5)
     for (let x = 0; x < 5; x++) {
@@ -151,6 +152,11 @@ function keccakF1600(state: BigUint64Array, steps?: CipherStep[], stepLabelPrefi
       })
     }
   }
+  return state
+}
+
+export function keccakF1600(state: BigUint64Array, steps?: CipherStep[], stepLabelPrefix?: string): void {
+  keccakP(state, 24, steps, stepLabelPrefix)
 }
 
 export function keccakP(state: bigint[], rounds: number): bigint[] {

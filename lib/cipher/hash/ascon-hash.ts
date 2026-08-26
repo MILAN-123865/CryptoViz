@@ -16,7 +16,8 @@
  * Status: SECURE (NIST SP 800-232 standardized).
  */
 import type { CipherResult, CipherStep, CipherOptions, TestVector, CipherMetadata } from '../types'
-import { CipherError, validateInput } from '../../utils'
+import { CipherError } from '../../utils'
+import { validateHashInput } from './sha256'
 import { asconPermutation } from '../symmetric/ascon'  // GENUINE REUSE from ascon.ts
 
 const METADATA: CipherMetadata = {
@@ -171,7 +172,7 @@ function asconHashCore(input: string, instrument: boolean): CipherResult {
 }
 
 export function encrypt(input: string, key: string, options: CipherOptions = {}): CipherResult {
-    validateInput(input)
+    validateHashInput(input)
     return asconHashCore(input, !!options.instrument)
 }
 

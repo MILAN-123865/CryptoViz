@@ -19,10 +19,9 @@
  * Status: SECURE (IRTF-documented).
  */
 import type { CipherResult, CipherStep, CipherOptions, TestVector, CipherMetadata } from '../types'
-import { CipherError, validateInput } from '../../utils'
+import { CipherError } from '../../utils'
+import { validateHashInput } from './sha256'
 // GENUINE REUSE: Import Keccak-p permutation from sha3.ts
-// Assuming sha3.ts exports a keccakP function that accepts a round count parameter.
-// If not, a small refactor to sha3.ts to export keccakP(state, rounds) would be needed.
 import { keccakP } from '../hash/sha3'
 
 const METADATA: CipherMetadata = {
@@ -195,8 +194,8 @@ function kangarooTwelveCore(input: string, instrument: boolean, outputLen: numbe
     return { output: toHex(output), outputEncoding: 'hex', steps, metadata: METADATA, durationMs: performance.now() - start }
 }
 
-export function encrypt(input: string, key: string, options: CipherOptions = {}): CipherResult {
-    validateInput(input)
+export function encrypt(input: string, key: string = '', options: CipherOptions = {}): CipherResult {
+    validateHashInput(input)
     const outLen = (options.outputLength as number) || 32
     return kangarooTwelveCore(input, !!options.instrument, outLen)
 }
