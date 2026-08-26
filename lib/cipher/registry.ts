@@ -923,6 +923,23 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     options: [{ name: 'Key Size', id: 'keySize', type: 'select', default: '64', choices: [{ label: 'LED-64 (64-bit key)', value: '64' }, { label: 'LED-128 (128-bit key)', value: '128' }] }]
   },
   {
+    id: 'aegis128l',
+    name: 'AEGIS-128L',
+    category: 'symmetric',
+    description: 'IETF RFC 9106 AEAD. 8 parallel 128-bit AES states. Highest-throughput AEAD in the AEGIS family. 128-bit key + 128-bit nonce. 128/256-bit tag.',
+    defaultKey: '00'.repeat(32),
+    defaultInput: '48656c6c6f',
+    securityStatus: 'recommended',
+    keyPlaceholder: '32 bytes hex (16-byte key + 16-byte nonce)',
+    practicalUseCases: ['High-throughput authenticated encryption', 'TLS 1.3 candidate', 'Server-side disk encryption'],
+    prerequisites: ['aes-gcm', 'aes-ccm', 'chacha20-poly1305'],
+    recommendedNext: [],
+    options: [
+      { name: 'Tag Length', id: 'tagLen', type: 'select', default: 16, choices: [{ label: '128-bit (16 bytes)', value: 16 }, { label: '256-bit (32 bytes)', value: 32 }] },
+      { name: 'Associated Data (AD)', id: 'ad', type: 'text', default: '' }
+    ]
+  },
+  {
     id: 'rectangle',
     name: 'RECTANGLE',
     category: 'symmetric',
