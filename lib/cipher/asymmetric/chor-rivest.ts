@@ -121,17 +121,24 @@ function findGenerator(): GFElement {
         const powered = gfPow(candidate, targetOrder)
         const isOne = powered.every((c, idx) => idx === 0 ? c === 1 : c === 0)
         if (isOne) {
-            // Verify it's a primitive root (no smaller order)
-            let isPrimitive = true
-            for (const divisor of [P - 1, (FIELD_SIZE - 1) / P]) {
-                if (divisor >= 1 && Number.isInteger(divisor)) {
-                    const test = gfPow(candidate, divisor)
-                    const testIsOne = test.every((c, idx) => idx === 0 ? c === 1 : c === 0)
-                    if (testIsOne) { isPrimitive = false; break }
-                }
-            }
-            if (isPrimitive) return candidate
-        }
+// Verify it's a primitive root by checking all prime factors of |GF(p^h)*|
+let order = targetOrder
+const primeFactors: number[] = []
+
+for (let factor = 2; factor * factor <= order; factor++) {
+    if (order % factor === 0) {
+        primeFactors.push(factor)
+        while (order % factor === 0) order = Math.floor(order / factor)
+    }
+}
+if (order > 1) primeFactors.push(order)
+
+const isPrimitive = primeFactors.every((factor) => {
+    const test = gfPow(candidate, Math.floor(targetOrder / factor))
+    return !test.every((c, idx) => idx === 0 ? c === 1 : c === 0)
+})
+
+if (isPrimitive) return candidate        }
     }
     return x  // Fallback
 }
@@ -150,7 +157,7 @@ function discreteLog(g: GFElement, target: GFElement): number {
         if (match) return k
         current = gfMul(current, g)
     }
-    throw new CipherError('INTERNAL_ERROR', 'Discrete log not found')
+    throw new CipherError('INVALID_INPUT', 'Discrete log not found')
 }
 
 interface ChorRivestKeys {
@@ -160,6 +167,35 @@ interface ChorRivestKeys {
     generator: GFElement
 }
 
+function parsePrivateKey(key: string): ChorRivestKeys {
+    try {
+        const parsed = JSON.parse(key) as ChorRivestKeys
+
+        if (
+            !Array.isArray(parsed.publicWeights) ||
+            !Array.isArray(parsed.privatePermutation) ||
+            typeof parsed.privateD !== 'number' ||
+            !Array.isArray(parsed.generator)
+        ) {
+            throw new Error()
+        }
+
+        if (
+            parsed.publicWeights.length !== MSG_LEN ||
+            parsed.privatePermutation.length !== MSG_LEN ||
+            parsed.generator.length !== H
+        ) {
+            throw new Error()
+        }
+
+        return parsed
+    } catch {
+        throw new CipherError(
+            'INVALID_INPUT',
+            'Invalid Chor-Rivest private key.'
+        )
+    }
+}
 /**
  * Key generation: compute discrete logarithms in GF(p^h) for a specific
  * set of field elements, then disguise them via permutation and modular
@@ -174,7 +210,6 @@ function keygen(): ChorRivestKeys {
     for (let i = 0; i < MSG_LEN; i++) {
         const element: GFElement = new Array(H).fill(0);
         element[i % H] = (Math.floor(i / H) + 1) % P;
-        if (element.every(c => c === 0)) element[0] = 1;
         const log = discreteLog(g, element);
         structuredWeights.push(log);
     }
@@ -312,10 +347,8 @@ function chorRivestCore(input: string, key: string, doDecrypt: boolean, instrume
 
     if (!doDecrypt) {
         // ENCRYPT
-        const keys = keygen()
-        const msgBytes = parseHex(input)
-
-        // Convert bytes to binary vector of length MSG_LEN
+const keys = key ? parsePrivateKey(key) : keygen()
+const msgBytes = parseHex(input)        // Convert bytes to binary vector of length MSG_LEN
         const bits: number[] = []
         for (const byte of msgBytes) {
             for (let bit = 7; bit >= 0 && bits.length < MSG_LEN; bit--) {
@@ -338,11 +371,10 @@ function chorRivestCore(input: string, key: string, doDecrypt: boolean, instrume
             })
         }
     } else {
-        // DECRYPT
-        const keys = keygen()  // Toy: regenerate for simplicity
-        const ciphertext = parseInt(input, 16)
-        const recovered = decryptMessage(ciphertext, keys)
-        outHex = toHex(recovered.map(b => b ? 0xFF : 0x00))
+// DECRYPT
+const keys = parsePrivateKey(key)
+const ciphertext = parseInt(input, 16)
+const recovered = decryptMessage(ciphertext, keys)        outHex = toHex(recovered.map(b => b ? 0xFF : 0x00))
 
         if (instrument) {
             steps.push({

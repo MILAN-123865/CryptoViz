@@ -81,7 +81,7 @@ Applies to any new route under `app/[feature]` and its paired components.
       (`<script>alert(1)</script>`) is included in the E2E test and
       asserted to render as inert text.
 - [ ] Bundle impact checked against the Performance Budgets table
-      (`pnpm analyze`); PR description states the delta.
+      (`npm run check:budgets`); PR description states the delta.
 
 ---
 
@@ -109,7 +109,7 @@ password hashing), or worker message boundaries.
       approximation wherever it does not implement the real protocol in
       full (see the Simulation vs Live Data Policy — this is mandatory,
       not optional).
-- [ ] New dependency, if any, is checked against `pnpm audit` with zero
+- [ ] New dependency, if any, is checked against `npm audit` with zero
       new high/critical advisories.
 - [ ] Reviewed by a second contributor before merge (self-merge
       prohibited for this category).

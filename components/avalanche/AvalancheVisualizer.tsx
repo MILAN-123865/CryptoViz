@@ -12,7 +12,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { CipherResult } from '../../lib/cipher/types'
-import { useCipherWorker } from '../../lib/hooks/useCipherWorker'
+import { useCipherWorker } from '@/hooks/useCipherWorker'
 import {
   computeByteCells,
   diffStats,
@@ -351,7 +351,7 @@ export default function AvalancheVisualizer() {
             <div>
               <h3 className="text-sm font-bold text-red-800 dark:text-red-300">Computation Error</h3>
               <p className="mt-1 text-sm text-red-700 dark:text-red-400">
-                {error || workerError?.message || workerError?.code || 'The cipher worker reported an error.'}
+                {error || workerError || 'The cipher worker reported an error.'}
               </p>
             </div>
           </div>

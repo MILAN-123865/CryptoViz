@@ -22,13 +22,23 @@ export interface AttackDemoItem {
 
 export const ATTACK_COLLECTION: AttackDemoItem[] = [
   {
+    id: 'aead-nonce-reuse',
+    slug: 'aead-nonce-reuse',
+    title: 'AEAD Nonce-Reuse Catastrophe',
+    category: 'Cryptanalysis',
+    riskLevel: 'Critical',
+    summary: 'Reusing one AES-GCM nonce lets an attacker solve for the GHASH key in GF(2¹²⁸) and forge a tag the real verifier accepts.',
+    educationalNote: 'The "forbidden attack" (Joux): the tag pad E_K(J0) depends only on the nonce, so two messages under one nonce cancel it, leaving ΔT = ΔC·H² — a unique GF(2¹²⁸) square root recovers H, then any message can be forged. Never reuse a GCM nonce; AES-GCM-SIV (RFC 8452) survives reuse.',
+    tags: ['AES-GCM', 'GHASH', 'GF(2¹²⁸)', 'Nonce Reuse', 'Forgery', 'AEAD'],
+  },
+  {
     id: 'signature-nonce-reuse',
     slug: 'signature-nonce-reuse',
     title: 'Signature Nonce-Reuse & Malleability',
     category: 'Cryptanalysis',
     riskLevel: 'Critical',
     summary: 'Recovering an ECDSA private key from two secp256k1 signatures that reused the same nonce, plus signature malleability.',
-    educationalNote: 'The real bug behind the Sony PS3 signing-key leak and drained Bitcoin wallets — reusing k makes r repeat, letting anyone solve for the private key. Fixed by deterministic nonces (RFC 6979) or a CSPRNG.',
+    educationalNote: 'The real bug behind the Sony PS3 signing-key leak in 2010 — reusing k makes r repeat, letting anyone solve for the private key. Fixed by deterministic nonces (RFC 6979) or a CSPRNG.',
     tags: ['ECDSA', 'secp256k1', 'Nonce Reuse', 'Malleability', 'Key Recovery'],
   },
   {

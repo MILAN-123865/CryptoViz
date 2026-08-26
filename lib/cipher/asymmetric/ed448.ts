@@ -99,7 +99,7 @@ function verifyCore(message: string, pubKeyAndSig: string, instrument: boolean):
     })
   }
   if (!valid) {
-    throw new CipherError('INVALID_INPUT', 'Ed448 signature verification failed.')
+    throw new CipherError('INVALID_INPUT', 'VERIFICATION_FAILED: Ed448 signature verification failed.')
   }
 
   return {

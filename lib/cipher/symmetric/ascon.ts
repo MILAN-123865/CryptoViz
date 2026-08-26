@@ -48,7 +48,7 @@ function rotr64(x: bigint, n: bigint): bigint {
 }
 
 // ── ASCON permutation: apply numRounds rounds starting at round (12-numRounds)
-function asconPermute(s: BigInt64Array, numRounds: number): void {
+export function asconPermute(s: BigInt64Array, numRounds: number): void {
     const start = 12 - numRounds
     const S = [
         BigInt.asUintN(64, s[0]),
@@ -86,6 +86,18 @@ function asconPermute(s: BigInt64Array, numRounds: number): void {
     }
 
     for (let i = 0; i < 5; i++) s[i] = BigInt.asIntN(64, S[i])
+}
+
+/**
+ * 5x64-bit state permutation helper for sponge modes (e.g. Ascon-Hash)
+ */
+export function asconPermutation(state: bigint[], numRounds: number = 12): bigint[] {
+    const s = new BigInt64Array(5)
+    for (let i = 0; i < 5; i++) s[i] = BigInt.asIntN(64, state[i] ?? 0n)
+    asconPermute(s, numRounds)
+    const out: bigint[] = new Array(5)
+    for (let i = 0; i < 5; i++) out[i] = BigInt.asUintN(64, s[i])
+    return out
 }
 
 // ── Byte/hex helpers ──────────────────────────────────────────────────────────

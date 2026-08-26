@@ -1,28 +1,46 @@
-import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
-module.exports = {
-  rules: {
-    "@typescript-eslint/no-explicit-any": "error",
-  },
-};
-const eslintConfig = defineConfig([
+
+export default [
   ...nextVitals,
   ...nextTs,
   {
+    ignores: [
+      ".next/**",
+      "out/**",
+      "build/**",
+      "dist/**",
+      "next-env.d.ts",
+    ],
+  },
+  {
     rules: {
+      "@typescript-eslint/no-explicit-any": "error",
       "no-console": "warn",
       "react/no-danger": "error",
     },
   },
-  // Override default ignores of eslint-config-next.
-  globalIgnores([
-    // Default ignores of eslint-config-next:
-    ".next/**",
-    "out/**",
-    "build/**",
-    "next-env.d.ts",
-  ]),
-]);
+  {
+    // Security-sensitive randomness must go through lib/random/cryptoRandom.ts
+    files: [
+      "lib/cipher/**/*.{ts,tsx}",
+      "lib/security/**/*.{ts,tsx}",
+      "lib/kdf/**/*.{ts,tsx}",
+      "lib/protocols/**/*.{ts,tsx}",
+      "lib/crypto/**/*.{ts,tsx}",
+    ],
+    ignores: ["**/*.test.ts", "**/*.test.tsx"],
+    rules: {
+      "no-restricted-properties": [
+        "error",
+        {
+          object: "Math",
+          property: "random",
+          message:
+            "Math.random() is not cryptographically secure. Use cryptoRandomBytes()/cryptoRandomInt() from lib/random/cryptoRandom.ts.",
+        },
+      ],
+    },
+  },
+];
 
-export default eslintConfig;

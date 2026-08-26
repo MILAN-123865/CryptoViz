@@ -4,11 +4,11 @@
  */
 import type { CipherResult, CipherStep, CipherOptions, TestVector, CipherMetadata } from '../types'
 import { CipherError } from '../../utils/errors'
-import { sha256 } from '@noble/hashes/sha256'
+import { sha256 } from '@noble/hashes/sha2.js'
 
 const METADATA: CipherMetadata = {
     name: 'LMS',
-    securityStatus: 'recommended',
+    securityStatus: 'secure',
     breakingComplexity: 'NIST SP 800-208. Quantum-safe via SHA-256. ⚠ Stateful.',
     yearDesigned: 2013,
     standardBody: 'RFC 8554',

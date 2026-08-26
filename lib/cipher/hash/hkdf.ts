@@ -10,9 +10,6 @@ import type {
   CipherOptions,
   TestVector,
 } from '../types'
-if (options?.hexInput) {
-  // handling hex input directly without casting
-}
 
 const METADATA: CipherMetadata = {
   name: 'HKDF (HMAC Key Derivation)',
@@ -81,7 +78,8 @@ export function encrypt(
   const hashName: HashName = (options.hash as HashName) || 'SHA-256'
   const { fn: hashFn, len: hashLen } = getHashInfo(hashName)
 
-  const keyLength = typeof options.keyLength === 'number' ? options.keyLength : typeof (options as any).length === 'number' ? (options as any).length : 32
+  const optLen = 'length' in options && typeof options.length === 'number' ? options.length : undefined
+  const keyLength = typeof options.keyLength === 'number' ? options.keyLength : optLen ?? 32
 
   if (keyLength <= 0) {
     throw new CipherError('INVALID_KEY_LENGTH', 'Derived key length L must be a positive integer.')
