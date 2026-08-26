@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { LanguageProvider } from "@/lib/i18n/context";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
+import ServiceWorkerIntegrity from "@/components/offline/ServiceWorkerIntegrity";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -57,6 +58,7 @@ export default function RootLayout({
 
         </div>
         <LanguageProvider>
+          <ServiceWorkerIntegrity />
           <main id="main-content" tabIndex={-1} className="outline-none flex-1">
             {children}
           </main>

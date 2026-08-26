@@ -5,14 +5,22 @@ import { CipherError } from '@/lib/utils'
 describe('Chor-Rivest', () => {
     it('exports test vectors', () => expect(TEST_VECTORS.length).toBeGreaterThan(0))
 
-    it('round trips with valid fixed-weight message', () => {
-        // 0xE0 = 11100000 = 3 bits set (matches FIXED_WEIGHT=3)
-        const msg = 'e0'
-        const ct = encrypt(msg, 'mock')
-        expect(ct.output).toBeDefined()
-        // Round-trip would require key persistence; verified by code inspection
+it('round trips with a supplied private key', () => {
+    const privateKey = JSON.stringify({
+        publicWeights: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        privatePermutation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+        privateD: 1,
+        generator: [0, 1, 0],
     })
 
+    const msg = 'e0'
+    const ct = encrypt(msg, privateKey)
+
+    expect(ct.output).toBeDefined()
+
+    const decrypted = decrypt(ct.output, privateKey)
+    expect(decrypted.output).toBeDefined()
+})
     it('REJECTS messages violating fixed Hamming weight constraint', () => {
         // 0xFF = 11111111 = 8 bits set (violates FIXED_WEIGHT=3)
         const invalidMsg = 'ff'

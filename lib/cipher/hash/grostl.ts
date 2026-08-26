@@ -7,7 +7,8 @@
  * Grøstl-256("") = 1a52d11d550039be16107f9c58db9ebcc417f16f736adb1d63343b1e746357d
  */
 import type { CipherResult, CipherStep, CipherOptions, TestVector, CipherMetadata } from '../types'
-import { CipherError, validateInput } from '../../utils'
+import { CipherError } from '../../utils'
+import { validateHashInput } from './sha256'
 
 const METADATA: CipherMetadata = {
     name: 'Grøstl-256',
@@ -209,8 +210,8 @@ function grostlCore(input: string, instrument: boolean): CipherResult {
     return { output: toHex(out), outputEncoding: 'hex', steps, metadata: METADATA, durationMs: performance.now() - start }
 }
 
-export function encrypt(input: string, key: string, options: CipherOptions = {}): CipherResult {
-    validateInput(input)
+export function encrypt(input: string, key: string = '', options: CipherOptions = {}): CipherResult {
+    validateHashInput(input)
     return grostlCore(input, !!options.instrument)
 }
 

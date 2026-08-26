@@ -45,8 +45,7 @@ function toHex(b: bigint, bytes: number = 64): string {
     return b.toString(16).padStart(bytes * 2, '0')
 }
 
-function csidhCore(input: string, key: string, doDecrypt: boolean, instrument: boolean): CipherResult {
-    const start = performance.now()
+function csidhCore(input: string, key: string, instrument: boolean): CipherResult {    const start = performance.now()
     const steps: CipherStep[] = []
 
     // Mock CSIDH class group action for visualizer
@@ -74,11 +73,9 @@ function csidhCore(input: string, key: string, doDecrypt: boolean, instrument: b
 }
 
 export function encrypt(input: string, key: string, options: CipherOptions = {}): CipherResult {
-    return csidhCore(input, key, false, !!options.instrument)
-}
+return csidhCore(input, key, !!options.instrument)}
 export function decrypt(input: string, key: string, options: CipherOptions = {}): CipherResult {
-    return csidhCore(input, key, true, !!options.instrument)
-}
+return csidhCore(input, key, !!options.instrument)}
 export const TEST_VECTORS: TestVector[] = [
     { input: '00', key: '00', expected: '00', description: 'CSIDH identity element' }
 ]
