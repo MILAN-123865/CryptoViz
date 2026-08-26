@@ -962,6 +962,30 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     recommendedNext: ["hmac", "sha512", "bcrypt"],
   },
   {
+    id: 'shavite3',
+    name: 'SHAvite-3',
+    category: 'hash',
+    description: 'SHA-3 finalist. HAIFA construction with AES-based compression and counter injection. Prevents length-extension attacks. SHAvite-3-256 and SHAvite-3-512 variants.',
+    defaultKey: '',
+    defaultInput: '',
+    securityStatus: 'legacy',
+    practicalUseCases: ['Academic study of HAIFA-mode hashing', 'AES-native hash construction'],
+    prerequisites: ['sha3', 'echo', 'jh'],
+    recommendedNext: ['blake3'],
+    options: [
+      {
+        name: 'Output Bits',
+        id: 'outputBits',
+        type: 'select',
+        default: 256,
+        choices: [
+          { label: 'SHAvite-3-256', value: 256 },
+          { label: 'SHAvite-3-512', value: 512 }
+        ]
+      }
+    ]
+  },
+  {
     id: 'echo',
     name: 'ECHO',
     category: 'hash',
