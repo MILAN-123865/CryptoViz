@@ -69,7 +69,7 @@ function signCore(message: string, privateKeyHex: string, instrument: boolean): 
   }
 
   const msgBytes = toByteArray(message, 'utf8')
-  const signature = ml_dsa65.sign(privKey, msgBytes)
+  const signature = ml_dsa65.sign(msgBytes, privKey)
 
   if (instrument) {
     steps.push({
@@ -99,7 +99,7 @@ function verifyCore(message: string, pubKeyAndSig: string, instrument: boolean):
   }
   const [pubKeyHex, sigHex] = parts
   const msgBytes = toByteArray(message, 'utf8')
-  const valid = ml_dsa65.verify(hexToBytes(pubKeyHex), msgBytes, hexToBytes(sigHex))
+  const valid = ml_dsa65.verify(hexToBytes(sigHex), msgBytes, hexToBytes(pubKeyHex))
 
   const steps: CipherStep[] = []
   if (instrument) {
@@ -113,7 +113,7 @@ function verifyCore(message: string, pubKeyAndSig: string, instrument: boolean):
     })
   }
   if (!valid) {
-    throw new CipherError('INVALID_INPUT', 'ML-DSA-65 signature verification failed.')
+    throw new CipherError('INVALID_INPUT', 'VERIFICATION_FAILED: ML-DSA-65 signature verification failed.')
   }
 
   return {
