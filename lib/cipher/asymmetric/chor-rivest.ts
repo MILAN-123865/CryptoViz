@@ -371,10 +371,11 @@ const msgBytes = parseHex(input)        // Convert bytes to binary vector of len
             })
         }
     } else {
-// DECRYPT
-const keys = parsePrivateKey(key)
-const ciphertext = parseInt(input, 16)
-const recovered = decryptMessage(ciphertext, keys)        outHex = toHex(recovered.map(b => b ? 0xFF : 0x00))
+        // DECRYPT
+        const keys = parsePrivateKey(key)
+        const ciphertext = parseInt(input, 16)
+        const recovered = decryptMessage(ciphertext, keys)
+        outHex = toHex(recovered.map(b => b ? 0xFF : 0x00))
 
         if (instrument) {
             steps.push({

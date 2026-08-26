@@ -17,87 +17,7 @@ import { CipherError, validateHexString } from './errors';
 
 export type BinaryInput = Uint8Array | readonly number[];
 
-/**
- * Convert string to byte array according to encoding ('utf8' | 'hex' | 'base64' | 'binary').
- */
-export function toByteArray(str: string, encoding: Encoding = 'utf8'): Uint8Array {
-  if (encoding === 'utf8') {
-    return new TextEncoder().encode(str);
-  }
-  if (encoding === 'hex') {
-    if (str.length > 0) {
-      validateHexString(str);
-    }
-    const arr = new Uint8Array(str.length / 2);
-    for (let i = 0; i < str.length; i += 2) {
-      arr[i / 2] = parseInt(str.slice(i, i + 2), 16);
-    }
-    return arr;
-  }
-  if (encoding === 'base64') {
-    try {
-      const binary = atob(str.trim());
-      const arr = new Uint8Array(binary.length);
-      for (let i = 0; i < binary.length; i++) {
-        arr[i] = binary.charCodeAt(i);
-      }
-      return arr;
-    } catch {
-      throw new CipherError('INVALID_KEY', 'Invalid base64 string.');
-    }
-  }
-  // Binary or raw fallback
-  const arr = new Uint8Array(str.length);
-  for (let i = 0; i < str.length; i++) {
-    arr[i] = str.charCodeAt(i) & 0xff;
-  }
-  return arr;
-}
-
-/**
- * Convert byte array to string representation according to encoding.
- */
-export function fromByteArray(arr: Uint8Array, encoding: Encoding = 'utf8'): string {
-  if (encoding === 'utf8') {
-    return new TextDecoder().decode(arr);
-  }
-  if (encoding === 'hex') {
-    return Array.from(arr)
-      .map((b) => b.toString(16).padStart(2, '0'))
-      .join('');
-  }
-  if (encoding === 'base64') {
-    const binary = Array.from(arr)
-      .map((b) => String.fromCharCode(b))
-      .join('');
-    return btoa(binary);
-  }
-  // Binary fallback
-  return Array.from(arr)
-    .map((b) => String.fromCharCode(b))
-    .join('');
-}
-
-export function validateRequiredInput(
-  input: string,
-  message = 'Input is required.'
-): void {
-  if (!input || input.trim() === '') {
-    throw new CipherError('INPUT_REQUIRED', message);
-  }
-}
-
-export function validateMaxLength(
-  byteLength: number,
-  max: number
-): void {
-  if (byteLength > max) {
-    throw new CipherError(
-      'INPUT_TOO_LONG',
-      `Input exceeds maximum size of ${max} bytes.`
-    );
-  }
-}
+export { validateHexString };
 
 export interface HexOptions {
   allowWhitespace?: boolean;
@@ -138,6 +58,25 @@ function assertExpectedLength(actual: number, expected: number | undefined, unit
   if (expected !== undefined && actual !== expected) {
     throw new Error(`${label} must contain exactly ${expected} ${unit}; received ${actual}.`);
   }
+}
+
+/**
+ * Clone an input into a fresh Uint8Array.
+ */
+export function asBytes(input: BinaryInput): Uint8Array {
+  if (input instanceof Uint8Array) {
+    return new Uint8Array(input);
+  }
+
+  const bytes = new Uint8Array(input.length);
+  for (let index = 0; index < input.length; index += 1) {
+    const value = input[index];
+    if (!Number.isInteger(value) || value < 0 || value > 255) {
+      throw new Error(`Byte at index ${index} must be an integer from 0 to 255.`);
+    }
+    bytes[index] = value;
+  }
+  return bytes;
 }
 
 /**
@@ -287,44 +226,39 @@ export function parseBase64Url(value: string, options: Omit<Base64Options, 'urlS
 /**
  * Backwards-compatible string-to-byte adapter used by cipher implementations.
  */
-export function toByteArray(value: string, encoding: 'hex' | 'utf8' | 'base64' | 'binary' = 'utf8'): Uint8Array {
+export function toByteArray(input: string, encoding: Encoding | 'utf8' | 'hex' | 'base64' | 'binary' = 'utf8'): Uint8Array {
+  if (typeof input !== 'string') {
+    throw new Error('Input must be a string.');
+  }
   switch (encoding) {
-    case 'hex': return parseHex(value);
-    case 'base64': return parseBase64(value);
-    case 'binary': return parseBinary(value);
-    case 'utf8': return new TextEncoder().encode(value);
+    case 'hex':
+      return parseHex(input);
+    case 'base64':
+      return parseBase64(input);
+    case 'binary':
+      return parseBinary(input);
+    case 'utf8':
+    default:
+      return new TextEncoder().encode(input);
   }
 }
 
 /**
  * Backwards-compatible byte-to-string adapter used by cipher implementations.
  */
-export function fromByteArray(input: BinaryInput, encoding: 'hex' | 'utf8' | 'base64' | 'binary' = 'utf8'): string {
+export function fromByteArray(input: BinaryInput, encoding: Encoding | 'utf8' | 'hex' | 'base64' | 'binary' = 'utf8'): string {
+  const bytes = asBytes(input);
   switch (encoding) {
-    case 'hex': return toHex(input);
-    case 'base64': return toBase64(input);
-    case 'binary': return toBinary(input);
-    case 'utf8': return new TextDecoder().decode(asBytes(input));
+    case 'hex':
+      return toHex(bytes);
+    case 'base64':
+      return toBase64(bytes);
+    case 'binary':
+      return toBinary(bytes);
+    case 'utf8':
+    default:
+      return new TextDecoder().decode(bytes);
   }
-}
-
-/**
- * Clone an input into a fresh Uint8Array.
- */
-export function asBytes(input: BinaryInput): Uint8Array {
-  if (input instanceof Uint8Array) {
-    return new Uint8Array(input);
-  }
-
-  const bytes = new Uint8Array(input.length);
-  for (let index = 0; index < input.length; index += 1) {
-    const value = input[index];
-    if (!Number.isInteger(value) || value < 0 || value > 255) {
-      throw new Error(`Byte at index ${index} must be an integer from 0 to 255.`);
-    }
-    bytes[index] = value;
-  }
-  return bytes;
 }
 
 /**
@@ -413,40 +347,23 @@ function encodeBase64Fallback(binary: string): string {
   return output;
 }
 
-/**
- * Universal conversion from supported encodings ('utf8' | 'hex' | 'base64' | 'binary') to Uint8Array.
- */
-export function toByteArray(input: string, encoding: 'utf8' | 'hex' | 'base64' | 'binary' = 'utf8'): Uint8Array {
-  if (typeof input !== 'string') {
-    throw new Error('Input must be a string.');
-  }
-  switch (encoding) {
-    case 'hex':
-      return parseHex(input);
-    case 'base64':
-      return parseBase64(input);
-    case 'binary':
-      return parseBinary(input);
-    case 'utf8':
-    default:
-      return new TextEncoder().encode(input);
+export function validateRequiredInput(
+  input: string,
+  message = 'Input is required.'
+): void {
+  if (!input || input.trim() === '') {
+    throw new CipherError('INPUT_REQUIRED', message);
   }
 }
 
-/**
- * Universal conversion from Uint8Array to string in the specified encoding.
- */
-export function fromByteArray(input: BinaryInput, encoding: 'utf8' | 'hex' | 'base64' | 'binary' = 'hex'): string {
-  const bytes = asBytes(input);
-  switch (encoding) {
-    case 'hex':
-      return toHex(bytes);
-    case 'base64':
-      return toBase64(bytes);
-    case 'binary':
-      return toBinary(bytes);
-    case 'utf8':
-    default:
-      return new TextDecoder().decode(bytes);
+export function validateMaxLength(
+  byteLength: number,
+  max: number
+): void {
+  if (byteLength > max) {
+    throw new CipherError(
+      'INPUT_TOO_LONG',
+      `Input exceeds maximum size of ${max} bytes.`
+    );
   }
 }

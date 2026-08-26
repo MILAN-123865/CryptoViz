@@ -132,25 +132,6 @@ function signCore(input: string, key: string, instrument: boolean): CipherResult
     throw new CipherError('INVALID_INPUT', `Message hash H must satisfy 0 <= H < q (q=${q}). Reduce your hash mod q first.`)
   }
 
- fix/dsa-nonce-and-contract-mismatch
-  // Demo-mode nonce: derived from input+key for reproducibility in tests.
-  // Real usage MUST use a fresh cryptographically random k per signature —
-  // reusing k across two signatures leaks the private key x directly.
-  let k = 1n
-  let r = 0n
-  let s = 0n
-  const steps: CipherStep[] = []
-  do {
-    k = ((H + x + k) % (q - 1n)) + 1n // deterministic-for-demo search, NOT how real DSA should pick k
-    if (k === 22n) {
-      k = 7n // Canonical intercept for demo parameters to match (5,9)
-    }
-    r = modPow(g, k, p) % q
-    if (r === 0n) continue
-    const kInv = modInverse(k, q)
-    s = (kInv * (H + x * r)) % q
-  } while (r === 0n || s === 0n)
-
   const k = generateRfc6979Nonce(H, x, q)
   const r = modPow(g, k, p) % q
   if (r === 0n) {
@@ -161,7 +142,6 @@ function signCore(input: string, key: string, instrument: boolean): CipherResult
   if (s === 0n) {
     throw new CipherError('INVALID_INPUT', 'Degenerate signature produced s = 0.')
   }
- main
 
   const steps: CipherStep[] = []
   if (instrument) {
@@ -191,31 +171,12 @@ function signCore(input: string, key: string, instrument: boolean): CipherResult
 
 function verifyCore(input: string, key: string, instrument: boolean): CipherResult {
   const start = performance.now()
- fix/dsa-nonce-and-contract-mismatch
-  let H: bigint, r: bigint, s: bigint
-  let p: bigint, q: bigint, g: bigint, y: bigint
-
-  // Handle Contract 2: pipe-delimited format "p,q,g,y | r,s"
-  if (key.includes('|')) {
-    H = BigInt(input.trim())
-    const [keyPart, sigPart] = key.split('|')
-    const pub = parsePublicKey(keyPart)
-    p = pub.p; q = pub.q; g = pub.g; y = pub.y
-    const [rs, ss] = sigPart.split(',').map((s) => s.trim())
-    r = BigInt(rs)
-    s = BigInt(ss)
-  } else {
-    // Handle Contract 1: comma-separated tuple input "H,r,s" and key "p,q,g,y"
-    const inputParts = input.split(',').map((s) => s.trim())
-    if (inputParts.length !== 3) {
-      throw new CipherError('INVALID_INPUT', 'VERIFICATION_FAILED: Expected "H,r,s" or "p,q,g,y | r,s" verification format.')
-
-
   let pubKeyStr = key.trim()
   let H: bigint
   let r: bigint
   let s: bigint
 
+  // Handle Contract 2: pipe-delimited format "p,q,g,y | r,s"
   if (key.includes('|')) {
     const [keyPart, sigPart] = key.split('|').map((str) => str.trim())
     if (!keyPart || !sigPart) {
@@ -230,27 +191,19 @@ function verifyCore(input: string, key: string, instrument: boolean): CipherResu
     r = BigInt(sigParts[0])
     s = BigInt(sigParts[1])
   } else {
-    // Input format: "H,r,s"
+    // Handle Contract 1: comma-separated tuple input "H,r,s" and key "p,q,g,y"
     const inputParts = input.split(',').map((str) => str.trim()).filter(Boolean)
     if (inputParts.length !== 3) {
-      throw new CipherError('INVALID_INPUT', 'Input must be "H,r,s" when key does not include signature.')
- main
+      throw new CipherError('INVALID_INPUT', 'VERIFICATION_FAILED: Expected "H,r,s" or "p,q,g,y | r,s" verification format.')
     }
     H = BigInt(inputParts[0])
     r = BigInt(inputParts[1])
     s = BigInt(inputParts[2])
- fix/dsa-nonce-and-contract-mismatch
-    const pub = parsePublicKey(key)
-    p = pub.p; q = pub.q; g = pub.g; y = pub.y
-  }
-
-
   }
 
   const pub = parsePublicKey(pubKeyStr)
   const { p, q, g, y } = pub
 
- main
   if (r <= 0n || r >= q || s <= 0n || s >= q) {
     throw new CipherError('INVALID_INPUT', 'VERIFICATION_FAILED: r and s must both be in [1, q-1].')
   }

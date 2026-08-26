@@ -85,7 +85,7 @@ export function useCipherWorker() {
 
     const handleMessage = (event: MessageEvent<WorkerResponse | WorkerProgressMessage>) => {
       const data = event.data
-      if (data.type === 'PROGRESS') {
+      if ('type' in data && data.type === 'PROGRESS') {
         const handler = activeRequestsRef.current.get(data.jobId)
         if (!handler) return
         setProgress({

@@ -103,13 +103,30 @@ const RHO_OFFSETS = generateRhoOffsets()
 
 // Keccak-p[1600, n_r] permutation where n_r defaults to 24.
 // For KangarooTwelve, n_r = 12 (the last 12 rounds: 24 - 12 = 12..23).
-export function keccakP(state: BigUint64Array, rounds: number = 24, steps?: CipherStep[], stepLabelPrefix?: string): BigUint64Array {
+export function keccakP(
+  state: BigUint64Array,
+  rounds?: number,
+  steps?: CipherStep[],
+  stepLabelPrefix?: string,
+): BigUint64Array
+export function keccakP(state: bigint[], rounds?: number): bigint[]
+export function keccakP(
+  state: BigUint64Array | bigint[],
+  rounds: number = 24,
+  steps?: CipherStep[],
+  stepLabelPrefix?: string,
+): BigUint64Array | bigint[] {
+  const isArray = Array.isArray(state)
+  const words = isArray
+    ? BigUint64Array.from(state.map((word) => BigInt.asUintN(64, word)))
+    : state
+
   const startRound = 24 - rounds
   for (let round = startRound; round < 24; round++) {
     // Theta: XOR each column's parity into every lane in that column's neighbors
     const C = new Array<bigint>(5)
     for (let x = 0; x < 5; x++) {
-      C[x] = state[x] ^ state[x + 5] ^ state[x + 10] ^ state[x + 15] ^ state[x + 20]
+      C[x] = words[x] ^ words[x + 5] ^ words[x + 10] ^ words[x + 15] ^ words[x + 20]
     }
     const D = new Array<bigint>(5)
     for (let x = 0; x < 5; x++) {
@@ -117,7 +134,7 @@ export function keccakP(state: BigUint64Array, rounds: number = 24, steps?: Ciph
     }
     for (let x = 0; x < 5; x++) {
       for (let y = 0; y < 5; y++) {
-        state[x + 5 * y] ^= D[x]
+        words[x + 5 * y] ^= D[x]
       }
     }
 
@@ -127,19 +144,19 @@ export function keccakP(state: BigUint64Array, rounds: number = 24, steps?: Ciph
       for (let y = 0; y < 5; y++) {
         const newX = y
         const newY = (2 * x + 3 * y) % 5
-        B[newX + 5 * newY] = rotl64(state[x + 5 * y], RHO_OFFSETS[x][y])
+        B[newX + 5 * newY] = rotl64(words[x + 5 * y], RHO_OFFSETS[x][y])
       }
     }
 
     // Chi: nonlinear mixing within each row
     for (let x = 0; x < 5; x++) {
       for (let y = 0; y < 5; y++) {
-        state[x + 5 * y] = B[x + 5 * y] ^ (~B[(x + 1) % 5 + 5 * y] & MASK64 & B[(x + 2) % 5 + 5 * y])
+        words[x + 5 * y] = B[x + 5 * y] ^ (~B[(x + 1) % 5 + 5 * y] & MASK64 & B[(x + 2) % 5 + 5 * y])
       }
     }
 
     // Iota: XOR the round constant into lane (0,0) to break symmetry
-    state[0] ^= ROUND_CONSTANTS[round]
+    words[0] ^= ROUND_CONSTANTS[round]
 
     if (steps) {
       steps.push({
@@ -147,22 +164,20 @@ export function keccakP(state: BigUint64Array, rounds: number = 24, steps?: Ciph
         label: `${stepLabelPrefix ?? 'Permutation'} — round ${round + 1}/24`,
         inputState: '',
         outputState: '',
-        table: [{ key: 'Lane (0,0) after iota', value: '0x' + state[0].toString(16).padStart(16, '0') }],
+        table: [{ key: 'Lane (0,0) after iota', value: '0x' + words[0].toString(16).padStart(16, '0') }],
         note: 'theta -> rho -> pi -> chi -> iota applied to the 1600-bit state.',
       })
     }
   }
-  return state
+
+  if (isArray) {
+    return Array.from(words, (word) => BigInt.asUintN(64, word))
+  }
+  return words
 }
 
 export function keccakF1600(state: BigUint64Array, steps?: CipherStep[], stepLabelPrefix?: string): void {
   keccakP(state, 24, steps, stepLabelPrefix)
-}
-
-export function keccakP(state: bigint[], rounds: number): bigint[] {
-  const words = BigUint64Array.from(state.map((word) => BigInt.asUintN(64, word)))
-  keccakF1600(words, undefined, undefined, rounds)
-  return Array.from(words, (word) => BigInt.asUintN(64, word))
 }
 
 function padTenOne(inputBytes: Uint8Array): Uint8Array {
