@@ -7,7 +7,8 @@
  * (Obtain from KS X 3262 spec or KISA reference implementation)
  */
 import type { CipherResult, CipherStep, CipherOptions, TestVector, CipherMetadata } from '../types'
-import { CipherError, validateInput } from '../../utils'
+import { CipherError } from '../../utils'
+import { validateHashInput } from './sha256'
 
 const METADATA: CipherMetadata = {
     name: 'LSH-256',
@@ -90,8 +91,8 @@ function lsh256Core(input: string, instrument: boolean): CipherResult {
     return { output: toHex(out), outputEncoding: 'hex', steps, metadata: METADATA, durationMs: performance.now() - start }
 }
 
-export function encrypt(input: string, key: string, options: CipherOptions = {}): CipherResult {
-    validateInput(input)
+export function encrypt(input: string, key: string = '', options: CipherOptions = {}): CipherResult {
+    validateHashInput(input)
     return lsh256Core(input, !!options.instrument)
 }
 

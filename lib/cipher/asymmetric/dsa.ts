@@ -1,20 +1,5 @@
-/**
- * DSA (Digital Signature Algorithm) — NIST FIPS 186, 1994.
- * @see CIPHER_ENGINE.md section "DSA"
- *
- * The finite-field discrete-log ancestor of ECDSA: same r/s signature
- * shape and same nonce-reuse vulnerability, computed in a prime-order
- * subgroup of (Z/pZ)* instead of on an elliptic curve. Demo mode uses
- * small textbook parameters (same approach as rsa.ts/dh.ts/elgamal.ts) —
- * real DSA requires p >= 2048 bits, q >= 224 bits per current NIST
- * guidance (SP 800-57).
- *
- * Verified demo values (independently computed, not hand-derived):
- *   p=47, q=23, g=4 (order-23 subgroup generator)
- *   private x=5, public y=37
- *   sign H=15 with nonce k=7 -> r=5, s=9 (verified valid)
- */
-
+import { hmac } from '@noble/hashes/hmac.js'
+import { sha256 } from '@noble/hashes/sha2.js'
 import { CipherError } from '../../utils/errors'
 import type { CipherResult, CipherStep, CipherMetadata, CipherOptions, TestVector } from '../types'
 
@@ -83,6 +68,61 @@ function parsePrivateKey(keyStr: string): DsaPrivateKey {
   return { p: BigInt(parts[0]), q: BigInt(parts[1]), g: BigInt(parts[2]), x: BigInt(parts[3]) }
 }
 
+function bigIntToBytes(num: bigint, len = 32): Uint8Array {
+  const bytes = new Uint8Array(len)
+  let temp = num
+  for (let i = len - 1; i >= 0; i--) {
+    bytes[i] = Number(temp & 0xffn)
+    temp >>= 8n
+  }
+  return bytes
+}
+
+function bytesToBigInt(bytes: Uint8Array): bigint {
+  let result = 0n
+  for (const b of bytes) {
+    result = (result << 8n) | BigInt(b)
+  }
+  return result
+}
+
+function concatBytes(...arrays: Uint8Array[]): Uint8Array {
+  const totalLen = arrays.reduce((acc, a) => acc + a.length, 0)
+  const res = new Uint8Array(totalLen)
+  let offset = 0
+  for (const a of arrays) {
+    res.set(a, offset)
+    offset += a.length
+  }
+  return res
+}
+
+function generateRfc6979Nonce(H: bigint, x: bigint, q: bigint): bigint {
+  const qlen = q.toString(2).length
+  const qBytesLen = Math.max(32, Math.ceil(qlen / 8))
+
+  const xBytes = bigIntToBytes(x, qBytesLen)
+  const hBytes = bigIntToBytes(H % q, qBytesLen)
+
+  let V = new Uint8Array(qBytesLen).fill(0x01)
+  let K = new Uint8Array(qBytesLen).fill(0x00)
+
+  K = hmac(sha256, K, concatBytes(V, new Uint8Array([0x00]), xBytes, hBytes))
+  V = hmac(sha256, K, V)
+  K = hmac(sha256, K, concatBytes(V, new Uint8Array([0x01]), xBytes, hBytes))
+  V = hmac(sha256, K, V)
+
+  while (true) {
+    V = hmac(sha256, K, V)
+    const k = (bytesToBigInt(V) % (q - 1n)) + 1n
+    if (k >= 1n && k < q) {
+      return k
+    }
+    K = hmac(sha256, K, concatBytes(V, new Uint8Array([0x00])))
+    V = hmac(sha256, K, V)
+  }
+}
+
 function signCore(input: string, key: string, instrument: boolean): CipherResult {
   const start = performance.now()
   const priv = parsePrivateKey(key)
@@ -92,6 +132,7 @@ function signCore(input: string, key: string, instrument: boolean): CipherResult
     throw new CipherError('INVALID_INPUT', `Message hash H must satisfy 0 <= H < q (q=${q}). Reduce your hash mod q first.`)
   }
 
+ fix/dsa-nonce-and-contract-mismatch
   // Demo-mode nonce: derived from input+key for reproducibility in tests.
   // Real usage MUST use a fresh cryptographically random k per signature —
   // reusing k across two signatures leaks the private key x directly.
@@ -110,6 +151,19 @@ function signCore(input: string, key: string, instrument: boolean): CipherResult
     s = (kInv * (H + x * r)) % q
   } while (r === 0n || s === 0n)
 
+  const k = generateRfc6979Nonce(H, x, q)
+  const r = modPow(g, k, p) % q
+  if (r === 0n) {
+    throw new CipherError('INVALID_INPUT', 'Degenerate nonce produced r = 0.')
+  }
+  const kInv = modInverse(k, q)
+  const s = (kInv * (H + x * r)) % q
+  if (s === 0n) {
+    throw new CipherError('INVALID_INPUT', 'Degenerate signature produced s = 0.')
+  }
+ main
+
+  const steps: CipherStep[] = []
   if (instrument) {
     steps.push({
       index: 0,
@@ -117,11 +171,11 @@ function signCore(input: string, key: string, instrument: boolean): CipherResult
       inputState: H.toString(),
       outputState: `r=${r}, s=${s}`,
       table: [
-        { key: 'k (nonce)', value: k.toString() },
+        { key: 'k (nonce, RFC 6979)', value: k.toString() },
         { key: 'r = (g^k mod p) mod q', value: r.toString() },
         { key: 's = k⁻¹(H + x·r) mod q', value: s.toString() },
       ],
-      note: 'r/s shape is the same equation ECDSA later adapted to elliptic curves. Never reuse k across signatures — doing so leaks x.',
+      note: 'r/s shape is the same equation ECDSA later adapted to elliptic curves. Nonce k derived deterministically per RFC 6979.',
       isMilestone: true,
     })
   }
@@ -137,6 +191,7 @@ function signCore(input: string, key: string, instrument: boolean): CipherResult
 
 function verifyCore(input: string, key: string, instrument: boolean): CipherResult {
   const start = performance.now()
+ fix/dsa-nonce-and-contract-mismatch
   let H: bigint, r: bigint, s: bigint
   let p: bigint, q: bigint, g: bigint, y: bigint
 
@@ -154,14 +209,48 @@ function verifyCore(input: string, key: string, instrument: boolean): CipherResu
     const inputParts = input.split(',').map((s) => s.trim())
     if (inputParts.length !== 3) {
       throw new CipherError('INVALID_INPUT', 'VERIFICATION_FAILED: Expected "H,r,s" or "p,q,g,y | r,s" verification format.')
+
+
+  let pubKeyStr = key.trim()
+  let H: bigint
+  let r: bigint
+  let s: bigint
+
+  if (key.includes('|')) {
+    const [keyPart, sigPart] = key.split('|').map((str) => str.trim())
+    if (!keyPart || !sigPart) {
+      throw new CipherError('INVALID_KEY', 'Verification requires "p,q,g,y | r,s".')
+    }
+    pubKeyStr = keyPart
+    H = BigInt(input.trim())
+    const sigParts = sigPart.split(',').map((str) => str.trim())
+    if (sigParts.length !== 2) {
+      throw new CipherError('INVALID_INPUT', 'Signature in key must be "r,s".')
+    }
+    r = BigInt(sigParts[0])
+    s = BigInt(sigParts[1])
+  } else {
+    // Input format: "H,r,s"
+    const inputParts = input.split(',').map((str) => str.trim()).filter(Boolean)
+    if (inputParts.length !== 3) {
+      throw new CipherError('INVALID_INPUT', 'Input must be "H,r,s" when key does not include signature.')
+ main
     }
     H = BigInt(inputParts[0])
     r = BigInt(inputParts[1])
     s = BigInt(inputParts[2])
+ fix/dsa-nonce-and-contract-mismatch
     const pub = parsePublicKey(key)
     p = pub.p; q = pub.q; g = pub.g; y = pub.y
   }
 
+
+  }
+
+  const pub = parsePublicKey(pubKeyStr)
+  const { p, q, g, y } = pub
+
+ main
   if (r <= 0n || r >= q || s <= 0n || s >= q) {
     throw new CipherError('INVALID_INPUT', 'VERIFICATION_FAILED: r and s must both be in [1, q-1].')
   }
@@ -209,7 +298,8 @@ export const TEST_VECTORS: TestVector[] = [
   {
     input: '15',
     key: '47,23,4,5', // p,q,g,x (private)
-    expected: '5,9',
-    description: 'Sign H=15 with demo params (p=47,q=23,g=4), private key x=5 -> r=5, s=9',
+    expected: '14,17',
+    description: 'Deterministic RFC 6979 DSA sign H=15 with demo params (p=47,q=23,g=4), private key x=5 -> r=14, s=17',
   },
 ]
+

@@ -4,7 +4,8 @@
  * Merkle-Damgård construction with 1024-bit blocks.
  */
 import type { CipherResult, CipherStep, CipherOptions, TestVector, CipherMetadata } from '../types'
-import { CipherError, validateInput } from '../../utils'
+import { CipherError } from '../../utils'
+import { validateHashInput } from './sha256'
 
 const METADATA: CipherMetadata = {
     name: 'HAVAL',
@@ -110,8 +111,8 @@ function havalCore(input: string, passes: number, outputBits: number, instrument
     return { output: Array.from(out).map(x => x.toString(16).padStart(2, '0')).join(''), outputEncoding: 'hex', steps, metadata: METADATA, durationMs: performance.now() - start }
 }
 
-export function encrypt(input: string, key: string, options: CipherOptions = {}): CipherResult {
-    validateInput(input)
+export function encrypt(input: string, key: string = '', options: CipherOptions = {}): CipherResult {
+    validateHashInput(input)
     const passes = (options.passes as number) || 5
     const outputBits = (options.outputBits as number) || 256
     return havalCore(input, passes, outputBits, !!options.instrument)

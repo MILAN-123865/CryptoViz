@@ -6,7 +6,8 @@
  * while maintaining the structural requirement of 4 large 256x32-bit tables.
  */
 import type { CipherResult, CipherStep, CipherOptions, TestVector, CipherMetadata } from '../types'
-import { CipherError, validateInput } from '../../utils'
+import { CipherError } from '../../utils'
+import { validateHashInput } from './sha256'
 
 const METADATA: CipherMetadata = {
     name: 'Snefru',
@@ -117,8 +118,8 @@ function snefruCore(input: string, passes: number, outputBits: number, instrumen
     return { output: toHex(outBytes), outputEncoding: 'hex', steps, metadata: METADATA, durationMs: performance.now() - start }
 }
 
-export function encrypt(input: string, key: string, options: CipherOptions = {}): CipherResult {
-    validateInput(input)
+export function encrypt(input: string, key: string = '', options: CipherOptions = {}): CipherResult {
+    validateHashInput(input)
     const passes = (options.passes as number) || 2
     const outputBits = (options.outputBits as number) || 128
     return snefruCore(input, passes, outputBits, !!options.instrument)
