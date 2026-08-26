@@ -1505,6 +1505,30 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     securityStatus: 'experimental',
     options: [{ name: 'Output Bits', id: 'outputBits', type: 'select', default: 256, choices: [{ label: '256-bit', value: 256 }, { label: '512-bit', value: 512 }] }]
   },
+  {
+    id: 'edon-r',
+    name: 'Edon-R',
+    category: 'hash',
+    description: '⚠️ BROKEN — SHA-3 first-round candidate. Quasigroup string transformations. Collision attacks (Mendel et al., 2009) reduce Edon-R256 to ~2^17. Educational and historical use only.',
+    defaultKey: '',
+    defaultInput: '',
+    securityStatus: 'broken',
+    practicalUseCases: ['Historical study of quasigroup-based hash', 'Cryptanalysis education'],
+    prerequisites: ['md5', 'n-hash'],
+    recommendedNext: ['sha3', 'blake3'],
+    options: [
+      {
+        name: 'Output Bits',
+        id: 'outputBits',
+        type: 'select',
+        default: 256,
+        choices: [
+          { label: 'Edon-R256', value: 256 },
+          { label: 'Edon-R512', value: 512 }
+        ]
+      }
+    ]
+  },
   // Asymmetric
   {
     id: "rsa",
