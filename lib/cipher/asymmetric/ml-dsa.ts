@@ -281,6 +281,10 @@ export function signCore(
     privateKey = ensureSecretKey(privateKeyHex)
   }
 
+ fix/ml-dsa-argument-inversion
+  const msgBytes = toByteArray(message, 'utf8')
+  const signature = ml_dsa65.sign(msgBytes, privKey)
+
   const messageBytes = toByteArray(message, 'utf8')
 
   /*
@@ -295,6 +299,7 @@ export function signCore(
    * Do not reorder these arguments.
    */
   const signature = ml_dsa65.sign(messageBytes, privateKey)
+ main
 
   if (instrument) {
     steps.push(createSignStep(steps.length, message, signature))
@@ -312,6 +317,15 @@ export function verifyCore(
   instrument: boolean,
 ): CipherResult {
   const start = performance.now()
+ fix/ml-dsa-argument-inversion
+  const parts = pubKeyAndSig.split('|').map((s) => s.trim())
+  if (parts.length !== 2) {
+    throw new CipherError('INVALID_KEY', 'Verify expects "publicKeyHex|signatureHex".')
+  }
+  const [pubKeyHex, sigHex] = parts
+  const msgBytes = toByteArray(message, 'utf8')
+  const valid = ml_dsa65.verify(hexToBytes(sigHex), msgBytes, hexToBytes(pubKeyHex))
+
   const { publicKey, signature } = parseVerificationKey(pubKeyAndSig)
   const messageBytes = toByteArray(message, 'utf8')
 
@@ -323,6 +337,7 @@ export function verifyCore(
    * never reach the intended cryptographic check.
    */
   const valid = ml_dsa65.verify(signature, messageBytes, publicKey)
+ main
 
   const steps: CipherStep[] = []
 
@@ -331,10 +346,14 @@ export function verifyCore(
   }
 
   if (!valid) {
+ fix/ml-dsa-argument-inversion
+    throw new CipherError('INVALID_INPUT', 'VERIFICATION_FAILED: ML-DSA-65 signature verification failed.')
+
     throw new CipherError(
       'INVALID_INPUT',
       'VERIFICATION_FAILED: ML-DSA-65 signature verification failed.',
     )
+ main
   }
 
   return createResult(message, 'utf8', steps, start)
