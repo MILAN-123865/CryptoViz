@@ -67,6 +67,15 @@ function parseHex(s: string, lbl: string): number[] {
 }
 function toHex(b: number[] | Uint8Array): string { return Array.from(b).map(x => x.toString(16).padStart(2, '0')).join('') }
 
+/**
+ * Generate cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param options Input required by the Generate operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function generate(options: CipherOptions = {}): { publicKey: string; privateKey: string } {
     const paramSet = (options.paramSet as string) || 'Saber'
     const params = PARAMS[paramSet] || PARAMS['Saber']
@@ -96,6 +105,17 @@ export function generate(options: CipherOptions = {}): { publicKey: string; priv
     return { publicKey: toHex(pkBytes), privateKey: toHex(skBytes) }
 }
 
+/**
+ * Encrypt cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param plaintext Input required by the Encrypt operation.
+ * @param publicKey Input required by the Encrypt operation.
+ * @param options Input required by the Encrypt operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function encrypt(plaintext: string, publicKey: string, options: CipherOptions = {}): string {
     const paramSet = (options.paramSet as string) || 'Saber'
     const params = PARAMS[paramSet] || PARAMS['Saber']
@@ -113,6 +133,17 @@ export function encrypt(plaintext: string, publicKey: string, options: CipherOpt
     return toHex(new Uint8Array([...c_m, ...K]))
 }
 
+/**
+ * Decrypt cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param ciphertext Input required by the Decrypt operation.
+ * @param privateKey Input required by the Decrypt operation.
+ * @param options Input required by the Decrypt operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function decrypt(ciphertext: string, privateKey: string, options: CipherOptions = {}): string {
     const paramSet = (options.paramSet as string) || 'Saber'
     const params = PARAMS[paramSet] || PARAMS['Saber']
@@ -132,6 +163,14 @@ export function decrypt(ciphertext: string, privateKey: string, options: CipherO
     return toHex(K)
 }
 
+/**
+ * TEST VECTORS cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export const TEST_VECTORS: TestVector[] = [
     { input: 'mock', key: 'mock', expected: 'mock_kem', description: 'SABER KEM (NIST Round 3 KAT)' }
 ]

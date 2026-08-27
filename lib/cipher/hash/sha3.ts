@@ -28,6 +28,14 @@ const METADATA: CipherMetadata = {
   standardBody: 'NIST FIPS 202',
 }
 
+/**
+ * TEST VECTORS cryptographic hash export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export const TEST_VECTORS: TestVector[] = [
   {
     input: '',
@@ -103,13 +111,38 @@ const RHO_OFFSETS = generateRhoOffsets()
 
 // Keccak-p[1600, n_r] permutation where n_r defaults to 24.
 // For KangarooTwelve, n_r = 12 (the last 12 rounds: 24 - 12 = 12..23).
+/**
+ * Keccak P cryptographic hash export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function keccakP(
   state: BigUint64Array,
   rounds?: number,
   steps?: CipherStep[],
   stepLabelPrefix?: string,
 ): BigUint64Array
+/**
+ * Keccak P cryptographic hash export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param state Input required by the Keccak P operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function keccakP(state: bigint[], rounds?: number): bigint[]
+/**
+ * Keccak P cryptographic hash export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function keccakP(
   state: BigUint64Array | bigint[],
   rounds: number = 24,
@@ -176,6 +209,15 @@ export function keccakP(
   return words
 }
 
+/**
+ * Keccak F1600 cryptographic hash export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param state Input required by the Keccak F1600 operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function keccakF1600(state: BigUint64Array, steps?: CipherStep[], stepLabelPrefix?: string): void {
   keccakP(state, 24, steps, stepLabelPrefix)
 }
@@ -262,6 +304,17 @@ function sha3Instrumented(inputBytes: Uint8Array): CipherResult {
   }
 }
 
+/**
+ * Encrypt cryptographic hash export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param input Input required by the Encrypt operation.
+ * @param _key Input required by the Encrypt operation.
+ * @param options Input required by the Encrypt operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function encrypt(input: string, _key: string = '', options: CipherOptions = {}): CipherResult {
   if (input === null || input === undefined || typeof input !== 'string') {
     throw new CipherError('INPUT_REQUIRED', 'Input is required.')
@@ -287,6 +340,14 @@ export function encrypt(input: string, _key: string = '', options: CipherOptions
   }
 }
 
+/**
+ * Decrypt cryptographic hash export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function decrypt(): CipherResult {
   throw new CipherError(
     'ALGORITHM_UNSUPPORTED',

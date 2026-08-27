@@ -7,12 +7,44 @@
 
 import type { DataProvenanceMetadata } from "../provenance";
 
+/**
+ * Encoding cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export type Encoding = "utf8" | "hex" | "base64" | "binary";
 
+/**
+ * Cipher Name cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export type CipherName = string;
 
+/**
+ * Cipher Direction cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export type CipherDirection = "encrypt" | "decrypt";
 
+/**
+ * Cipher Step cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export interface CipherStep {
   index: number;
   label: string;
@@ -32,6 +64,14 @@ export interface CipherStep {
   isMilestone?: boolean;
 }
 
+/**
+ * Cipher Result cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export interface CipherResult {
   output: string;
   outputEncoding: Encoding;
@@ -41,6 +81,14 @@ export interface CipherResult {
   provenance?: DataProvenanceMetadata;
 }
 
+/**
+ * Cipher Metadata cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export interface CipherMetadata {
   name: string;
   keySize?: number;
@@ -63,6 +111,14 @@ export interface CipherMetadata {
   provenance?: DataProvenanceMetadata;
 }
 
+/**
+ * Cipher Options cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export interface CipherOptions {
   mode?: string;
   padding?: boolean | string;
@@ -84,6 +140,14 @@ export interface CipherOptions {
   [key: string]: unknown;
 }
 
+/**
+ * Test Vector cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export interface TestVector {
   input: string;
   key: string;

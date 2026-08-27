@@ -1,8 +1,24 @@
+/**
+ * Use Category cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/197/final — FIPS 197.
+ */
 export interface UseCategory {
   title: string;
   items: string[];
 }
 
+/**
+ * REAL WORLD USES cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/197/final — FIPS 197.
+ */
 export const REAL_WORLD_USES: Record<string, UseCategory[]> = {
   aes: [
     {
