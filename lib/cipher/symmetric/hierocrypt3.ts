@@ -176,10 +176,10 @@ function outerDiffusion(state: number[]): number[] {
  */
 function outerDiffusionInv(state: number[]): number[] {
     const INV_OUTER_MDS: number[][] = [
-        [10, 11, 14, 15],
-        [15, 10, 11, 14],
-        [14, 15, 10, 11],
-        [11, 14, 15, 10]
+        [0xB4, 0x90, 0x73, 0x52],
+        [0x52, 0xB4, 0x90, 0x73],
+        [0x73, 0x52, 0xB4, 0x90],
+        [0x90, 0x73, 0x52, 0xB4]
     ]
 
     const out: number[] = new Array(16).fill(0)
