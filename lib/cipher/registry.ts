@@ -966,6 +966,17 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     recommendedNext: ['mantis'],
   },
   {
+    id: 'schwaemm',
+    name: 'SCHWAEMM256-128',
+    category: 'symmetric',
+    description: 'NIST SP 800-232 LWC standard. SPARKLE-384 permutation, Alzette ARX-box. 256-bit nonce, 128-bit key, 128-bit tag. Pure-ARX sponge AEAD.',
+    defaultKey: '00'.repeat(48),
+    defaultInput: '48656c6c6f',
+    securityStatus: 'recommended',
+    keyPlaceholder: '48 bytes hex (16-byte key + 32-byte nonce)',
+    options: [{ name: 'Associated Data (AD)', id: 'ad', type: 'text', default: '' }]
+  },
+  {
     id: "sha256",
     name: "SHA-256",
     category: "hash",
