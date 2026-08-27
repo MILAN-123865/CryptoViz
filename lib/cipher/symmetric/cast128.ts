@@ -119,9 +119,11 @@ function cast128Core(input: string, key: string, doDecrypt: boolean, options: Ci
             }
         }
 
+        // The Feistel swap is part of the round state, not an extra
+        // serialization swap.  Decryption has already restored L || R.
         let resBlock = [
-            (R >>> 24) & 0xFF, (R >>> 16) & 0xFF, (R >>> 8) & 0xFF, R & 0xFF,
-            (L >>> 24) & 0xFF, (L >>> 16) & 0xFF, (L >>> 8) & 0xFF, L & 0xFF
+            (L >>> 24) & 0xFF, (L >>> 16) & 0xFF, (L >>> 8) & 0xFF, L & 0xFF,
+            (R >>> 24) & 0xFF, (R >>> 16) & 0xFF, (R >>> 8) & 0xFF, R & 0xFF
         ]
 
         if (mode === 'cbc' && doDecrypt) {
