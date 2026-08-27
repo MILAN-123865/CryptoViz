@@ -32,7 +32,7 @@ const documentationLinks: FooterLink[] = [
 const communityLinks: FooterLink[] = [
   { name: "GitHub Repository", href: "https://github.com/csxark/CryptoViz" },
   { name: "Issues & Roadmap", href: "https://github.com/csxark/CryptoViz/issues" },
-  { name: "Contribute Guide", href: "https://github.com/csxark/CryptoViz/blob/main/CONTRIBUTING.md" },
+  { name: "Contributing Guide", href: "https://github.com/csxark/CryptoViz/blob/main/CONTRIBUTING.md" },
   { name: "Discussions", href: "https://github.com/csxark/CryptoViz/discussions" },
 ];
 
