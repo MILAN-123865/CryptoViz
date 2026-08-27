@@ -2096,4 +2096,14 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
       }
     ]
   },
+  {
+    id: 'opaque',
+    name: 'OPAQUE',
+    category: 'asymmetric',
+    description: 'RFC 9497 Augmented PAKE. OPRF (ristretto255) + Argon2id KSF + 3DH AKE. Server-side zero-knowledge password storage. Single-call API simulates full flow.',
+    defaultKey: '',
+    defaultInput: 'correct-horse-battery-staple',
+    securityStatus: 'recommended',
+    keyPlaceholder: 'Server public key (hex)'
+  },
 ];
