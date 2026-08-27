@@ -12,6 +12,14 @@ const METADATA: CipherMetadata = {
   standardBody: 'NIST',
 }
 
+/**
+ * TEST VECTORS cryptographic hash export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export const TEST_VECTORS: TestVector[] = [
   {
     input: 'abc',
@@ -77,6 +85,15 @@ function Maj(x: number, y: number, z: number): number {
   return ((x & y) ^ (x & z) ^ (y & z)) >>> 0
 }
 
+/**
+ * Validate Hash Input cryptographic hash export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param input Input required by the Validate Hash Input operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function validateHashInput(input: unknown): asserts input is string {
   if (input === null || input === undefined) {
     throw new CipherError('INPUT_REQUIRED', 'Input is required.')
@@ -289,6 +306,14 @@ function sha256Instrumented(inputBytes: Uint8Array): CipherResult {
   }
 }
 
+/**
+ * Encrypt cryptographic hash export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function encrypt(
   input: string,
   _key: string = '',
@@ -312,6 +337,14 @@ export function encrypt(
   }
 }
 
+/**
+ * Decrypt cryptographic hash export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function decrypt(
   input: string,
   _key: string = '',
