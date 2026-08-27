@@ -979,6 +979,16 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     recommendedNext: ["hmac", "sha512", "bcrypt"],
   },
   {
+    id: 'simd',
+    name: 'SIMD',
+    category: 'hash',
+    description: 'SHA-3 finalist. Quasi-cyclic LDPC message expansion over Z/257Z. 4-pipe ARX compression. SIMD-256 and SIMD-512 variants.',
+    defaultKey: '',
+    defaultInput: '',
+    securityStatus: 'legacy',
+    options: [{ name: 'Output Bits', id: 'outputBits', type: 'select', default: 256, choices: [{ label: 'SIMD-256', value: 256 }, { label: 'SIMD-512', value: 512 }] }]
+  },
+  {
     id: 'shavite3',
     name: 'SHAvite-3',
     category: 'hash',
