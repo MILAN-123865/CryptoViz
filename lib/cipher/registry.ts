@@ -940,6 +940,16 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     ]
   },
   {
+    id: 'saturnin',
+    name: 'SATURNIN',
+    category: 'symmetric',
+    description: 'NIST LWC submission. Quantum-era design with 256-bit block for 128-bit quantum security. Hierarchical SPN with 4x4x4 nibble state. CTR-Cascade AEAD.',
+    defaultKey: '00'.repeat(64),
+    defaultInput: '00'.repeat(32),
+    securityStatus: 'experimental',
+    keyPlaceholder: '64 bytes hex (32-byte key + 32-byte nonce)'
+  },
+  {
     id: 'rectangle',
     name: 'RECTANGLE',
     category: 'symmetric',
