@@ -33,10 +33,12 @@ export default function StandardsLibrary() {
       <div className="grid md:grid-cols-2 gap-4">
 
         <input
+          id="standards-search-input"
           type="text"
-          placeholder="🔍 Search standards..."
+          placeholder="Search standards (e.g. FIPS 197, RFC 8446)..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          aria-label="Search cryptographic standards and RFCs"
           className="border rounded-lg px-4 py-2 w-full dark:bg-zinc-900"
         />
         <Link href="/docs/nist-rfc-standards-library">
@@ -44,8 +46,10 @@ export default function StandardsLibrary() {
 </Link>
 
         <select
+          id="standards-category-select"
           value={category}
           onChange={(e) => setCategory(e.target.value)}
+          aria-label="Filter standards by category"
           className="border rounded-lg px-4 py-2 dark:bg-zinc-900"
         >
           {categories.map((cat) => (

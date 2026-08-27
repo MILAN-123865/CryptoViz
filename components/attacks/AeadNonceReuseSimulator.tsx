@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useId } from 'react'
 import { gcmEncryptRaw } from '@/lib/cipher/symmetric/aes-gcm'
 import {
   runForbiddenAttack,
@@ -52,6 +52,12 @@ export default function AeadNonceReuseSimulator() {
   const [cursor, setCursor] = useState(-1)
   const [running, setRunning] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const keyId = useId()
+  const ivId = useId()
+  const msg1Id = useId()
+  const msg2Id = useId()
+  const forgedId = useId()
 
   const timer = useRef<ReturnType<typeof setInterval> | null>(null)
   useEffect(() => () => { if (timer.current) clearInterval(timer.current) }, [])
@@ -131,29 +137,34 @@ export default function AeadNonceReuseSimulator() {
 
       <div className="grid gap-3 rounded-lg border border-slate-700 bg-slate-900/40 p-5">
         <div className="grid gap-3 sm:grid-cols-2">
-          <label className="text-sm">AES-128 key (hex)
-            <input className="mt-1 w-full rounded border border-slate-700 bg-slate-950 px-2 py-2 font-mono text-xs"
+          <div className="flex flex-col">
+            <label htmlFor={keyId} className="text-sm">AES-128 key (hex)</label>
+            <input id={keyId} className="mt-1 w-full rounded border border-slate-700 bg-slate-950 px-2 py-2 font-mono text-xs"
               value={key} onChange={(e) => setKey(e.target.value)} />
-          </label>
-          <label className="text-sm">Nonce / IV — reused (96-bit hex)
-            <input className="mt-1 w-full rounded border border-slate-700 bg-slate-950 px-2 py-2 font-mono text-xs"
+          </div>
+          <div className="flex flex-col">
+            <label htmlFor={ivId} className="text-sm">Nonce / IV — reused (96-bit hex)</label>
+            <input id={ivId} className="mt-1 w-full rounded border border-slate-700 bg-slate-950 px-2 py-2 font-mono text-xs"
               value={iv} onChange={(e) => setIv(e.target.value)} />
-          </label>
+          </div>
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
-          <label className="text-sm">Message 1 (≤ 16 chars)
-            <input maxLength={16} className="mt-1 w-full rounded border border-slate-700 bg-slate-950 px-2 py-2"
+          <div className="flex flex-col">
+            <label htmlFor={msg1Id} className="text-sm">Message 1 (≤ 16 chars)</label>
+            <input id={msg1Id} maxLength={16} className="mt-1 w-full rounded border border-slate-700 bg-slate-950 px-2 py-2"
               value={message1} onChange={(e) => setMessage1(e.target.value)} />
-          </label>
-          <label className="text-sm">Message 2 (≤ 16 chars)
-            <input maxLength={16} className="mt-1 w-full rounded border border-slate-700 bg-slate-950 px-2 py-2"
+          </div>
+          <div className="flex flex-col">
+            <label htmlFor={msg2Id} className="text-sm">Message 2 (≤ 16 chars)</label>
+            <input id={msg2Id} maxLength={16} className="mt-1 w-full rounded border border-slate-700 bg-slate-950 px-2 py-2"
               value={message2} onChange={(e) => setMessage2(e.target.value)} />
-          </label>
+          </div>
         </div>
-        <label className="text-sm">Forged message the attacker wants accepted (≤ 16 chars)
-          <input maxLength={16} className="mt-1 w-full rounded border border-slate-700 bg-slate-950 px-2 py-2"
+        <div className="flex flex-col">
+          <label htmlFor={forgedId} className="text-sm">Forged message the attacker wants accepted (≤ 16 chars)</label>
+          <input id={forgedId} maxLength={16} className="mt-1 w-full rounded border border-slate-700 bg-slate-950 px-2 py-2"
             value={forged} onChange={(e) => setForged(e.target.value)} />
-        </label>
+        </div>
         <button onClick={run}
           className="w-fit rounded bg-teal-600 px-4 py-2 text-sm font-medium text-white hover:bg-teal-500">
           Reuse the nonce &amp; run the attack
