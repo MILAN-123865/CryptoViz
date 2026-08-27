@@ -113,3 +113,17 @@ password hashing), or worker message boundaries.
       new high/critical advisories.
 - [ ] Reviewed by a second contributor before merge (self-merge
       prohibited for this category).
+
+---
+
+## 4. Package Manager & Dependency Verification Checklist
+
+Applies to all pull requests that update dependencies, configurations, or CI workflows.
+
+- [ ] All installation and build instructions strictly use `npm` CLI commands (`npm install`, `npm test`, `npm run build`).
+- [ ] No `pnpm-lock.yaml`, `yarn.lock`, or `bun.lockb` files exist in the repository or working tree.
+- [ ] Any dependency version pins or security overrides are defined exclusively in `package.json` under `"overrides"`.
+- [ ] The `package-lock.json` lockfile is committed and synchronized with `package.json`.
+- [ ] `npm audit` reports zero high or critical security vulnerabilities.
+- [ ] CI caching configuration in `.github/workflows/` specifies `cache: 'npm'`.
+
