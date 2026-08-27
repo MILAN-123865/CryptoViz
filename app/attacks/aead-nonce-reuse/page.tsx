@@ -4,9 +4,8 @@ import Navbar from '../../../components/layout/Navbar'
 import Footer from '../../../components/layout/footer'
 
 export const metadata: Metadata = {
-  title: 'AEAD Nonce-Reuse Catastrophe Lab | CryptoViz',
-  description:
-    'The AES-GCM "forbidden attack": reuse a nonce, recover the GHASH authentication key H as a GF(2¹²⁸) square root, and forge a tag the real verifier accepts — step by step.',
+  title: "AEAD Nonce-Reuse Catastrophe Simulation | CryptoViz",
+  description: "Interactive simulation of the AES-GCM nonce-reuse vulnerability. Learn how GHASH key recovery enables arbitrary ciphertext and authentication tag forgery.",
 }
 
 export default function AeadNonceReusePage() {
