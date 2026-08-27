@@ -169,9 +169,9 @@ function sharkCore(input: string, key: string, doDecrypt: boolean, instrument: b
             for (let i = 0; i < 8; i++) state[i] = S_BOX_INV[state[i]]
 
             for (let r = 5; r >= 0; r--) {
-                for (let i = 0; i < 8; i++) state[i] ^= roundKeys[r][i]
-                state = mixColumns(state, INV_MDS_MATRIX)
                 for (let i = 0; i < 8; i++) state[i] = S_BOX_INV[state[i]]
+                state = mixColumns(state, INV_MDS_MATRIX)
+                for (let i = 0; i < 8; i++) state[i] ^= roundKeys[r][i]
             }
         }
 
