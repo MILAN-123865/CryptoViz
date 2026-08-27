@@ -15,6 +15,15 @@ const METADATA = {
 }
 
 // Generate the 5x5 Playfair grid from a key
+/**
+ * Generate Grid cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param key Input required by the Generate Grid operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function generateGrid(key: string): { grid: string[][]; letterMap: Map<string, { r: number; c: number }> } {
   const cleanKey = normalizeAsciiText(key, { uppercase: true, stripNonAlpha: true }).replace(/J/g, 'I')
   const seen = new Set<string>()
@@ -55,6 +64,15 @@ export function generateGrid(key: string): { grid: string[][]; letterMap: Map<st
 }
 
 // Prepares plaintext for Playfair encryption
+/**
+ * Prepare Plaintext cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param input Input required by the Prepare Plaintext operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function preparePlaintext(input: string): string {
   const clean = input.toUpperCase().replace(/J/g, 'I').replace(/[^A-Z]/g, '')
   let prepared = ''
@@ -81,6 +99,15 @@ export function preparePlaintext(input: string): string {
 }
 
 // Prepares ciphertext for Playfair decryption
+/**
+ * Prepare Ciphertext cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param input Input required by the Prepare Ciphertext operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function prepareCiphertext(input: string): string {
   return input.toUpperCase().replace(/J/g, 'I').replace(/[^A-Z]/g, '')
 }
@@ -254,6 +281,14 @@ function playfairFast(
   }
 }
 
+/**
+ * Encrypt cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function encrypt(
   input: string,
   key: string,
@@ -265,6 +300,14 @@ export function encrypt(
   return playfairFast(input, key, false)
 }
 
+/**
+ * Decrypt cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function decrypt(
   input: string,
   key: string,
@@ -276,6 +319,14 @@ export function decrypt(
   return playfairFast(input, key, true)
 }
 
+/**
+ * TEST VECTORS cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export const TEST_VECTORS: TestVector[] = [
   {
     input: 'HIDETHEGOLDINTHETREXESTUMP',

@@ -1,9 +1,25 @@
 import type { CipherOptions, CipherResult, CipherStep } from '../types';
 
+/**
+ * Rc6Options cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export interface Rc6Options extends CipherOptions {
   rounds?: number;
 }
 
+/**
+ * Rc6Round Trace cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export interface Rc6RoundTrace {
   round: number;
   a: string;
@@ -17,6 +33,14 @@ export interface Rc6RoundTrace {
   output: string;
 }
 
+/**
+ * Rc6Encryption Trace cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export interface Rc6EncryptionTrace {
   plaintextHex: string;
   keyHex: string;
@@ -26,6 +50,14 @@ export interface Rc6EncryptionTrace {
   ciphertextHex: string;
 }
 
+/**
+ * Rc6Cipher Input cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export interface Rc6CipherInput {
   text?: string;
   input?: string;
@@ -36,6 +68,14 @@ export interface Rc6CipherInput {
   options?: Rc6Options;
 }
 
+/**
+ * Rc6Cipher Output cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export interface Rc6CipherOutput {
   text: string;
   output: string;
@@ -47,6 +87,14 @@ export interface Rc6CipherOutput {
   trace?: Rc6EncryptionTrace;
 }
 
+/**
+ * Rc6Common Cipher cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export interface Rc6CommonCipher {
   name: "RC6";
   displayName: string;
@@ -67,6 +115,17 @@ function cleanHex(value: string): string {
   return value.trim().replace(/\s+/g, "").replace(/^0x/i, "").toUpperCase();
 }
 
+/**
+ * Assert Hex Length cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param value Input required by the Assert Hex Length operation.
+ * @param expectedLength Input required by the Assert Hex Length operation.
+ * @param label Input required by the Assert Hex Length operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function assertHexLength(value: string, expectedLength: number, label: string): string {
   const cleaned = cleanHex(value);
 
@@ -143,6 +202,16 @@ function writeWordLE(value: number, output: Uint8Array, offset: number): void {
   output[offset + 3] = (value >>> 24) & 0xff;
 }
 
+/**
+ * Rotl32 cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param value Input required by the Rotl32 operation.
+ * @param shift Input required by the Rotl32 operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function rotl32(value: number, shift: number): number {
   const amount = shift & 31;
   return amount === 0
@@ -150,6 +219,16 @@ export function rotl32(value: number, shift: number): number {
     : (((value << amount) | (value >>> (WORD_BITS - amount))) >>> 0);
 }
 
+/**
+ * Rotr32 cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param value Input required by the Rotr32 operation.
+ * @param shift Input required by the Rotr32 operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function rotr32(value: number, shift: number): number {
   const amount = shift & 31;
   return amount === 0
@@ -169,6 +248,16 @@ function multiply32(left: number, right: number): number {
   return Math.imul(left, right) >>> 0;
 }
 
+/**
+ * Generate Rc6Subkeys cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param keyHex Input required by the Generate Rc6Subkeys operation.
+ * @param rounds Input required by the Generate Rc6Subkeys operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function generateRc6Subkeys(keyHex: string, rounds = DEFAULT_ROUNDS): number[] {
   const keyBytes = hexToBytes(assertKeyHex(keyHex));
   const c = Math.max(1, Math.ceil(keyBytes.length / WORD_BYTES));
@@ -221,6 +310,17 @@ function formatBlock(a: number, b: number, c: number, d: number): string {
   return bytesToHex(output);
 }
 
+/**
+ * Encrypt Rc6Block cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param plaintextHex Input required by the Encrypt Rc6Block operation.
+ * @param keyHex Input required by the Encrypt Rc6Block operation.
+ * @param options Input required by the Encrypt Rc6Block operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function encryptRc6Block(plaintextHex: string, keyHex: string, options: Rc6Options = {}): string {
   const rounds = options.rounds ?? DEFAULT_ROUNDS;
   const s = generateRc6Subkeys(keyHex, rounds);
@@ -245,6 +345,17 @@ export function encryptRc6Block(plaintextHex: string, keyHex: string, options: R
   return formatBlock(a, b, c, d);
 }
 
+/**
+ * Decrypt Rc6Block cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param ciphertextHex Input required by the Decrypt Rc6Block operation.
+ * @param keyHex Input required by the Decrypt Rc6Block operation.
+ * @param options Input required by the Decrypt Rc6Block operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function decryptRc6Block(ciphertextHex: string, keyHex: string, options: Rc6Options = {}): string {
   const rounds = options.rounds ?? DEFAULT_ROUNDS;
   const s = generateRc6Subkeys(keyHex, rounds);
@@ -269,6 +380,17 @@ export function decryptRc6Block(ciphertextHex: string, keyHex: string, options: 
   return formatBlock(a, b, c, d);
 }
 
+/**
+ * Trace Rc6Encryption cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param plaintextHex Input required by the Trace Rc6Encryption operation.
+ * @param keyHex Input required by the Trace Rc6Encryption operation.
+ * @param options Input required by the Trace Rc6Encryption operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function traceRc6Encryption(plaintextHex: string, keyHex: string, options: Rc6Options = {}): Rc6EncryptionTrace {
   const rounds = options.rounds ?? DEFAULT_ROUNDS;
   const normalizedPlaintext = assertHexLength(plaintextHex, 32, "RC6 block");
@@ -363,6 +485,15 @@ function buildOutput(
   };
 }
 
+/**
+ * Encrypt Rc6 cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param input Input required by the Encrypt Rc6 operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function encryptRc6(input: Rc6CipherInput | string, keyHex?: string, options?: Rc6Options): Rc6CipherOutput | string {
   const resolved = resolveInput(input, keyHex, options, "encrypt");
   const trace = traceRc6Encryption(resolved.inputHex, resolved.keyHex, resolved.options);
@@ -371,6 +502,15 @@ export function encryptRc6(input: Rc6CipherInput | string, keyHex?: string, opti
   return resolved.shouldReturnString ? output.result : output;
 }
 
+/**
+ * Decrypt Rc6 cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param input Input required by the Decrypt Rc6 operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function decryptRc6(input: Rc6CipherInput | string, keyHex?: string, options?: Rc6Options): Rc6CipherOutput | string {
   const resolved = resolveInput(input, keyHex, options, "decrypt");
   const plaintext = decryptRc6Block(resolved.inputHex, resolved.keyHex, resolved.options);
@@ -379,12 +519,29 @@ export function decryptRc6(input: Rc6CipherInput | string, keyHex?: string, opti
   return resolved.shouldReturnString ? output.result : output;
 }
 
+/**
+ * Rc6 cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param input Input required by the Rc6 operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function rc6(input: Rc6CipherInput): Rc6CipherOutput {
   return input.mode === "decrypt"
     ? (decryptRc6(input) as Rc6CipherOutput)
     : (encryptRc6(input) as Rc6CipherOutput);
 }
 
+/**
+ * Rc6Cipher cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export const rc6Cipher: Rc6CommonCipher = {
   name: "RC6",
   displayName: "RC6",
@@ -395,10 +552,26 @@ export const rc6Cipher: Rc6CommonCipher = {
   run: rc6,
 };
 
+/**
+ * RC6 cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export const RC6 = rc6Cipher;
 
 export default rc6Cipher;
 
+/**
+ * Rc6Implementation Notes cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function rc6ImplementationNotes(): string[] {
   return [
     "Exports block-level helpers and shared API-compatible encrypt/decrypt wrappers.",
@@ -409,6 +582,14 @@ export function rc6ImplementationNotes(): string[] {
   ];
 }
 
+/**
+ * TEST VECTORS cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export const TEST_VECTORS = [
   {
     input: '00000000000000000000000000000000',
@@ -418,6 +599,16 @@ export const TEST_VECTORS = [
   },
 ]
 
+/**
+ * Encrypt cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param input Input required by the Encrypt operation.
+ * @param key Input required by the Encrypt operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function encrypt(input: string, key: string, options?: Rc6Options): CipherResult {
   if (!input) {
     throw new Error('Input message is required.')
@@ -463,6 +654,16 @@ export function encrypt(input: string, key: string, options?: Rc6Options): Ciphe
   }
 }
 
+/**
+ * Decrypt cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param input Input required by the Decrypt operation.
+ * @param key Input required by the Decrypt operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function decrypt(input: string, key: string, options?: Rc6Options): CipherResult {
   if (!input) {
     throw new Error('Input message is required.')

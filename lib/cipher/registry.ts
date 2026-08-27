@@ -1,6 +1,22 @@
+/**
+ * Cipher Option Value cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/197/final — FIPS 197.
+ */
 export type CipherOptionValue = string | number | boolean
 // Add to cipher registry definitions:
 // csidhDefinition,
+/**
+ * Cipher Definition cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/197/final — FIPS 197.
+ */
 export interface CipherDefinition {
   id: string;
   name: string;
@@ -25,6 +41,14 @@ export interface CipherDefinition {
   }[];
 }
 
+/**
+ * CIPHER REGISTRY cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/197/final — FIPS 197.
+ */
 export const CIPHER_REGISTRY: CipherDefinition[] = [
   {
     id: "caesar",

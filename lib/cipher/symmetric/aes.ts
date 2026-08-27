@@ -22,6 +22,14 @@ const METADATA = {
 // ECB/CBC are block modes (require PKCS7 padding); CTR/CFB/OFB turn AES into a
 // stream cipher (keystream XORed with the data, no padding, ciphertext length
 // equals plaintext length). See NIST SP 800-38A.
+/**
+ * Aes Mode symmetric cipher export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/197/final — FIPS 197.
+ */
 export type AesMode = 'ECB' | 'CBC' | 'CTR' | 'CFB' | 'OFB'
 
 const STREAM_MODES: readonly AesMode[] = ['CTR', 'CFB', 'OFB']
@@ -91,6 +99,15 @@ const mul14 = (x: number) => mul2(mul2(mul2(x) ^ x) ^ x)
 
 // --- Key Schedule Expansion ---
 
+/**
+ * Expand Key symmetric cipher export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param keyBytes Input required by the Expand Key operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/197/final — FIPS 197.
+ */
 export function expandKey(keyBytes: Uint8Array): Uint8Array[] {
   const nWords = keyBytes.length / 4
   const nRounds = nWords + 6
@@ -242,6 +259,14 @@ function invMixColumns(state: Uint8Array): void {
 }
 
 // Process a single 16-byte block
+/**
+ * Process Block symmetric cipher export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/197/final — FIPS 197.
+ */
 export function processBlock(
   blockBytes: Uint8Array<ArrayBufferLike>,
   roundKeys: Uint8Array[],
@@ -910,6 +935,14 @@ function getKeyBytes(key: string): Uint8Array {
   return keyBytes
 }
 
+/**
+ * Encrypt symmetric cipher export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/197/final — FIPS 197.
+ */
 export function encrypt(
   input: string,
   key: string,
@@ -958,6 +991,14 @@ export function encrypt(
   return result
 }
 
+/**
+ * Decrypt symmetric cipher export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/197/final — FIPS 197.
+ */
 export function decrypt(
   input: string,
   key: string,
@@ -1005,6 +1046,14 @@ export function decrypt(
   }
 }
 
+/**
+ * TEST VECTORS symmetric cipher export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/197/final — FIPS 197.
+ */
 export const TEST_VECTORS: TestVector[] = [
   {
     input: '6bc1bee22e409f96e93d7e117393172a',
