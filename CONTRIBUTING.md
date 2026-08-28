@@ -34,39 +34,101 @@ Before writing any code, please complete the following steps:
 
 ## 💻 Local Development Setup
 
-Follow these steps to set up your local development environment:
+Follow these steps to set up CryptoViz locally.
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/csxark/CryptoViz.git
-   cd cryptoviz
-   ```
+### Prerequisites
 
-2. **Install node dependencies**:
-   ```bash
-   npm install
-   ```
+Before you begin, make sure you have the following installed:
 
-3. **Verify your local installation**:
-   Run the unit tests to ensure your starting environment is correct:
-   ```bash
-   npm test
-   ```
-   Verify that the static export build succeeds:
-   ```bash
-   npm build
-   ```
+* **Node.js**: 22.x LTS
+* **npm**: 9.x or later
+* **Git**: Latest stable version
 
-4. **Start the development server**:
-   ```bash
-   npm dev
-   ```
+You can verify your installed versions with:
 
-Open `http://localhost:3000` in your browser. You are ready to start coding.
+```bash
+node --version
+npm --version
+git --version
+```
+
+### Step 1: Fork the Repository
+
+Fork the [CryptoViz repository](https://github.com/csxark/CryptoViz) to your own GitHub account.
+
+### Step 2: Clone Your Fork
+
+Clone your fork and move into the project directory:
+
+```bash
+git clone https://github.com/<your-username>/CryptoViz.git
+cd CryptoViz
+```
+
+### Step 3: Add the Upstream Repository
+
+Add the original CryptoViz repository as an upstream remote:
+
+```bash
+git remote add upstream https://github.com/csxark/CryptoViz.git
+```
+
+Verify your remotes:
+
+```bash
+git remote -v
+```
+
+### Step 4: Install Dependencies
+
+Install the project dependencies using npm:
+
+```bash
+npm install
+```
+
+### Step 5: Create a Development Branch
+
+Create a new branch from `main` before making changes:
+
+```bash
+git checkout main
+git pull upstream main
+git checkout -b docs/your-change
+```
+
+Use an appropriate branch prefix such as `feat/`, `fix/`, `docs/`, `test/`, or `chore/`.
+
+### Step 6: Start the Development Server
+
+Start the local development server:
+
+```bash
+npm run dev
+```
+
+Open http://localhost:3000 in your browser.
+
+The development server automatically reloads when you make changes to the source files.
+
+### Step 7: Run Quality Checks
+
+Before submitting your changes, run the relevant checks:
+
+```bash
+npm run lint
+npm run typecheck
+npm test
+npm run build
+```
+
+All applicable checks should pass before opening a Pull Request.
+
 
 ---
 
 ## 🌿 Development Workflow
+
 
 We follow a strict Test-Driven Development (TDD) cycle for cipher implementations:
 
@@ -88,14 +150,49 @@ We follow a strict Test-Driven Development (TDD) cycle for cipher implementation
 4. **Verify Quality Gates**:
    Run the formatting, typechecking, and testing scripts locally:
    ```bash
-   npm lint
-   npm typecheck
-   npm test
-   npm build
+  npm run lint
+  npm run typecheck
+  npm test
+  npm run build
    ```
 
 5. **Submit Pull Request**:
    Open a PR against the `main` branch. Ensure the PR title conforms to the commit message convention.
+
+
+## 📦 Common npm Commands
+
+The following commands are commonly used during development:
+
+| Command                       | Purpose                                     |
+| ----------------------------- | ------------------------------------------- |
+| `npm install`                 | Install project dependencies                |
+| `npm run dev`                 | Start the local development server          |
+| `npm run build`               | Create a production build                   |
+| `npm start`                   | Start the production server after building  |
+| `npm run lint`                | Run ESLint checks                           |
+| `npm run typecheck`           | Run TypeScript type checking                |
+| `npm test`                    | Run the unit test suite                     |
+| `npm run test:a11y`           | Run accessibility tests                     |
+| `npm run test:e2e`            | Run end-to-end tests                        |
+| `npm run test:e2e:ui`         | Run end-to-end tests with the Playwright UI |
+| `npm run test:security`       | Run security-focused tests                  |
+| `npm run test:visual`         | Run visual regression tests                 |
+| `npm run check:budgets`       | Check bundle budgets                        |
+| `npm run check:bundle-budget` | Run the bundle budget check                 |
+
+### Recommended Pre-PR Check
+
+For most code changes, run:
+
+```bash
+npm run lint
+npm run typecheck
+npm test
+npm run build
+```
+
+For changes affecting accessibility, security, end-to-end behavior, or visual output, also run the relevant specialized test command.
 
 ---
 
