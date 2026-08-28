@@ -1,6 +1,6 @@
 import { sha256 } from '@noble/hashes/sha2.js'
 import { toByteArray, fromByteArray } from '../../utils/encoding'
-import { CipherError } from '../../utils/errors'
+import { CipherError, validateHashInput } from '../../utils/errors'
 import type { CipherResult, CipherStep, CipherMetadata, CipherOptions, TestVector } from '../types'
 
 const METADATA: CipherMetadata = {
@@ -94,18 +94,7 @@ function Maj(x: number, y: number, z: number): number {
  * @returns The operation result produced by the cipher engine.
  * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
  */
-export function validateHashInput(input: unknown): asserts input is string {
-  if (input === null || input === undefined) {
-    throw new CipherError('INPUT_REQUIRED', 'Input is required.')
-  }
-  if (typeof input !== 'string') {
-    throw new CipherError('INPUT_REQUIRED', 'Input must be a string.')
-  }
-  const byteLength = new TextEncoder().encode(input).length
-  if (byteLength > 2 * 1024 * 1024) {
-    throw new CipherError('INPUT_TOO_LONG', `Input exceeds maximum size of 2MB (got ${byteLength}).`)
-  }
-}
+export { validateHashInput }
 
 function sha256Fast(inputBytes: Uint8Array): string {
   const hashBytes = sha256(inputBytes)

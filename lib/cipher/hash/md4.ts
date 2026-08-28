@@ -15,7 +15,7 @@
  */
 
 import type { CipherResult, CipherStep, CipherMetadata, CipherOptions, TestVector } from '../types'
-import { CipherError, validateInput } from '../../utils'
+import { CipherError, validateHashInput } from '../../utils'
 
 const METADATA: CipherMetadata = {
   name: 'MD4',
@@ -171,9 +171,7 @@ function md4Digest(input: string, instrument: boolean): CipherResult {
  * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
  */
 export function encrypt(input: string, _key: string, options: CipherOptions = {}): CipherResult {
-  if (input === null || input === undefined || typeof input !== 'string') {
-    throw new CipherError('INPUT_REQUIRED', 'Input text is required.')
-  }
+  validateHashInput(input)
   return md4Digest(input, !!options.instrument)
 }
 /**
