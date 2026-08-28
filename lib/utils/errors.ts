@@ -1,3 +1,13 @@
+export type ErrorCategory =
+  | "INPUT"
+  | "KEY"
+  | "OPTION"
+  | "ALGORITHM"
+  | "ENCODING"
+  | "RESOURCE"
+  | "EXECUTION"
+  | "INTERNAL";
+
 export type CipherErrorCode =
   | "INPUT_REQUIRED"
   | "INPUT_TOO_LONG"
@@ -27,14 +37,165 @@ export type CipherErrorCode =
   | "UNSUPPORTED_KDF"
   | "ONE_WAY_HASH";
 
-export class CipherError extends Error {
-  public readonly code: CipherErrorCode;
+export type CryptoVizErrorCode =
+  | CipherErrorCode
+  | "KEY_INVALID"
+  | "INPUT_INVALID"
+  | "OPTION_INVALID"
+  | "ENCODING_INVALID"
+  | "RESOURCE_LIMIT"
+  | "EXECUTION_FAILED"
+  | "INTERNAL_ERROR";
 
-  constructor(code: CipherErrorCode, message: string) {
-    super(message);
-    this.name = "CipherError";
-    this.code = code;
+export function categorizeErrorCode(code: string): ErrorCategory {
+  if (code.startsWith("INPUT") || code.endsWith("_INPUT")) return "INPUT";
+  if (code.startsWith("KEY") || code.endsWith("_KEY")) return "KEY";
+  if (
+    code.startsWith("OPTION") ||
+    code.endsWith("_OPTION") ||
+    code.includes("PADDING") ||
+    code.includes("IV") ||
+    code.includes("AAD")
+  ) {
+    return "OPTION";
   }
+  if (
+    code.startsWith("ALGORITHM") ||
+    code.includes("KDF") ||
+    code.includes("HASH")
+  ) {
+    return "ALGORITHM";
+  }
+  if (code.startsWith("ENCODING")) return "ENCODING";
+  if (
+    code.startsWith("WORKER") ||
+    code.startsWith("WORKLOAD") ||
+    code.startsWith("RESOURCE") ||
+    code.includes("WEBCRYPTO")
+  ) {
+    return "RESOURCE";
+  }
+  if (code.startsWith("EXECUTION") || code.includes("AUTH_TAG")) return "EXECUTION";
+  if (code.startsWith("INTERNAL")) return "INTERNAL";
+  return "INTERNAL";
+}
+
+export interface CryptoVizErrorOptions {
+  details?: unknown;
+  remediation?: string;
+  cause?: unknown;
+  category?: ErrorCategory;
+  timestamp?: number;
+}
+
+export class CryptoVizError extends Error {
+  public readonly code: CryptoVizErrorCode;
+  public readonly category: ErrorCategory;
+  public readonly details?: unknown;
+  public readonly remediation?: string;
+  public readonly timestamp: number;
+  public override readonly cause?: unknown;
+
+  constructor(
+    code: CryptoVizErrorCode,
+    message: string,
+    options: CryptoVizErrorOptions = {}
+  ) {
+    super(message);
+    this.name = "CryptoVizError";
+    this.code = code;
+    this.category = options.category ?? categorizeErrorCode(code);
+    this.details = options.details;
+    this.remediation = options.remediation;
+    this.timestamp = options.timestamp ?? Date.now();
+    if (options.cause !== undefined) {
+      this.cause = options.cause;
+    }
+  }
+
+  public toJSON(): Record<string, unknown> {
+    return {
+      name: this.name,
+      code: this.code,
+      category: this.category,
+      message: this.message,
+      details: this.details,
+      remediation: this.remediation,
+      timestamp: this.timestamp,
+      cause:
+        this.cause instanceof Error
+          ? { name: this.cause.name, message: this.cause.message }
+          : this.cause,
+    };
+  }
+
+  public static fromJSON(json: Record<string, unknown>): CryptoVizError {
+    const code = (json.code as CryptoVizErrorCode) || "INTERNAL_ERROR";
+    const message =
+      typeof json.message === "string" ? json.message : "Unknown error";
+    const err = new CryptoVizError(code, message, {
+      details: json.details,
+      remediation:
+        typeof json.remediation === "string" ? json.remediation : undefined,
+      category: (json.category as ErrorCategory) || undefined,
+      timestamp: typeof json.timestamp === "number" ? json.timestamp : undefined,
+      cause: json.cause,
+    });
+    if (typeof json.name === "string") {
+      err.name = json.name;
+    }
+    return err;
+  }
+}
+
+export class CipherError extends CryptoVizError {
+  constructor(
+    code: CipherErrorCode,
+    message: string,
+    options?: CryptoVizErrorOptions
+  ) {
+    super(code, message, options);
+    this.name = "CipherError";
+  }
+}
+
+export function isCryptoVizError(err: unknown): err is CryptoVizError {
+  if (err instanceof CryptoVizError) {
+    return true;
+  }
+  if (typeof err === "object" && err !== null) {
+    const obj = err as Record<string, unknown>;
+    return (
+      (obj.name === "CryptoVizError" || obj.name === "CipherError") &&
+      typeof obj.code === "string"
+    );
+  }
+  return false;
+}
+
+export function toCryptoVizError(
+  err: unknown,
+  fallbackCode: CryptoVizErrorCode = "INTERNAL_ERROR"
+): CryptoVizError {
+  if (err instanceof CryptoVizError) {
+    return err;
+  }
+
+  if (isCryptoVizError(err)) {
+    return CryptoVizError.fromJSON(err as unknown as Record<string, unknown>);
+  }
+
+  if (err instanceof Error) {
+    return new CryptoVizError(fallbackCode, err.message, { cause: err });
+  }
+
+  if (typeof err === "string") {
+    return new CryptoVizError(fallbackCode, err);
+  }
+
+  return new CryptoVizError(fallbackCode, "An unexpected error occurred", {
+    details: err,
+  });
 }
 
 /**
@@ -100,3 +261,4 @@ export function validateMaxInputBytes(input: string, maxBytes: number): void {
     );
   }
 }
+
