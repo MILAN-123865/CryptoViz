@@ -16,7 +16,7 @@ const visualizerLinks: FooterLink[] = [
 
 const learningLinks: FooterLink[] = [
   { name: "Learning Paths", href: "/learning-paths" },
-  { name: "Challenge Mode", href: "/challenge" },
+  { name: "Practice Challenges", href: "/challenge" },
   { name: "Cryptography Timeline", href: "/timeline" },
   { name: "Interactive Glossary", href: "/glossary" },
   { name: "Myth Busters", href: "/myth-busters" },
