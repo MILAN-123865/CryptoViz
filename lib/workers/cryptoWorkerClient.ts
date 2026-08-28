@@ -68,7 +68,8 @@ class CryptoWorkerClient {
 
   private initWorker() {
     if (!this.worker && this.isWorkerSupported()) {
-      this.worker = new Worker(new URL('./crypto.worker.ts', import.meta.url), { type: 'module' })      this.worker.onmessage = (event: MessageEvent<CryptoWorkerResponse | CryptoWorkerProgress>) => {
+      this.worker = new Worker(new URL('./crypto.worker.ts', import.meta.url), { type: 'module' })
+      this.worker.onmessage = (event: MessageEvent<CryptoWorkerResponse | CryptoWorkerProgress>) => {
         const data = event.data
         if ('jobId' in data && 'percent' in data && 'currentMilestone' in data) {
           const request = this.pendingRequests.get(data.jobId)
