@@ -1,7 +1,7 @@
 import { hmac } from '@noble/hashes/hmac.js'
 import { sha256 } from '@noble/hashes/sha2.js'
 import { toByteArray, fromByteArray } from '../../utils/encoding'
-import { CipherError, validateInput, validateKey } from '../../utils/errors'
+import { CipherError, validateHashInput, validateKey } from '../../utils/errors'
 import type { CipherResult, CipherStep, CipherMetadata, CipherOptions, TestVector } from '../types'
 
 const METADATA: CipherMetadata = {
@@ -56,7 +56,7 @@ export function encrypt(
   key: string,
   options: CipherOptions = {}
 ): CipherResult {
-  validateInput(input)
+  validateHashInput(input)
   validateKey(key)
 
   const msgBytes = toByteArray(input, options.encoding || 'utf8')

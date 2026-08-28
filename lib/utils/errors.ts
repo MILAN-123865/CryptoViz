@@ -225,6 +225,25 @@ export function validateInput(input: unknown): asserts input is string {
   }
 }
 
+export function validateHashInput(input: unknown): asserts input is string {
+  if (input === null || input === undefined) {
+    throw new CipherError("INPUT_REQUIRED", "Input text is required.");
+  }
+
+  if (typeof input !== "string") {
+    throw new CipherError("INPUT_REQUIRED", "Input must be a string.");
+  }
+
+  const byteLength = new TextEncoder().encode(input).length;
+
+  if (byteLength > MAX_INPUT_BYTES) {
+    throw new CipherError(
+      "INPUT_TOO_LONG",
+      `Input exceeds maximum size of ${MAX_INPUT_BYTES} bytes (got ${byteLength}).`,
+    );
+  }
+}
+
 export function validateKey(key: unknown): asserts key is string {
   if (key === null || key === undefined || key === "") {
     throw new CipherError("INVALID_KEY", "Encryption key is required.");

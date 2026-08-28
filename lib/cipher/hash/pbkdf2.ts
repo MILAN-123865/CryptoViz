@@ -6,7 +6,7 @@
  * Default iteration count: 600,000 (per current OWASP guidance for HMAC-SHA256)
  */
 import type { CipherResult, CipherStep, CipherOptions, TestVector, CipherMetadata } from '../types'
-import { CipherError, validateInput } from '../../utils'
+import { CipherError, validateHashInput } from '../../utils'
 // Assuming hmac.ts exports a reusable HMAC function
 // import { hmac } from './hmac' 
 
@@ -81,7 +81,7 @@ function toHex(b: Uint8Array): string {
  * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
  */
 export function encrypt(input: string, key: string, options: CipherOptions = {}): CipherResult {
-    validateInput(input)
+    validateHashInput(input)
     const c = (options.iterations as number) || 600000
     const dkLen = (options.keyLength as number) || 32
     return pbkdf2Core(input, key, c, dkLen, !!options.instrument)
