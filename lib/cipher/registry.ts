@@ -977,6 +977,17 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     recommendedNext: ['lblock'],
   },
   {
+    id: 'deoxys',
+    name: 'Deoxys-II-256',
+    category: 'symmetric',
+    description: 'CAESAR winner. Nonce-misuse-resistant AEAD. Deoxys-TBC-384 tweakable block cipher. 256-bit key, 128-bit tag. Two-pass architecture.',
+    defaultKey: '00'.repeat(48),
+    defaultInput: '48656c6c6f',
+    securityStatus: 'recommended',
+    keyPlaceholder: '48 bytes hex (32-byte key + 16-byte nonce)',
+    options: [{ name: 'Associated Data (AD)', id: 'ad', type: 'text', default: '' }]
+  },
+  {
     id: 'piccolo',
     name: 'PICCOLO',
     category: 'symmetric',
