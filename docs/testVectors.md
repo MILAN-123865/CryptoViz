@@ -49,3 +49,37 @@ When adding a standardized algorithm:
 5. Run the complete test suite locally.
 
 An algorithm without vector coverage must not be merged.
+
+## Differential conformance execution
+
+Having vector data is not enough - it must actually be run against
+CryptoViz's own cipher code. This is done by two files:
+
+- `lib/testVectors/runner.ts` - generic runner. Given a vector and a
+  dispatch table, it calls the matching executor, compares the result
+  against `ciphertextHex`, and returns a structured result (`NONE`,
+  `OUTPUT_MISMATCH`, `EXECUTION_ERROR`, or `UNSUPPORTED_ALGORITHM`) instead
+  of a plain boolean, so failures are diagnosable.
+- `lib/testVectors/dispatch.ts` - maps each vector's `algorithm` string to
+  an executor function that calls the real cipher implementation under
+  `lib/cipher/` (at the block/digest-primitive level, not through the
+  padded UI-facing `encrypt()` helpers) and returns a hex string.
+
+`tests/unit/vectors/katSuites.test.ts` runs every vector in
+`allKnownAnswerVectors` through this dispatch table in CI, with no browser
+or UI required.
+
+### Adding conformance execution for a new algorithm
+
+1. Add its vectors under `tests/vectors/<algo>/index.ts` as usual.
+2. In `lib/testVectors/dispatch.ts`, write a small executor function that
+   calls your cipher's primitive (not the padded `encrypt()` wrapper) and
+   returns a hex string.
+3. Register the executor in `cipherDispatchTable` under the exact
+   `algorithm` string used by your vectors.
+4. Run `npx vitest run tests/unit/vectors/katSuites.test.ts` - your new
+   vectors will execute automatically; any output mismatch prints the
+   expected vs. actual hex and the vector's id/standard.
+
+Algorithms without a registered executor show up as **skipped**, not
+passed, so missing conformance coverage stays visible.

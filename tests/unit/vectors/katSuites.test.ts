@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { allKnownAnswerVectors } from "../../../lib/testVectors";
-
+import { runKnownAnswerVectorSuite, formatMismatchDiagnostic } from "../../../lib/testVectors/runner";
+import { cipherDispatchTable } from "../../../lib/testVectors/dispatch";
 const REQUIRED_EDGE_CASES_PER_CATEGORY: Record<string, string[]> = {
   aes: ["NONE", "EMPTY_INPUT", "MULTI_BLOCK", "BOUNDARY_KEY"],
   sha: ["NONE", "EMPTY_INPUT"],
@@ -13,20 +14,19 @@ const REQUIRED_EDGE_CASES_PER_CATEGORY: Record<string, string[]> = {
 describe("NIST & RFC Known-Answer Test Vector Suite Execution", () => {
   // 1. Functional Execution: Actually run vectors against crypto logic
   describe("Cryptographic Execution Verification", () => {
-    allKnownAnswerVectors.forEach((vector) => {
-      it(`executes ${vector.algorithm} [${vector.id}] correctly against expected ciphertext`, async () => {
-        // Replace this mock runner with your project's algorithm dispatcher/implementations:
-        // Example:
-        // const result = await executeCryptoOp(vector.algorithm, vector.plaintextHex, vector.keyHex, vector.ivHex);
-        // expect(result.ciphertextHex).toBe(vector.ciphertextHex);
+    const results = runKnownAnswerVectorSuite(allKnownAnswerVectors, cipherDispatchTable);
 
-        expect(vector.standard).toBeDefined();
-        expect(vector.standard.length).toBeGreaterThan(0);
-        expect(vector.ciphertextHex).toBeDefined();
+    results.forEach((result) => {
+      const { vector } = result;
+      // Algorithms without a wired-up executor (e.g. ECC/PQC today) are
+      // reported as skipped, not silently passed - see docs/testVectors.md.
+      const test = result.mismatchType === "UNSUPPORTED_ALGORITHM" ? it.skip : it;
+
+      test(`executes ${vector.algorithm} [${vector.id}] correctly against expected ciphertext`, () => {
+        expect(result.passed, formatMismatchDiagnostic(result)).toBe(true);
       });
     });
   });
-
   // 2. Strict Coverage Manifest: Enforce coverage PER ALGORITHM CATEGORY
   describe("Per-Category Edge Case Coverage Manifest", () => {
     Object.entries(REQUIRED_EDGE_CASES_PER_CATEGORY).forEach(([category, requiredCases]) => {
