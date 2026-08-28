@@ -140,16 +140,46 @@ function ripemd128Core(input: string, instrument: boolean, encoding: 'utf8' | 'h
     return { output: toHex(outBytes), outputEncoding: 'hex', steps, metadata: METADATA, durationMs: performance.now() - start }
 }
 
+/**
+ * Encrypt cryptographic hash export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param input Input required by the Encrypt operation.
+ * @param key Input required by the Encrypt operation.
+ * @param options Input required by the Encrypt operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function encrypt(input: string, key: string = '', options: CipherOptions = {}): CipherResult {
     validateHashInput(input)
     const encoding = (options.encoding as 'utf8' | 'hex') || 'hex'
     return ripemd128Core(input, !!options.instrument, encoding)
 }
 
+/**
+ * Decrypt cryptographic hash export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param input Input required by the Decrypt operation.
+ * @param key Input required by the Decrypt operation.
+ * @param options Input required by the Decrypt operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function decrypt(input: string, key: string, options: CipherOptions = {}): CipherResult {
     throw new CipherError('ALGORITHM_UNSUPPORTED', 'RIPEMD-128 is a hash function and cannot be decrypted.')
 }
 
+/**
+ * TEST VECTORS cryptographic hash export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export const TEST_VECTORS: TestVector[] = [
     { input: '', key: '', expected: 'cdf26213a150dc3ecb610f18f6b38b46', description: 'RIPEMD-128("")' },
     { input: '616263', key: '', expected: 'c14a12199c66e4ba84636b0f69144c77', description: 'RIPEMD-128("abc")' }

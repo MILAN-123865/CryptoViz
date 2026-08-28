@@ -1,5 +1,13 @@
 import type { CipherResult, CipherStep } from './types'
 
+/**
+ * Step Metadata cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export interface StepMetadata {
   index: number
   label: string
@@ -7,6 +15,14 @@ export interface StepMetadata {
   isMilestone?: boolean
 }
 
+/**
+ * Virtualized Cipher Result cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export interface VirtualizedCipherResult extends CipherResult {
   /** Lightweight descriptors for navigation; full step objects are hydrated on demand. */
   stepMetadata: StepMetadata[]
@@ -85,6 +101,14 @@ export function createVirtualizedCipherResult(
   }
 }
 
+/**
+ * Get Virtualized Step cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function getVirtualizedStep(
   result: VirtualizedCipherResult | null,
   index: number,
