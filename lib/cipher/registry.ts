@@ -1011,6 +1011,17 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     recommendedNext: ['mantis'],
   },
   {
+    id: 'craft',
+    name: 'CRAFT',
+    category: 'symmetric',
+    description: 'Lightweight tweakable block cipher (TCHES 2019). 64-bit block, 128-bit key, 64-bit tweak, 32 rounds. Reflection decryption via tweak.',
+    defaultKey: '00000000000000000000000000000000',
+    defaultInput: '0000000000000000',
+    securityStatus: 'secure',
+    keyPlaceholder: '32 hex characters (128-bit key)',
+    options: [{ name: 'Tweak', id: 'tweak', type: 'text', default: '0000000000000000' }]
+  },
+  {
     id: 'schwaemm',
     name: 'SCHWAEMM256-128',
     category: 'symmetric',
