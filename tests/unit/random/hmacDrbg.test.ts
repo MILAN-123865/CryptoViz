@@ -28,7 +28,7 @@ describe('HMAC_DRBG (SHA-256) — NIST SP 800-90A known-answer', () => {
   })
 })
 
-describe('HMAC_DRBG — behaviour', () => {
+describe('HMAC_DRBG — behavior', () => {
   const entropy = hexToBytes('00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff')
   const nonce = hexToBytes('0011223344556677')
 

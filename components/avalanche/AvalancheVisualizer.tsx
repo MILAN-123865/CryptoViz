@@ -36,7 +36,7 @@ interface AvalancheAlgorithm {
 
 /**
  * The subset of the registry that produces a fixed-width hex digest/ciphertext
- * where the avalanche effect is meaningful to visualise.
+ * where the avalanche effect is meaningful to visualize.
  */
 const ALGORITHMS: AvalancheAlgorithm[] = [
   {

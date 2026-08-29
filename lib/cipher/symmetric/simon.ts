@@ -2,7 +2,7 @@
  * SIMON-128/128 — NSA/IARPA, 2013 (IACR 2013/404).
  * 128-bit block (two 64-bit words), 128-bit key, 68 Feistel rounds.
  * Round function: f(x) = (x<<<1 AND x<<<8) XOR x<<<2.
- * Sibling of SPECK (already in repo) — optimised for hardware gate count.
+ * Sibling of SPECK (already in repo) — optimized for hardware gate count.
  *
  * Test vector (IACR 2013/404 Table B.3, 64-bit LE words):
  *   key = 0f0e0d0c0b0a09080706050403020100
