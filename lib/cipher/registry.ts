@@ -2005,7 +2005,7 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     id: 'csidh',
     name: 'CSIDH',
     category: 'asymmetric',
-    description: 'Commutative Supersingular Isogeny Diffie-Hellman (ASIACRYPT 2018). Post-quantum non-interactive key exchange. Ideal class group action over GF(p).',
+    description: 'Commutative Supersingular Isogeny Diffie-Hellman (ASIACRYPT 2018). Educational simulation using a mock integer addition class group action.',
     defaultKey: '00',
     defaultInput: '00',
     securityStatus: 'experimental',
