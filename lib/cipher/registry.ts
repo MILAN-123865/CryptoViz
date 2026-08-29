@@ -1022,6 +1022,17 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     options: [{ name: 'Associated Data (AD)', id: 'ad', type: 'text', default: '' }]
   },
   {
+    id: 'romulus',
+    name: 'Romulus-N',
+    category: 'symmetric',
+    description: 'NIST LWC finalist. AEAD mode built on SKINNY-128-384+ tweakable block cipher. 128-bit key, 128-bit nonce, sponge AEAD mode.',
+    defaultKey: '00'.repeat(32),
+    defaultInput: '48656c6c6f',
+    securityStatus: 'secure',
+    keyPlaceholder: '32 bytes hex (16-byte key + 16-byte nonce)',
+    options: [{ name: 'Associated Data (AD)', id: 'ad', type: 'text', default: '' }]
+  },
+  {
     id: "sha256",
     name: "SHA-256",
     category: "hash",
