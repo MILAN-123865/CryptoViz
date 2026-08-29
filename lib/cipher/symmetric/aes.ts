@@ -1,5 +1,3 @@
-'use server'
-
 /**
  * Advanced Encryption Standard (AES).
  * FIPS 197 compliant implementation.
