@@ -2213,4 +2213,14 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     securityStatus: 'recommended',
     keyPlaceholder: 'Server public key (hex)'
   },
+  {
+    id: 'blind-rsa',
+    name: 'Blind RSA',
+    category: 'asymmetric',
+    description: 'RFC 9474 Blind RSA Signatures. Client blind + server sign + client unblind protocol. Unlinkable anonymous credentials. Privacy Pass foundation.',
+    defaultKey: '',
+    defaultInput: 'test message',
+    securityStatus: 'recommended',
+    keyPlaceholder: 'Server public key (JSON)',
+  },
 ];
