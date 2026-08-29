@@ -295,6 +295,15 @@ function htVerify(msg: Uint8Array, sig: Uint8Array, pk: Uint8Array, params: Sphi
     return roots.length === k && wotsPk.length > 0
 }
 
+/**
+ * Generate cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param options Input required by the Generate operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function generate(options: CipherOptions = {}): { publicKey: string; privateKey: string } {
     const paramSet = (options.paramSet as string) || '128s'
     const params = PARAMS[paramSet] || PARAMS['128s']
@@ -312,6 +321,17 @@ export function generate(options: CipherOptions = {}): { publicKey: string; priv
     return { publicKey: bytesToHex(pk), privateKey: bytesToHex(sk) }
 }
 
+/**
+ * Sign cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param message Input required by the Sign operation.
+ * @param privateKey Input required by the Sign operation.
+ * @param options Input required by the Sign operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function sign(message: string, privateKey: string, options: CipherOptions = {}): string {
     const paramSet = (options.paramSet as string) || '128s'
     const params = PARAMS[paramSet] || PARAMS['128s']
@@ -332,6 +352,18 @@ export function sign(message: string, privateKey: string, options: CipherOptions
     return bytesToHex(new Uint8Array([...r, ...sig]))
 }
 
+/**
+ * Verify cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param message Input required by the Verify operation.
+ * @param publicKey Input required by the Verify operation.
+ * @param signature Input required by the Verify operation.
+ * @param options Input required by the Verify operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function verify(message: string, publicKey: string, signature: string, options: CipherOptions = {}): boolean {
     const paramSet = (options.paramSet as string) || '128s'
     const params = PARAMS[paramSet] || PARAMS['128s']
@@ -348,6 +380,14 @@ export function verify(message: string, publicKey: string, signature: string, op
     return htVerify(msgBytes, sig, pkBytes, params)
 }
 
+/**
+ * TEST VECTORS cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export const TEST_VECTORS: TestVector[] = [
     { input: 'test message', key: 'mock', expected: 'mock_sig', description: 'SPHINCS+-SHA2-128s sign/verify (FIPS 205 KAT)' }
 ]

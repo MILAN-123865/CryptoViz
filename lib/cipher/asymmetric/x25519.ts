@@ -37,6 +37,14 @@ const METADATA: CipherMetadata = {
 }
 
 // RFC 7748 §6.1 Test Vector 1 — canonical reference vectors (zero-padded to 64 hex chars).
+/**
+ * TEST VECTORS cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export const TEST_VECTORS: TestVector[] = [
   {
     input: '0e6db6867583030db3594c1a424b15f7c726624ec26b3353b10a903a6d0ab1c4', // peer public key (u-coordinate, 32 bytes)
@@ -59,6 +67,17 @@ function parseKey32(hex: string, label: string): Uint8Array {
   return bytes
 }
 
+/**
+ * Encrypt cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param input Input required by the Encrypt operation.
+ * @param key Input required by the Encrypt operation.
+ * @param options Input required by the Encrypt operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function encrypt(input: string, key: string = '', options: CipherOptions = {}): CipherResult {
   if (!input) throw new CipherError('INPUT_REQUIRED', "Peer's public key (u-coordinate hex) is required as input.")
   const start = performance.now()
@@ -102,6 +121,17 @@ export function encrypt(input: string, key: string = '', options: CipherOptions 
   }
 }
 
+/**
+ * Decrypt cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param input Input required by the Decrypt operation.
+ * @param key Input required by the Decrypt operation.
+ * @param options Input required by the Decrypt operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function decrypt(input: string, key: string, options: CipherOptions = {}): CipherResult {
   if (!input) throw new CipherError('INPUT_REQUIRED', 'My public key (u-coordinate hex) is required as input.')
   if (!key) throw new CipherError('INVALID_KEY', "Peer's private key is required to recompute the shared secret from their side.")

@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { toByteArray, fromByteArray } from '@/lib/utils/encoding'
 import { toBase32, fromBase32 } from '@exodus/bytes/base32.js'
 import { toBase58, fromBase58 } from '@exodus/bytes/base58.js'
+import { toBase85, fromBase85 } from '@/lib/encoding/base85'
 
 export default function EncodingExplorer() {
   const [input, setInput] = useState('')
@@ -40,6 +41,12 @@ export default function EncodingExplorer() {
         } else {
           result = fromByteArray(toByteArray(input, 'base64'), 'utf8')
         }
+      } else if (encoding === 'Base85 (Ascii85)') {
+        if (mode === 'Encode') {
+          result = toBase85(toByteArray(input, 'utf8'))
+        } else {
+          result = new TextDecoder().decode(fromBase85(input))
+        }
       } else if (encoding === 'URL') {
         result =
           mode === 'Encode'
@@ -59,6 +66,8 @@ export default function EncodingExplorer() {
     message = 'Invalid Base58 input.'
   } else if (encoding === 'Base64') {
     message = 'Invalid Base64 input.'
+  } else if (encoding === 'Base85 (Ascii85)') {
+    message = 'Invalid Base85 input.'
   } else if (encoding === 'URL') {
     message = 'Invalid URL-encoded input.'
   }
@@ -80,6 +89,7 @@ export default function EncodingExplorer() {
           <option>Base32</option>
           <option>Base58</option>
           <option>Base64</option>
+          <option>Base85 (Ascii85)</option>
           <option>URL</option>
         </select>
 
@@ -126,6 +136,11 @@ export default function EncodingExplorer() {
     <li>
       <strong>Base64:</strong> Encodes binary data into ASCII. Commonly used in
       APIs, JWTs, email attachments, and images.
+    </li>
+
+    <li>
+      <strong>Base85 (Ascii85):</strong> Packs binary into a compact 85-character
+      set. Used in PDF streams, PostScript, and Git binary diffs.
     </li>
 
     <li>

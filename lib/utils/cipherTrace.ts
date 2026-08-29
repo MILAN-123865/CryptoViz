@@ -1,3 +1,4 @@
+import { sha256 } from "@noble/hashes/sha2.js";
 import type {
   CipherDirection,
   CipherMetadata,
@@ -8,7 +9,6 @@ import type {
 import { CIPHER_REGISTRY } from "../cipher/registry";
 import { resolveProvenance } from "../provenance/resolve";
 import type { DataProvenanceMetadata } from "../provenance";
-
 /**
  * Cipher trace files intentionally retain the existing schema version.
  *
@@ -17,6 +17,18 @@ import type { DataProvenanceMetadata } from "../provenance";
  * resolved through the shared provenance resolver.
  */
 export const TRACE_SCHEMA_VERSION = 1 as const;
+
+/**
+ * Controls whether sensitive values (the cipher key and secret options) are
+ * embedded in an exported trace.
+ *
+ * "redacted" (the default) replaces sensitive values with REDACTED_VALUE so
+ * traces are safe to share. "full" retains the real values and must be
+ * chosen explicitly by the user for educational/debugging exports.
+ */
+export type TraceExportMode = "redacted" | "full";
+
+export const REDACTED_VALUE = "[redacted]" as const;
 
 export interface CipherTraceFile {
   schemaVersion: typeof TRACE_SCHEMA_VERSION;
@@ -40,8 +52,22 @@ export interface CipherTraceFile {
    * provenance location for CipherResult.
    */
   provenance?: DataProvenanceMetadata;
-}
 
+  /**
+   * Whether the key and secret options below contain real values ("full")
+   * or REDACTED_VALUE placeholders ("redacted"). Absent on traces created
+   * before this field existed, which always embedded real values.
+   */
+  exportMode?: TraceExportMode;
+
+  /**
+   * SHA-256 hash (hex) of the trace's canonical content, excluding this
+   * field. Verified before a trace is replayed so tampered or corrupted
+   * trace files are rejected. Absent on traces created before this field
+   * existed.
+   */
+  integrityHash?: string;
+}
 export type TraceValidationResult =
   | { success: true; trace: CipherTraceFile }
   | { success: false; error: string };
@@ -57,13 +83,17 @@ const SAFE_OPTION_KEYS = new Set([
   "hexInput",
   "rounds",
   "demoMode",
-  "bobSecret",
   "mode",
   "padding",
   "encoding",
   "iv",
 ]);
 
+/**
+ * Option keys that hold secret material. These are only included in an
+ * exported trace when exportMode is "full" (explicitly chosen by the user).
+ */
+const SENSITIVE_OPTION_KEYS = new Set(["bobSecret"]);
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
@@ -181,12 +211,17 @@ function isCipherMetadata(value: unknown): value is CipherMetadata {
 
 function sanitizeOptions(
   options: Record<string, unknown>,
+  exportMode: TraceExportMode = "redacted",
 ): Record<string, string | number | boolean> {
   const sanitized: Record<string, string | number | boolean> = {};
+  const allowedKeys =
+    exportMode === "full"
+      ? new Set([...SAFE_OPTION_KEYS, ...SENSITIVE_OPTION_KEYS])
+      : SAFE_OPTION_KEYS;
 
   for (const [key, value] of Object.entries(options)) {
     if (
-      SAFE_OPTION_KEYS.has(key) &&
+      allowedKeys.has(key) &&
       (typeof value === "string" ||
         typeof value === "number" ||
         typeof value === "boolean")
@@ -198,6 +233,58 @@ function sanitizeOptions(
   return sanitized;
 }
 
+/**
+ * Computes a stable SHA-256 hash (hex) over a trace's content so tampering
+ * or corruption can be detected before replay. Key order does not affect
+ * the result.
+ */
+function canonicalStringify(value: unknown): string {
+  if (value === null || value === undefined) return "null";
+  if (typeof value === "string") return JSON.stringify(value);
+  if (typeof value === "number" || typeof value === "boolean") {
+    return String(value);
+  }
+  if (Array.isArray(value)) {
+    return "[" + value.map(canonicalStringify).join(",") + "]";
+  }
+  if (isRecord(value)) {
+    // Omit undefined-valued keys, matching JSON.stringify's own behavior,
+    // so a key that's explicitly undefined hashes the same as an absent key.
+    const keys = Object.keys(value)
+      .filter((k) => value[k] !== undefined)
+      .sort();
+    return (
+      "{" +
+      keys
+        .map((k) => JSON.stringify(k) + ":" + canonicalStringify(value[k]))
+        .join(",") +
+      "}"
+    );
+  }
+  return String(value);
+}
+
+function computeTraceIntegrityHash(
+  trace: Omit<CipherTraceFile, "integrityHash">,
+): string {
+  const hashBytes = sha256(
+    new TextEncoder().encode(canonicalStringify(trace)),
+  );
+  return Array.from(hashBytes)
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+/**
+ * Verifies a trace's integrityHash, if present. Traces created before this
+ * field existed have no hash to check and are treated as valid for backward
+ * compatibility.
+ */
+export function verifyCipherTraceIntegrity(trace: CipherTraceFile): boolean {
+  if (!trace.integrityHash) return true;
+  const { integrityHash, ...rest } = trace;
+  return computeTraceIntegrityHash(rest) === integrityHash;
+}
 /**
  * Resolve provenance once at the trace boundary.
  *
@@ -217,6 +304,7 @@ export function createCipherTrace({
   key,
   options,
   result,
+  exportMode = "redacted",
 }: {
   cipherId: string;
   direction: CipherDirection;
@@ -224,16 +312,17 @@ export function createCipherTrace({
   key: string;
   options: Record<string, unknown>;
   result: CipherResult;
+  exportMode?: TraceExportMode;
 }): CipherTraceFile {
   const provenance = resolveTraceProvenance(result.metadata.provenance);
 
-  return {
+  const traceWithoutHash: Omit<CipherTraceFile, "integrityHash"> = {
     schemaVersion: TRACE_SCHEMA_VERSION,
     cipherId,
     direction,
     input,
-    key,
-    options: sanitizeOptions(options),
+    key: exportMode === "full" ? key : REDACTED_VALUE,
+    options: sanitizeOptions(options, exportMode),
     output: result.output,
     outputEncoding: result.outputEncoding,
     steps: result.steps,
@@ -244,9 +333,14 @@ export function createCipherTrace({
     durationMs: result.durationMs,
     timestamp: new Date().toISOString(),
     provenance,
+    exportMode,
+  };
+
+  return {
+    ...traceWithoutHash,
+    integrityHash: computeTraceIntegrityHash(traceWithoutHash),
   };
 }
-
 export function validateCipherTrace(
   value: unknown,
 ): TraceValidationResult {
@@ -345,8 +439,28 @@ export function validateCipherTrace(
   }
 
   if (
-    typeof value.durationMs !== "number" ||
-    !Number.isFinite(value.durationMs) ||
+    value.exportMode !== undefined &&
+    value.exportMode !== "redacted" &&
+    value.exportMode !== "full"
+  ) {
+    return {
+      success: false,
+      error: "Trace export mode is invalid.",
+    };
+  }
+
+  if (
+    value.integrityHash !== undefined &&
+    typeof value.integrityHash !== "string"
+  ) {
+    return {
+      success: false,
+      error: "Trace integrity hash is invalid.",
+    };
+  }
+
+  if (
+    typeof value.durationMs !== "number" ||    !Number.isFinite(value.durationMs) ||
     value.durationMs < 0
   ) {
     return {
@@ -379,29 +493,49 @@ export function validateCipherTrace(
     rootProvenance ?? metadataProvenance,
   );
 
-  return {
-    success: true,
-    trace: {
-      schemaVersion: TRACE_SCHEMA_VERSION,
-      cipherId: value.cipherId,
-      direction: value.direction,
-      input: value.input,
-      key: value.key,
-      options: sanitizeOptions(value.options),
-      output: value.output,
-      outputEncoding: value.outputEncoding as Encoding,
-      steps: value.steps,
-      metadata: {
-        ...value.metadata,
-        provenance,
-      },
-      durationMs: value.durationMs,
-      timestamp: value.timestamp,
+  /*
+   * Traces created before exportMode existed always embedded real values,
+   * so default to "full" for them rather than assuming redaction.
+   */
+  const exportMode: TraceExportMode =
+    value.exportMode === "redacted" || value.exportMode === "full"
+      ? value.exportMode
+      : "full";
+
+  const trace: CipherTraceFile = {
+    schemaVersion: TRACE_SCHEMA_VERSION,
+    cipherId: value.cipherId,
+    direction: value.direction,
+    input: value.input,
+    key: value.key,
+    options: sanitizeOptions(value.options, exportMode),
+    output: value.output,
+    outputEncoding: value.outputEncoding as Encoding,
+    steps: value.steps,
+    metadata: {
+      ...value.metadata,
       provenance,
     },
+    durationMs: value.durationMs,
+    timestamp: value.timestamp,
+    provenance,
+    exportMode,
+    integrityHash:
+      typeof value.integrityHash === "string"
+        ? value.integrityHash
+        : undefined,
   };
-}
 
+  if (!verifyCipherTraceIntegrity(trace)) {
+    return {
+      success: false,
+      error:
+        "Trace integrity check failed — the trace may have been tampered with or corrupted.",
+    };
+  }
+
+  return { success: true, trace };
+}
 export function parseCipherTraceJson(
   json: string,
 ): TraceValidationResult {

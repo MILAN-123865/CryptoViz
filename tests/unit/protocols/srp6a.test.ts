@@ -60,7 +60,7 @@ describe('SRP-6a — RFC 5054 Appendix B test vector', () => {
   })
 })
 
-describe('SRP-6a — protocol behaviour', () => {
+describe('SRP-6a — protocol behavior', () => {
   const salt = hexToBytes('00112233445566778899aabbccddeeff')
 
   it('both parties derive the same key and accept each other’s proofs on the correct password', () => {

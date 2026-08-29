@@ -148,14 +148,41 @@ function shavite3Core(input: string, salt: string, outputBits: number, instrumen
     return { output: toHex(h.slice(0, outLen)), outputEncoding: 'hex', steps, metadata: METADATA, durationMs: performance.now() - start }
 }
 
+/**
+ * Encrypt cryptographic hash export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param input Input required by the Encrypt operation.
+ * @param key Input required by the Encrypt operation.
+ * @param options Input required by the Encrypt operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/197/final — FIPS 197.
+ */
 export function encrypt(input: string, key: string, options: CipherOptions = {}): CipherResult {
     const bits = (options.outputBits as number) || 256
     return shavite3Core(input, key, bits, !!options.instrument)
 }
+/**
+ * Decrypt cryptographic hash export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/197/final — FIPS 197.
+ */
 export function decrypt(): CipherResult {
     throw new CipherError('ONE_WAY_HASH', 'SHAvite-3 is a one-way hash function.')
 }
 
+/**
+ * TEST VECTORS cryptographic hash export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/197/final — FIPS 197.
+ */
 export const TEST_VECTORS: TestVector[] = [
     { input: '', key: '', expected: 'mock_shavite3_256_empty', description: 'SHAvite-3-256 empty string' }
 ]

@@ -36,7 +36,7 @@ interface AvalancheAlgorithm {
 
 /**
  * The subset of the registry that produces a fixed-width hex digest/ciphertext
- * where the avalanche effect is meaningful to visualise.
+ * where the avalanche effect is meaningful to visualize.
  */
 const ALGORITHMS: AvalancheAlgorithm[] = [
   {
@@ -147,6 +147,7 @@ export default function AvalancheVisualizer() {
 
   useEffect(() => {
     if (input.length === 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setOriginalOutput(null)
       setModifiedOutput(null)
       setError(null)

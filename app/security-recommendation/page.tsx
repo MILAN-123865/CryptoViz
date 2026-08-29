@@ -63,14 +63,14 @@ export default function SecurityRecommendationPage() {
       <Navbar />
 
       <main className="mx-auto max-w-7xl space-y-8 px-4 py-10 sm:px-6 lg:px-8">
-        <Breadcrumbs items={[{ label: "Sandbox" }, { label: "Security Recommendation Engine" }]} />
+        <Breadcrumbs items={[{ label: "Sandbox" }, { label: "Security Advisor" }]} />
 
         <header className="max-w-3xl">
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-teal-600 dark:text-teal-400">
-            Guidance & Compliance
+            Cryptographic Migration Advisor
           </p>
           <h1 className="mt-3 text-4xl font-bold tracking-tight sm:text-5xl">
-            Security Recommendation Engine
+            Security Architecture Advisor
           </h1>
           <p className="mt-4 text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
             Get expert cryptographic algorithm recommendations aligned with your application use case, security requirements, and official compliance standards.

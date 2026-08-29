@@ -110,8 +110,7 @@ export default function CipherOptionsPanel(props: CipherOptionsPanelProps) {
 
       <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <button type="button" onClick={props.onRun} disabled={loading} className="flex h-10 w-full items-center justify-center rounded-lg bg-teal-600 text-sm font-semibold text-white shadow-sm hover:bg-teal-500 disabled:opacity-50 dark:bg-teal-500 dark:hover:bg-teal-400 sm:flex-1">
-          {loading ? "Running in Web Worker..." : "Run Computation"}
-        </button>
+          {loading ? "Processing cryptographic operation..." : "Run Computation"}        </button>
         <div className="flex items-center gap-3">
           <label htmlFor={autoComputeId} className="cursor-pointer select-none text-xs font-semibold text-zinc-500 dark:text-zinc-400">
             Auto Compute

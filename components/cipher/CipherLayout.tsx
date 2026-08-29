@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import type { CipherDefinition } from "@/lib/cipher/registry";
 import type { CipherResult, CipherOptions } from "@/lib/cipher/types";
 import type { AnimationSpeed } from "./StepAnimator";
+import { createVirtualizedCipherResult } from "@/lib/cipher/stepVirtualization";
 import WorkspacePresetManager from "./WorkspacePresetManager";
 import ConversionHistory from "./ConversionHistory";
 import WhereIsThisUsed from "./WhereIsThisUsed";
@@ -207,6 +208,10 @@ export default function CipherLayout({ cipher }: CipherLayoutProps) {
   };
 
   const direction = cipher.id === "dh" ? "encrypt" : action;
+  const virtualizedResult = useMemo(
+    () => (result ? createVirtualizedCipherResult(result) : null),
+    [result],
+  );
   const activeStep = result?.steps?.[currentStep];
   const annotationScope = { cipherId: cipher.id, direction: direction as "encrypt" | "decrypt" };
   const scopeAnnotations = getScopeAnnotations(annotationStore, annotationScope);
@@ -437,7 +442,8 @@ export default function CipherLayout({ cipher }: CipherLayoutProps) {
                     </div>
                   </div>
                   <StepAnimator
-                    steps={result.steps}
+                    steps={virtualizedResult?.steps ?? result.steps}
+                    stepMetadata={virtualizedResult?.stepMetadata}
                     currentStep={currentStep}
                     onStepChange={handleStepChange}
                     speed={animationSpeed}
@@ -457,10 +463,8 @@ export default function CipherLayout({ cipher }: CipherLayoutProps) {
             />
           )}
 
-          {activeTab === "debugger" && (
-            <UniversalCipherDebugger
-              {...({ action, input, key, options } as any)}
-            />
+          {activeTab === "debugger" && result && (
+            <UniversalCipherDebugger steps={result.steps} />
           )}
         </div>
       </div>

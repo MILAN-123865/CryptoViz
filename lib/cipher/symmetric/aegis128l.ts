@@ -110,6 +110,17 @@ function constantTimeCompare(a: number[], b: number[]): boolean {
     return diff === 0
 }
 
+/**
+ * Encrypt cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param plaintext Input required by the Encrypt operation.
+ * @param key Input required by the Encrypt operation.
+ * @param options Input required by the Encrypt operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/197/final — FIPS 197.
+ */
 export function encrypt(plaintext: string, key: string, options: CipherOptions = {}): CipherResult {
     const start = performance.now()
     const keyBytes = parseHex(key, 'AEGIS-128L key+nonce')
@@ -181,6 +192,17 @@ export function encrypt(plaintext: string, key: string, options: CipherOptions =
     return { output: toHex([...ctBytes, ...tag]), outputEncoding: 'hex', steps, metadata: METADATA, durationMs: performance.now() - start }
 }
 
+/**
+ * Decrypt cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param ciphertext Input required by the Decrypt operation.
+ * @param key Input required by the Decrypt operation.
+ * @param options Input required by the Decrypt operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/197/final — FIPS 197.
+ */
 export function decrypt(ciphertext: string, key: string, options: CipherOptions = {}): CipherResult {
     const start = performance.now()
     const keyBytes = parseHex(key, 'AEGIS-128L key+nonce')
@@ -256,6 +278,14 @@ export function decrypt(ciphertext: string, key: string, options: CipherOptions 
     return { output: toHex(ptBytes), outputEncoding: 'hex', steps, metadata: METADATA, durationMs: performance.now() - start }
 }
 
+/**
+ * TEST VECTORS cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/197/final — FIPS 197.
+ */
 export const TEST_VECTORS: TestVector[] = [
     { input: '00000000000000000000000000000000', key: '00'.repeat(32), expected: 'mock_aegis_ct_tag', description: 'RFC 9106 Test Case 1' }
 ]

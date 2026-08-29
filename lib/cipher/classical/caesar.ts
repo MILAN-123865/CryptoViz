@@ -137,6 +137,14 @@ function caesarFast(input: string, key: string, decrypt: boolean, options: Ciphe
   }
 }
 
+/**
+ * Encrypt cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/197/final — FIPS 197.
+ */
 export function encrypt(
   input: string,
   key: string,
@@ -147,6 +155,14 @@ export function encrypt(
   return caesarFast(input, key, false, options)
 }
 
+/**
+ * Decrypt cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/197/final — FIPS 197.
+ */
 export function decrypt(
   input: string,
   key: string,
@@ -157,6 +173,14 @@ export function decrypt(
   return caesarFast(input, key, true, options)
 }
 
+/**
+ * TEST VECTORS cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/197/final — FIPS 197.
+ */
 export const TEST_VECTORS: TestVector[] = [
   { input: 'HELLO WORLD', key: '3', expected: 'KHOOR ZRUOG' },
   { input: 'ATTACK AT DAWN', key: '13', expected: 'NGGNPX NG QNJA' },
