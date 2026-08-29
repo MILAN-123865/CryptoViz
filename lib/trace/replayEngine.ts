@@ -4,7 +4,7 @@
  */
 
 import type { AlgorithmTrace, TraceStep } from './traceSchema';
-
+import { getValidationEngine } from '../validation';
 export interface ReplayPosition {
   stepIndex: number;
   phase: string;
@@ -94,14 +94,26 @@ export class UnifiedReplayEngine {
   }
 
   /**
-   * Get current step
+   * Get current step with validation
    */
   public getCurrentStep(): TraceStep | null {
     const idx = this.state.currentPosition.stepIndex;
     if (idx < 0 || idx >= this.state.trace.steps.length) return null;
-    return this.state.trace.steps[idx];
-  }
 
+    const step = this.state.trace.steps[idx];
+
+    // Validate step invariants
+    const validator = getValidationEngine();
+    if (validator.hasValidator(this.state.trace.algorithmId)) {
+      validator.validateStep(
+        this.state.trace.algorithmId,
+        step.stepIndex,
+        step.output
+      );
+    }
+
+    return step;
+  }
   /**
    * Set playback speed
    * @param speed Multiplier (0.25, 0.5, 1.0, 2.0, etc.)
@@ -164,7 +176,7 @@ export class UnifiedReplayEngine {
   }
 
   /**
-   * Validate trace integrity
+   * Validate trace integrity including invariants
    */
   public validateTrace(): { valid: boolean; errors: string[] } {
     const errors: string[] = [];
@@ -181,9 +193,23 @@ export class UnifiedReplayEngine {
       errors.push('Missing terminal state');
     }
 
+    // Validate cryptographic invariants
+    const validator = getValidationEngine();
+    if (validator.hasValidator(this.state.trace.algorithmId)) {
+      const result = validator.validateTrace(
+        this.state.trace,
+        this.state.trace.customMetadata
+      );
+
+      if (!result.isValid) {
+        errors.push(
+          `Invariant validation failed: ${result.failedInvariants.join(', ')}`
+        );
+      }
+    }
+
     return {
       valid: errors.length === 0,
       errors,
     };
-  }
-}
+  }}
