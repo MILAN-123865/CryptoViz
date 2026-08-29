@@ -1,7 +1,7 @@
 <!-- README.md -->
 # CryptoViz
 
-Interact with Cryptography, Visualised in Real-Time.
+Interact with Cryptography, Visualized in Real-Time.
 
 ![CI Status](https://img.shields.io/github/actions/workflow/status/csxark/CryptoViz/ci.yml?branch=main&label=CI)
 ![License](https://img.shields.io/github/license/csxark/CryptoViz?color=blue&label=License)
@@ -135,7 +135,7 @@ cryptoviz/
 │   ├── store/            # Visualizer application stores
 │   ├── mdx/              # MDX remark/rehype processors
 │   ├── search/           # Pagefind index loaders
-│   └── utils/            # CSS classes merging and sanitisers
+│   └── utils/            # CSS classes merging and sanitizers
 ├── content/              # Raw data files
 │   ├── docs/             # MDX documents content
 │   └── resources.ts      # Statically-typed resource database
