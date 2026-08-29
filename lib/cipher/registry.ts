@@ -998,6 +998,16 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     options: [{ name: 'Associated Data (AD)', id: 'ad', type: 'text', default: '' }]
   },
   {
+    id: 'e0',
+    name: 'E0',
+    category: 'symmetric',
+    description: '⚠️ BROKEN — Bluetooth BR/EDR stream cipher. 4 LFSRs + summation combiner FSM. Attacked by Fluhrer-Mantin (2001) and Lu-Vaudenay (2004). Replaced by AES-CCM in Bluetooth LE.',
+    defaultKey: '00'.repeat(24),
+    defaultInput: '48656c6c6f',
+    securityStatus: 'broken',
+    keyPlaceholder: '24 bytes hex (16-byte key + 8-byte IV)',
+  },
+  {
     id: 'piccolo',
     name: 'PICCOLO',
     category: 'symmetric',
