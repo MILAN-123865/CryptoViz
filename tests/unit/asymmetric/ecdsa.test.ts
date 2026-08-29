@@ -162,7 +162,7 @@ describe('ECDSA (secp256k1)', () => {
     expect(decrypt(input, `${pubKey}|${signed.output}`).output).toBe(input)
   })
 
-  it('signs and verifies compatibility case 12: quotes ' and "', () => {
+  it('signs and verifies compatibility case 12: quotes \' and "', () => {
     const input = 'quotes \' and "'
     const signed = encrypt(input, privKey)
     const traced = encrypt(input, privKey, { instrument: true })
