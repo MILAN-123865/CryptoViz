@@ -22,14 +22,6 @@ const METADATA = {
 // ECB/CBC are block modes (require PKCS7 padding); CTR/CFB/OFB turn AES into a
 // stream cipher (keystream XORed with the data, no padding, ciphertext length
 // equals plaintext length). See NIST SP 800-38A.
-/**
- * Aes Mode symmetric cipher export.
- *
- * This API is intentionally documented at the engine boundary so callers
- * can understand the input contract without opening the implementation.
- * @returns The operation result produced by the cipher engine.
- * @see https://csrc.nist.gov/pubs/fips/197/final — FIPS 197.
- */
 export type AesMode = 'ECB' | 'CBC' | 'CTR' | 'CFB' | 'OFB'
 
 const STREAM_MODES: readonly AesMode[] = ['CTR', 'CFB', 'OFB']
@@ -99,15 +91,6 @@ const mul14 = (x: number) => mul2(mul2(mul2(x) ^ x) ^ x)
 
 // --- Key Schedule Expansion ---
 
-/**
- * Expand Key symmetric cipher export.
- *
- * This API is intentionally documented at the engine boundary so callers
- * can understand the input contract without opening the implementation.
- * @param keyBytes Input required by the Expand Key operation.
- * @returns The operation result produced by the cipher engine.
- * @see https://csrc.nist.gov/pubs/fips/197/final — FIPS 197.
- */
 export function expandKey(keyBytes: Uint8Array): Uint8Array[] {
   const nWords = keyBytes.length / 4
   const nRounds = nWords + 6
@@ -259,14 +242,6 @@ function invMixColumns(state: Uint8Array): void {
 }
 
 // Process a single 16-byte block
-/**
- * Process Block symmetric cipher export.
- *
- * This API is intentionally documented at the engine boundary so callers
- * can understand the input contract without opening the implementation.
- * @returns The operation result produced by the cipher engine.
- * @see https://csrc.nist.gov/pubs/fips/197/final — FIPS 197.
- */
 export function processBlock(
   blockBytes: Uint8Array<ArrayBufferLike>,
   roundKeys: Uint8Array[],
@@ -332,7 +307,6 @@ function aesInstrumented(
 
   const steps: CipherStep[] = []
   const numBlocks = Math.ceil(inputBytes.length / 16)
-  const MAX_TRACED_BLOCKS = 200
   const outputBytes = new Uint8Array(numBlocks * 16)
   const useCbc = mode === 'CBC'
   let prevBlock = useCbc ? iv : null
@@ -616,33 +590,28 @@ function aesInstrumented(
       })
     } else {
       let resultBlock: Uint8Array
-      const traceThisBlock = blockNum <= MAX_TRACED_BLOCKS
 
       if (useCbc && !decrypt) {
         const xored = xorBlocks(blockBytes, prevBlock ?? new Uint8Array(16))
-        if (traceThisBlock) {
-          steps.push({
-            index: steps.length,
-            label: `Block ${blockNum} — CBC Mode XOR (with ${chainLabel})`,
-            inputState: fromByteArray(blockBytes, 'hex'),
-            outputState: fromByteArray(xored, 'hex'),
-            note: `XORed plaintext block with ${chainLabel} before AES encryption.`,
-          })
-        }
+        steps.push({
+          index: steps.length,
+          label: `Block ${blockNum} — CBC Mode XOR (with ${chainLabel})`,
+          inputState: fromByteArray(blockBytes, 'hex'),
+          outputState: fromByteArray(xored, 'hex'),
+          note: `XORed plaintext block with ${chainLabel} before AES encryption.`,
+        })
         resultBlock = processBlock(xored, roundKeys, false)
         prevBlock = new Uint8Array(resultBlock)
       } else if (useCbc && decrypt) {
         const decrypted = processBlock(blockBytes, roundKeys, true)
         resultBlock = xorBlocks(decrypted, prevBlock ?? new Uint8Array(16))
-        if (traceThisBlock) {
-          steps.push({
-            index: steps.length,
-            label: `Block ${blockNum} — CBC Mode XOR (with ${chainLabel})`,
-            inputState: fromByteArray(decrypted, 'hex'),
-            outputState: fromByteArray(resultBlock, 'hex'),
-            note: `XORed decrypted block with ${chainLabel} to recover plaintext.`,
-          })
-        }
+        steps.push({
+          index: steps.length,
+          label: `Block ${blockNum} — CBC Mode XOR (with ${chainLabel})`,
+          inputState: fromByteArray(decrypted, 'hex'),
+          outputState: fromByteArray(resultBlock, 'hex'),
+          note: `XORed decrypted block with ${chainLabel} to recover plaintext.`,
+        })
         prevBlock = new Uint8Array(blockBytes)
       } else {
         resultBlock = processBlock(blockBytes, roundKeys, decrypt)
@@ -650,26 +619,16 @@ function aesInstrumented(
 
       outputBytes.set(resultBlock, b * 16)
 
-      if (traceThisBlock) {
-        steps.push({
-          index: steps.length,
-          label: `Block ${b + 1} Computation`,
-          inputState: fromByteArray(blockBytes, 'hex'),
-          outputState: fromByteArray(resultBlock, 'hex'),
-          note: `AES block cipher processing complete for block ${b + 1}.`,
-          isMilestone: true,
-        })
-      } else if (blockNum === MAX_TRACED_BLOCKS + 1) {
-        steps.push({
-          index: steps.length,
-          label: `Remaining ${numBlocks - MAX_TRACED_BLOCKS} blocks (summarized)`,
-          inputState: '',
-          outputState: '',
-          note: 'AES block processing continues identically for the rest of the ciphertext — omitted from the trace to stay within the step budget.',
-          isMilestone: true,
-        })
-      }
+      steps.push({
+        index: steps.length,
+        label: `Block ${b + 1} Computation`,
+        inputState: fromByteArray(blockBytes, 'hex'),
+        outputState: fromByteArray(resultBlock, 'hex'),
+        note: `AES block cipher processing complete for block ${b + 1}.`,
+        isMilestone: true,
+      })
     }
+  }
 
   steps.push({
     index: steps.length,
@@ -951,14 +910,6 @@ function getKeyBytes(key: string): Uint8Array {
   return keyBytes
 }
 
-/**
- * Encrypt symmetric cipher export.
- *
- * This API is intentionally documented at the engine boundary so callers
- * can understand the input contract without opening the implementation.
- * @returns The operation result produced by the cipher engine.
- * @see https://csrc.nist.gov/pubs/fips/197/final — FIPS 197.
- */
 export function encrypt(
   input: string,
   key: string,
@@ -1007,14 +958,6 @@ export function encrypt(
   return result
 }
 
-/**
- * Decrypt symmetric cipher export.
- *
- * This API is intentionally documented at the engine boundary so callers
- * can understand the input contract without opening the implementation.
- * @returns The operation result produced by the cipher engine.
- * @see https://csrc.nist.gov/pubs/fips/197/final — FIPS 197.
- */
 export function decrypt(
   input: string,
   key: string,
@@ -1062,14 +1005,6 @@ export function decrypt(
   }
 }
 
-/**
- * TEST VECTORS symmetric cipher export.
- *
- * This API is intentionally documented at the engine boundary so callers
- * can understand the input contract without opening the implementation.
- * @returns The operation result produced by the cipher engine.
- * @see https://csrc.nist.gov/pubs/fips/197/final — FIPS 197.
- */
 export const TEST_VECTORS: TestVector[] = [
   {
     input: '6bc1bee22e409f96e93d7e117393172a',
