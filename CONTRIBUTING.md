@@ -12,6 +12,7 @@ All contributors are expected to adhere to our [Code of Conduct](./CODE_OF_CONDU
 ## 🔍 Before You Start
 
 ### Prerequisites
+
 To contribute code, you should have a solid foundation in the following:
 - **Node.js**: Version 22.x LTS (pinned target)
 - **Package Manager**: npm (version 9.x+)
@@ -20,6 +21,7 @@ To contribute code, you should have a solid foundation in the following:
 - Familiarity with basic cryptographic principles is highly recommended. Please review the [CIPHER_ENGINE.md](./CIPHER_ENGINE.md) document to study the mathematical equations and parameters of each algorithm.
 
 ### Read-First Checklist
+
 Before writing any code, please complete the following steps:
 
 1. Read [README.md](./README.md) for project clearity and ide on what you are building and what we plan to build in the future.
@@ -40,6 +42,18 @@ Follow these steps to set up CryptoViz locally.
 
 Before you begin, make sure you have the following installed:
 
+3. **Verify your local installation**:
+
+   Run the unit tests to ensure your starting environment is correct:
+
+   ```bash
+   npm test
+   ```
+
+   Verify that the static export build succeeds:
+   ```bash
+   npm build
+   ```
 * **Node.js**: 22.x LTS
 * **npm**: 9.x or later
 * **Git**: Latest stable version
@@ -132,23 +146,29 @@ All applicable checks should pass before opening a Pull Request.
 
 We follow a strict Test-Driven Development (TDD) cycle for cipher implementations:
 
-1. **Branch Naming**:
+1. **Branch Naming**
+
    Create a new branch from `main`. Use descriptive prefixes for branch names:
    - Features: `feat/cipher-playfair`
    - Bug fixes: `fix/worker-timeout`
    - Documentation: `docs/tls-handshake`
    - Housekeeping: `chore/update-deps`
 
-2. **Write Tests First (TDD)**:
+2. **Write Tests First (TDD)**
+
    You must write your unit tests and register test vectors in a test file *before* writing the implementation code.
    - Test files belong in `tests/unit/[category]/[cipher].test.ts`.
    - Your test file must exist and fail in CI before implementation code can be merged.
 
-3. **Implement Feature**:
+3. **Implement Feature**
+
    Write code in the appropriate directories. Ensure no main-thread blocks are introduced.
 
-4. **Verify Quality Gates**:
+   
+4. **Verify Quality Gates**
+
    Run the formatting, typechecking, and testing scripts locally:
+
    ```bash
   npm run lint
   npm run typecheck
@@ -156,7 +176,8 @@ We follow a strict Test-Driven Development (TDD) cycle for cipher implementation
   npm run build
    ```
 
-5. **Submit Pull Request**:
+5. **Submit Pull Request**
+
    Open a PR against the `main` branch. Ensure the PR title conforms to the commit message convention.
 
 
@@ -201,11 +222,14 @@ For changes affecting accessibility, security, end-to-end behavior, or visual ou
 Follow this step-by-step guide to add a new cryptographic algorithm to the visualizer engine:
 
 ### Step 1: Research and Foundations
+
 Read the corresponding section in [CIPHER_ENGINE.md](./CIPHER_ENGINE.md). Learn the key structure, block transformations, and step tracing schemas required for visual execution.
 > **Note:** If you are implementing a classical cipher that is cryptographically broken (e.g. Beaufort or Playfair), it is considered educational content. You must implement it with `securityStatus: 'broken'` in its metadata and provide a brief explanation of how it is broken.
 
 ### Step 2: Create the Test Suite
+
 Before writing any cipher logic, create its test file at `tests/unit/[category]/[cipher].test.ts`.
+
 Add tests for:
 - Standard NIST/RFC known-answer test vectors.
 - Empty input handling (must throw `INPUT_REQUIRED`).
