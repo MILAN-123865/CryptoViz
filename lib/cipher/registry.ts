@@ -1046,6 +1046,15 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     recommendedNext: ["hmac", "sha512", "bcrypt"],
   },
   {
+    id: 'esch',
+    name: 'ESCH256',
+    category: 'hash',
+    description: 'NIST SP 800-232 LWC standard. SPARKLE-384 permutation sponge, 128-bit rate, 256-bit output. Alzette ARX-box.',
+    defaultKey: '',
+    defaultInput: '',
+    securityStatus: 'recommended',
+  },
+  {
     id: 'simd',
     name: 'SIMD',
     category: 'hash',
