@@ -964,6 +964,16 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     ]
   },
   {
+    id: 'saturnin',
+    name: 'SATURNIN',
+    category: 'symmetric',
+    description: 'NIST LWC submission. Quantum-era design with 256-bit block for 128-bit quantum security. Hierarchical SPN with 4x4x4 nibble state. CTR-Cascade AEAD.',
+    defaultKey: '00'.repeat(64),
+    defaultInput: '00'.repeat(32),
+    securityStatus: 'experimental',
+    keyPlaceholder: '64 bytes hex (32-byte key + 32-byte nonce)'
+  },
+  {
     id: 'rectangle',
     name: 'RECTANGLE',
     category: 'symmetric',
@@ -975,6 +985,17 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     practicalUseCases: ['IoT authentication', 'RFID', 'Ultra-low-resource embedded devices'],
     prerequisites: ['present', 'gift'],
     recommendedNext: ['lblock'],
+  },
+  {
+    id: 'deoxys',
+    name: 'Deoxys-II-256',
+    category: 'symmetric',
+    description: 'CAESAR winner. Nonce-misuse-resistant AEAD. Deoxys-TBC-384 tweakable block cipher. 256-bit key, 128-bit tag. Two-pass architecture.',
+    defaultKey: '00'.repeat(48),
+    defaultInput: '48656c6c6f',
+    securityStatus: 'recommended',
+    keyPlaceholder: '48 bytes hex (32-byte key + 16-byte nonce)',
+    options: [{ name: 'Associated Data (AD)', id: 'ad', type: 'text', default: '' }]
   },
   {
     id: 'piccolo',
@@ -990,6 +1011,17 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     recommendedNext: ['mantis'],
   },
   {
+    id: 'schwaemm',
+    name: 'SCHWAEMM256-128',
+    category: 'symmetric',
+    description: 'NIST SP 800-232 LWC standard. SPARKLE-384 permutation, Alzette ARX-box. 256-bit nonce, 128-bit key, 128-bit tag. Pure-ARX sponge AEAD.',
+    defaultKey: '00'.repeat(48),
+    defaultInput: '48656c6c6f',
+    securityStatus: 'recommended',
+    keyPlaceholder: '48 bytes hex (16-byte key + 32-byte nonce)',
+    options: [{ name: 'Associated Data (AD)', id: 'ad', type: 'text', default: '' }]
+  },
+  {
     id: "sha256",
     name: "SHA-256",
     category: "hash",
@@ -1001,6 +1033,16 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     keySize: "None (hash function)",
     practicalUseCases: ["Data integrity verification", "Digital signatures", "Cryptographic commitments", "Password hashing (via HMAC/PBKDF2)"],
     recommendedNext: ["hmac", "sha512", "bcrypt"],
+  },
+  {
+    id: 'simd',
+    name: 'SIMD',
+    category: 'hash',
+    description: 'SHA-3 finalist. Quasi-cyclic LDPC message expansion over Z/257Z. 4-pipe ARX compression. SIMD-256 and SIMD-512 variants.',
+    defaultKey: '',
+    defaultInput: '',
+    securityStatus: 'legacy',
+    options: [{ name: 'Output Bits', id: 'outputBits', type: 'select', default: 256, choices: [{ label: 'SIMD-256', value: 256 }, { label: 'SIMD-512', value: 512 }] }]
   },
   {
     id: 'shavite3',
@@ -2119,5 +2161,15 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
         ]
       }
     ]
+  },
+  {
+    id: 'opaque',
+    name: 'OPAQUE',
+    category: 'asymmetric',
+    description: 'RFC 9497 Augmented PAKE. OPRF (ristretto255) + Argon2id KSF + 3DH AKE. Server-side zero-knowledge password storage. Single-call API simulates full flow.',
+    defaultKey: '',
+    defaultInput: 'correct-horse-battery-staple',
+    securityStatus: 'recommended',
+    keyPlaceholder: 'Server public key (hex)'
   },
 ];

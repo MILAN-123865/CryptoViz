@@ -6,7 +6,7 @@
  * Default browser-safe parameters: m=19456 KiB, t=2, p=1 (RFC 9106 second recommendation)
  */
 import type { CipherResult, CipherStep, CipherOptions, TestVector, CipherMetadata } from '../types'
-import { CipherError, validateInput } from '../../utils'
+import { CipherError, validateHashInput } from '../../utils'
 // Assuming blake2b.ts exports a compression function or we use a simplified internal representation
 // import { blake2bCompress } from './blake2b' 
 
@@ -65,7 +65,7 @@ function toHex(b: Uint8Array): string {
  * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
  */
 export function encrypt(input: string, key: string, options: CipherOptions = {}): CipherResult {
-    validateInput(input)
+    validateHashInput(input)
     const m = (options.memoryCost as number) || 19456
     const t = (options.timeCost as number) || 2
     const p = (options.parallelism as number) || 1

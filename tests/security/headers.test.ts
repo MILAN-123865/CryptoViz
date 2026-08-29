@@ -1,4 +1,4 @@
-﻿import { describe, it, expect } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { getSecurityHeaders, PRODUCTION_SECURITY_HEADERS, buildCspHeaderString, PRODUCTION_CSP_DIRECTIVES } from '../../lib/security/securityHeaders'
@@ -79,5 +79,17 @@ describe('Centralized Enforced Security Headers (#1331)', () => {
     const generatedCsp = buildCspHeaderString(PRODUCTION_CSP_DIRECTIVES)
     expect(generatedCsp).toContain("default-src 'self'")
     expect(generatedCsp).toContain("upgrade-insecure-requests")
+  })
+
+  it('ensures connect-src contains no wildcard origins (#1465)', () => {
+    const cspHeader = getModuleHeader('Content-Security-Policy')!
+    const connectSrc = cspHeader
+      .split(';')
+      .map((d: string) => d.trim())
+      .find((d: string) => d.startsWith('connect-src '))
+
+    expect(connectSrc).toBeDefined()
+    expect(connectSrc).not.toContain('*')
+    expect(connectSrc).toContain("connect-src 'self' https://api.github.com https://vercel-insights.com https://supabase.co")
   })
 })
