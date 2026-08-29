@@ -606,7 +606,7 @@ export default function CipherIdentifier() {
                   </h3>
                   <p className="mt-2 text-xs leading-relaxed text-zinc-400">
                     Measures information density per character. Normal English ≈ 4.1-4.5 bits,
-                    high entropy (>5.5) suggests encryption or encoding.
+                    high entropy ({'>'}5.5) suggests encryption or encoding.
                     <strong className="text-zinc-300">
                       {" "}Current: {report.analysis.entropy.toFixed(2)} bits/char
                     </strong>
