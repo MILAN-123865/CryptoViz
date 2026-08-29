@@ -332,6 +332,7 @@ function aesInstrumented(
 
   const steps: CipherStep[] = []
   const numBlocks = Math.ceil(inputBytes.length / 16)
+  const MAX_TRACED_BLOCKS = 200
   const outputBytes = new Uint8Array(numBlocks * 16)
   const useCbc = mode === 'CBC'
   let prevBlock = useCbc ? iv : null
@@ -615,28 +616,33 @@ function aesInstrumented(
       })
     } else {
       let resultBlock: Uint8Array
+      const traceThisBlock = blockNum <= MAX_TRACED_BLOCKS
 
       if (useCbc && !decrypt) {
         const xored = xorBlocks(blockBytes, prevBlock ?? new Uint8Array(16))
-        steps.push({
-          index: steps.length,
-          label: `Block ${blockNum} — CBC Mode XOR (with ${chainLabel})`,
-          inputState: fromByteArray(blockBytes, 'hex'),
-          outputState: fromByteArray(xored, 'hex'),
-          note: `XORed plaintext block with ${chainLabel} before AES encryption.`,
-        })
+        if (traceThisBlock) {
+          steps.push({
+            index: steps.length,
+            label: `Block ${blockNum} — CBC Mode XOR (with ${chainLabel})`,
+            inputState: fromByteArray(blockBytes, 'hex'),
+            outputState: fromByteArray(xored, 'hex'),
+            note: `XORed plaintext block with ${chainLabel} before AES encryption.`,
+          })
+        }
         resultBlock = processBlock(xored, roundKeys, false)
         prevBlock = new Uint8Array(resultBlock)
       } else if (useCbc && decrypt) {
         const decrypted = processBlock(blockBytes, roundKeys, true)
         resultBlock = xorBlocks(decrypted, prevBlock ?? new Uint8Array(16))
-        steps.push({
-          index: steps.length,
-          label: `Block ${blockNum} — CBC Mode XOR (with ${chainLabel})`,
-          inputState: fromByteArray(decrypted, 'hex'),
-          outputState: fromByteArray(resultBlock, 'hex'),
-          note: `XORed decrypted block with ${chainLabel} to recover plaintext.`,
-        })
+        if (traceThisBlock) {
+          steps.push({
+            index: steps.length,
+            label: `Block ${blockNum} — CBC Mode XOR (with ${chainLabel})`,
+            inputState: fromByteArray(decrypted, 'hex'),
+            outputState: fromByteArray(resultBlock, 'hex'),
+            note: `XORed decrypted block with ${chainLabel} to recover plaintext.`,
+          })
+        }
         prevBlock = new Uint8Array(blockBytes)
       } else {
         resultBlock = processBlock(blockBytes, roundKeys, decrypt)
@@ -644,16 +650,26 @@ function aesInstrumented(
 
       outputBytes.set(resultBlock, b * 16)
 
-      steps.push({
-        index: steps.length,
-        label: `Block ${b + 1} Computation`,
-        inputState: fromByteArray(blockBytes, 'hex'),
-        outputState: fromByteArray(resultBlock, 'hex'),
-        note: `AES block cipher processing complete for block ${b + 1}.`,
-        isMilestone: true,
-      })
+      if (traceThisBlock) {
+        steps.push({
+          index: steps.length,
+          label: `Block ${b + 1} Computation`,
+          inputState: fromByteArray(blockBytes, 'hex'),
+          outputState: fromByteArray(resultBlock, 'hex'),
+          note: `AES block cipher processing complete for block ${b + 1}.`,
+          isMilestone: true,
+        })
+      } else if (blockNum === MAX_TRACED_BLOCKS + 1) {
+        steps.push({
+          index: steps.length,
+          label: `Remaining ${numBlocks - MAX_TRACED_BLOCKS} blocks (summarized)`,
+          inputState: '',
+          outputState: '',
+          note: 'AES block processing continues identically for the rest of the ciphertext — omitted from the trace to stay within the step budget.',
+          isMilestone: true,
+        })
+      }
     }
-  }
 
   steps.push({
     index: steps.length,

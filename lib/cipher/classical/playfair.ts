@@ -121,6 +121,7 @@ function playfairInstrumented(
   const { grid, letterMap } = generateGrid(key)
 
   const steps: CipherStep[] = []
+  const MAX_TRACED_BIGRAMS = 40
 
   // Step 0: Grid construction
   steps.push({
@@ -192,31 +193,46 @@ function playfairInstrumented(
     const highlightIdxNew1 = r1 * 5 + c1
     const highlightIdxNew2 = r2 * 5 + c2
 
-    // Step 1 for this bigram: Lookup
-    bigramSteps.push({
-      index: steps.length + bigramSteps.length,
-      label: `Bigram ${i / 2 + 1} — '${l1}${l2}' Lookup`,
-      inputState: `${l1}${l2}`,
-      outputState: `${l1}${l2}`,
-      matrix: grid,
-      highlight: [highlightIdx1, highlightIdx2],
-      note: `Locating '${l1}' at (${pos1.r}, ${pos1.c}) and '${l2}' at (${pos2.r}, ${pos2.c}) in the grid.`,
-    })
+    const bigramNum = i / 2 + 1
+    if (bigramNum <= MAX_TRACED_BIGRAMS) {
+      // Step 1 for this bigram: Lookup
+      bigramSteps.push({
+        index: steps.length + bigramSteps.length,
+        label: `Bigram ${bigramNum} — '${l1}${l2}' Lookup`,
+        inputState: `${l1}${l2}`,
+        outputState: `${l1}${l2}`,
+        matrix: grid,
+        highlight: [highlightIdx1, highlightIdx2],
+        note: `Locating '${l1}' at (${pos1.r}, ${pos1.c}) and '${l2}' at (${pos2.r}, ${pos2.c}) in the grid.`,
+      })
 
-    // Step 2 for this bigram: Replace
-    bigramSteps.push({
-      index: steps.length + bigramSteps.length,
-      label: `Bigram ${i / 2 + 1} — '${l1}${l2}' → '${n1}${n2}'`,
-      inputState: `${l1}${l2}`,
-      outputState: `${n1}${n2}`,
-      matrix: grid,
-      highlight: [highlightIdxNew1, highlightIdxNew2],
-      note: `${rule} rule: '${l1}' (${pos1.r},${pos1.c}) and '${l2}' (${pos2.r},${pos2.c}) ${decrypt ? 'decrypted' : 'encrypted'} to '${n1}' (${r1},${c1}) and '${n2}' (${r2},${c2}).`,
-    })
+      // Step 2 for this bigram: Replace
+      bigramSteps.push({
+        index: steps.length + bigramSteps.length,
+        label: `Bigram ${bigramNum} — '${l1}${l2}' → '${n1}${n2}'`,
+        inputState: `${l1}${l2}`,
+        outputState: `${n1}${n2}`,
+        matrix: grid,
+        highlight: [highlightIdxNew1, highlightIdxNew2],
+        note: `${rule} rule: '${l1}' (${pos1.r},${pos1.c}) and '${l2}' (${pos2.r},${pos2.c}) ${decrypt ? 'decrypted' : 'encrypted'} to '${n1}' (${r1},${c1}) and '${n2}' (${r2},${c2}).`,
+      })
+    }
   }
 
   // Push bigram steps
   steps.push(...bigramSteps)
+
+  const totalBigrams = prepared.length / 2
+  if (totalBigrams > MAX_TRACED_BIGRAMS) {
+    steps.push({
+      index: steps.length,
+      label: `Remaining ${totalBigrams - MAX_TRACED_BIGRAMS} bigrams (summarized)`,
+      inputState: '',
+      outputState: '',
+      note: 'The same lookup/replace rule continues identically for the rest of the text — omitted from the trace to stay within the step budget.',
+      isMilestone: true,
+    })
+  }
 
   // Final milestone
   steps.push({

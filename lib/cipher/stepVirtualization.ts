@@ -80,19 +80,23 @@ export function createVirtualizedCipherResult(
   }
 
   const steps = new Proxy([] as CipherStep[], {
-    get(_target, property, receiver) {
-      if (property === 'length') return serializedSteps.length
-      if (property === 'toJSON') {
-        return () => Array.from({ length: serializedSteps.length }, (_, index) => touch(index))
-      }
-
-      if (typeof property === 'string' && /^\d+$/.test(property)) {
-        return touch(Number(property))
-      }
-
-      return Reflect.get(receiver, property)
-    },
-  })
+  get(_target, property, receiver) {
+    if (property === 'length') return serializedSteps.length
+    if (property === 'toJSON') {
+      return () => Array.from({ length: serializedSteps.length }, (_, index) => touch(index))
+    }
+    if (typeof property === 'string' && /^\d+$/.test(property)) {
+      return touch(Number(property))
+    }
+    return Reflect.get(_target, property, receiver)
+  },
+  has(_target, property) {
+    if (typeof property === 'string' && /^\d+$/.test(property)) {
+      return Number(property) < serializedSteps.length
+    }
+    return Reflect.has(_target, property)
+  },
+})
 
   return {
     ...result,
