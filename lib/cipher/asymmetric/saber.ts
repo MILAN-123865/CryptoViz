@@ -5,8 +5,7 @@
  */
 import type { CipherResult, CipherStep, CipherOptions, TestVector, CipherMetadata } from '../types'
 import { CipherError } from '../../utils/errors'
-import { shake128 } from '@noble/hashes/shake128'
-import { sha3_256 } from '@noble/hashes/sha3'
+import { shake128, sha3_256 } from '@noble/hashes/sha3.js'
 
 const METADATA: CipherMetadata = {
     name: 'SABER',

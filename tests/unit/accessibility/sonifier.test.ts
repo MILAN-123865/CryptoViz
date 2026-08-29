@@ -55,6 +55,7 @@ const AudioContextMock = vi.fn(function (this: any) {
     .mockReturnValueOnce(createMockMasterGain())   // 1st call → master gain
     .mockImplementation(() => createMockGainNode()); // subsequent → tone gains
   this.close = mockContextClose;
+  // eslint-disable-next-line @typescript-eslint/no-this-alias
   mockCtx = this; // expose reference for assertions
 });
 
