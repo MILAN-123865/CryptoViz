@@ -115,6 +115,7 @@ function hillCore(input: string, key: string, decrypt: boolean, instrument: bool
   const { matrix, detInverse } = parseHillKey(key)
   const effectiveMatrix = decrypt ? invertMatrix(matrix, detInverse) : matrix
   const prepared = prepareText(input)
+  const MAX_TRACED_BLOCKS = 60
 
   const steps: CipherStep[] = []
   if (instrument) {
@@ -132,6 +133,7 @@ function hillCore(input: string, key: string, decrypt: boolean, instrument: bool
   }
 
   let output = ''
+  const totalBlocks = Math.ceil(prepared.length / 2)
   for (let i = 0; i < prepared.length; i += 2) {
     const pIdx: [number, number] = [prepared.charCodeAt(i) - 65, prepared.charCodeAt(i + 1) - 65]
     const cIdx = transformBlock(pIdx, effectiveMatrix)
@@ -139,10 +141,11 @@ function hillCore(input: string, key: string, decrypt: boolean, instrument: bool
     const outChars = String.fromCharCode(cIdx[0] + 65) + String.fromCharCode(cIdx[1] + 65)
     output += outChars
 
-    if (instrument) {
+    const blockNum = i / 2 + 1
+    if (instrument && blockNum <= MAX_TRACED_BLOCKS) {
       steps.push({
         index: steps.length,
-        label: `Block ${i / 2 + 1} — '${inChars}'`,
+        label: `Block ${blockNum} — '${inChars}'`,
         inputState: inChars,
         outputState: outChars,
         highlight: [i, i + 1],
@@ -150,6 +153,17 @@ function hillCore(input: string, key: string, decrypt: boolean, instrument: bool
         note: `[${pIdx[0]},${pIdx[1]}] -> K*v mod 26 = [${cIdx[0]},${cIdx[1]}] = '${outChars}'`,
       })
     }
+  }
+
+  if (instrument && totalBlocks > MAX_TRACED_BLOCKS) {
+    steps.push({
+      index: steps.length,
+      label: `Remaining ${totalBlocks - MAX_TRACED_BLOCKS} blocks (summarized)`,
+      inputState: '',
+      outputState: '',
+      note: 'The same matrix transform continues identically for the rest of the text — omitted from the trace to stay within the step budget.',
+      isMilestone: true,
+    })
   }
 
   return {
