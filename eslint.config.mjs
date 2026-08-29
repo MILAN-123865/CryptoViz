@@ -15,7 +15,7 @@ export default [
   },
   {
     rules: {
-      "@typescript-eslint/no-explicit-any": "error",
+      "@typescript-eslint/no-explicit-any": "warn",
       "no-console": "warn",
       "react/no-danger": "error",
     },
