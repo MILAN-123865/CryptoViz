@@ -171,4 +171,66 @@ describe("cryptographic workload limits", () => {
 
     expect(limits.maxIterations).toBe(12);
   });
+
+  it("clamps oversized Argon2id parameters to safe client limits", () => {
+    const { clampArgon2idParameters } = require("../../../lib/security/workloadLimits");
+    const res = clampArgon2idParameters({
+      memoryBlocks: 128,
+      iterations: 20,
+    });
+    expect(res.modified).toBe(true);
+    expect(res.clamped.memoryBlocks).toBe(64);
+    expect(res.clamped.iterations).toBe(10);
+    expect(res.warnings).toHaveLength(2);
+  });
+
+  it("clamps oversized Scrypt parameters to safe client limits", () => {
+    const { clampScryptParameters } = require("../../../lib/security/workloadLimits");
+    const res = clampScryptParameters({
+      N: 131072,
+      p: 16,
+    });
+    expect(res.modified).toBe(true);
+    expect(res.clamped.N).toBe(65536);
+    expect(res.clamped.p).toBe(8);
+    expect(res.warnings.length).toBeGreaterThan(0);
+  });
+
+  it("audits workload limit parameters and generates audit reports", () => {
+    const { auditWorkloadLimits } = require("../../../lib/security/workloadLimits");
+    const reportPass = auditWorkloadLimits({
+      operation: "cipher",
+      cipherId: "argon2id",
+      options: { memoryBlocks: 32, iterations: 3 },
+    });
+    expect(reportPass.status).toBe("PASSED");
+
+    const reportClamp = auditWorkloadLimits({
+      operation: "cipher",
+      cipherId: "argon2id",
+      options: { memoryBlocks: 128, iterations: 20 },
+    });
+    expect(reportClamp.status).toBe("CLAMPED");
+    expect(reportClamp.warnings.length).toBeGreaterThan(0);
+  });
+
+  it("provides human readable workload limit summaries", () => {
+    const { getWorkloadLimitSummary } = require("../../../lib/security/workloadLimits");
+    const summaryArgon = getWorkloadLimitSummary("argon2id");
+    expect(summaryArgon).toContain("Argon2id Workload Limits");
+    expect(summaryArgon).toContain("Max Memory 64 MB");
+
+    const summaryDefault = getWorkloadLimitSummary();
+    expect(summaryDefault).toContain("Default Workload Limits");
+  });
+
+  it("validates high memory workloads before worker dispatch", () => {
+    const { validateHighMemoryWorkload } = require("../../../lib/security/workloadLimits");
+    const validRes = validateHighMemoryWorkload("argon2id", { memoryBlocks: 16, iterations: 2 });
+    expect(validRes.valid).toBe(true);
+
+    const invalidRes = validateHighMemoryWorkload("argon2id", { memoryBlocks: 128, iterations: 20 });
+    expect(invalidRes.valid).toBe(false);
+    expect(invalidRes.clampedOptions?.memoryBlocks).toBe(64);
+  });
 });
