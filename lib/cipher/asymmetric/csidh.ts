@@ -133,5 +133,4 @@ export const TEST_VECTORS: TestVector[] = [
 
     { input: '00', key: '00', expected: '00'.repeat(64), description: 'CSIDH identity element' },
     { input: '0a', key: '05', expected: '00'.repeat(63) + '0f', description: 'Pedagogical addition mockup vector (0a + 05 = 0f)' }
- main
 ]
