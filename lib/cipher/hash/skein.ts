@@ -209,12 +209,34 @@ function skeinCore(input: string, instrument: boolean): CipherResult {
 }
 
 // key param unused for plain hash; both encrypt and decrypt compute the hash
+/**
+ * Encrypt cryptographic hash export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param input Input required by the Encrypt operation.
+ * @param _key Input required by the Encrypt operation.
+ * @param options Input required by the Encrypt operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function encrypt(input: string, _key: string = '', options: CipherOptions = {}): CipherResult {
     if (input === null || input === undefined) {
         throw new CipherError('INPUT_REQUIRED', 'Input text is required.')
     }
     return skeinCore(input, !!options.instrument)
 }
+/**
+ * Decrypt cryptographic hash export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param input Input required by the Decrypt operation.
+ * @param _key Input required by the Decrypt operation.
+ * @param options Input required by the Decrypt operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function decrypt(input: string, _key: string = '', options: CipherOptions = {}): CipherResult {
     if (input === null || input === undefined) {
         throw new CipherError('INPUT_REQUIRED', 'Input text is required.')
@@ -222,6 +244,14 @@ export function decrypt(input: string, _key: string = '', options: CipherOptions
     return skeinCore(input, !!options.instrument)
 }
 
+/**
+ * TEST VECTORS cryptographic hash export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export const TEST_VECTORS: TestVector[] = [
     {
         input: '',

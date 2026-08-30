@@ -18,10 +18,9 @@ function readStorage(): string[] {
   return parsed !== null ? normalizeFavoriteCipherIds(parsed) : []
 }
 
-function writeStorage(ids: string[]): void {
-  setItem(FAVORITE_CIPHERS_STORAGE_KEY, ids)
+function writeStorage(ids: string[]): boolean {
+  return setItem(FAVORITE_CIPHERS_STORAGE_KEY, ids)
 }
-
 function removeStorage(): void {
   removeItem(FAVORITE_CIPHERS_STORAGE_KEY)
 }
@@ -74,12 +73,12 @@ function dispatchFavoriteChange(ids: string[]) {
 export function saveFavoriteCipherIds(ids: string[]): string[] {
   const normalized = normalizeFavoriteCipherIds(ids)
 
-  writeStorage(normalized)
-  dispatchFavoriteChange(normalized)
+  if (writeStorage(normalized)) {
+    dispatchFavoriteChange(normalized)
+  }
 
   return normalized
 }
-
 export function toggleFavoriteCipher(
   currentIds: string[],
   cipherId: string,

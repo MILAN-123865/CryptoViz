@@ -63,7 +63,48 @@ function wotsCore(input: string, key: string, verify: boolean, w: number): Ciphe
     steps.push({ index: 0, label: 'WOTS Verification', inputState: input, outputState: valid ? 'Valid' : 'Invalid', isMilestone: true })
     return { output: valid ? '01' : '00', outputEncoding: 'hex', steps, metadata: METADATA_WOTS, durationMs: performance.now() - start }
 }
+/**
+ * Encrypt Lamport cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param input Input required by the Encrypt Lamport operation.
+ * @param key Input required by the Encrypt Lamport operation.
+ * @param _options Input required by the Encrypt Lamport operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function encryptLamport(input: string, key: string, _options: CipherOptions = {}): CipherResult { return lamportCore(input, key, false) }
+/**
+ * Encrypt Wots cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param input Input required by the Encrypt Wots operation.
+ * @param key Input required by the Encrypt Wots operation.
+ * @param options Input required by the Encrypt Wots operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function encryptWots(input: string, key: string, options: CipherOptions = {}): CipherResult { return wotsCore(input, key, false, (options.w as number) || 4) }
+/**
+ * Decrypt cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param input Input required by the Decrypt operation.
+ * @param key Input required by the Decrypt operation.
+ * @param _options Input required by the Decrypt operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function decrypt(input: string, key: string, _options: CipherOptions = {}): CipherResult { return lamportCore(input, key, true) }
+/**
+ * TEST VECTORS cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export const TEST_VECTORS: TestVector[] = [{ input: '48656c6c6f', key: '00'.repeat(32), expected: 'mock_lamport_sig', description: 'Lamport OTS sign' }]

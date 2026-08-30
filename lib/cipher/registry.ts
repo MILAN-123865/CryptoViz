@@ -1,6 +1,22 @@
+/**
+ * Cipher Option Value cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/197/final — FIPS 197.
+ */
 export type CipherOptionValue = string | number | boolean
 // Add to cipher registry definitions:
 // csidhDefinition,
+/**
+ * Cipher Definition cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/197/final — FIPS 197.
+ */
 export interface CipherDefinition {
   id: string;
   name: string;
@@ -25,6 +41,14 @@ export interface CipherDefinition {
   }[];
 }
 
+/**
+ * CIPHER REGISTRY cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/197/final — FIPS 197.
+ */
 export const CIPHER_REGISTRY: CipherDefinition[] = [
   {
     id: "caesar",
@@ -940,6 +964,16 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     ]
   },
   {
+    id: 'saturnin',
+    name: 'SATURNIN',
+    category: 'symmetric',
+    description: 'NIST LWC submission. Quantum-era design with 256-bit block for 128-bit quantum security. Hierarchical SPN with 4x4x4 nibble state. CTR-Cascade AEAD.',
+    defaultKey: '00'.repeat(64),
+    defaultInput: '00'.repeat(32),
+    securityStatus: 'experimental',
+    keyPlaceholder: '64 bytes hex (32-byte key + 32-byte nonce)'
+  },
+  {
     id: 'rectangle',
     name: 'RECTANGLE',
     category: 'symmetric',
@@ -951,6 +985,27 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     practicalUseCases: ['IoT authentication', 'RFID', 'Ultra-low-resource embedded devices'],
     prerequisites: ['present', 'gift'],
     recommendedNext: ['lblock'],
+  },
+  {
+    id: 'deoxys',
+    name: 'Deoxys-II-256',
+    category: 'symmetric',
+    description: 'CAESAR winner. Nonce-misuse-resistant AEAD. Deoxys-TBC-384 tweakable block cipher. 256-bit key, 128-bit tag. Two-pass architecture.',
+    defaultKey: '00'.repeat(48),
+    defaultInput: '48656c6c6f',
+    securityStatus: 'recommended',
+    keyPlaceholder: '48 bytes hex (32-byte key + 16-byte nonce)',
+    options: [{ name: 'Associated Data (AD)', id: 'ad', type: 'text', default: '' }]
+  },
+  {
+    id: 'e0',
+    name: 'E0',
+    category: 'symmetric',
+    description: '⚠️ BROKEN — Bluetooth BR/EDR stream cipher. 4 LFSRs + summation combiner FSM. Attacked by Fluhrer-Mantin (2001) and Lu-Vaudenay (2004). Replaced by AES-CCM in Bluetooth LE.',
+    defaultKey: '00'.repeat(24),
+    defaultInput: '48656c6c6f',
+    securityStatus: 'broken',
+    keyPlaceholder: '24 bytes hex (16-byte key + 8-byte IV)',
   },
   {
     id: 'piccolo',
@@ -966,6 +1021,39 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     recommendedNext: ['mantis'],
   },
   {
+    id: 'craft',
+    name: 'CRAFT',
+    category: 'symmetric',
+    description: 'Lightweight tweakable block cipher (TCHES 2019). 64-bit block, 128-bit key, 64-bit tweak, 32 rounds. Reflection decryption via tweak.',
+    defaultKey: '00000000000000000000000000000000',
+    defaultInput: '0000000000000000',
+    securityStatus: 'secure',
+    keyPlaceholder: '32 hex characters (128-bit key)',
+    options: [{ name: 'Tweak', id: 'tweak', type: 'text', default: '0000000000000000' }]
+  },
+  {
+    id: 'schwaemm',
+    name: 'SCHWAEMM256-128',
+    category: 'symmetric',
+    description: 'NIST SP 800-232 LWC standard. SPARKLE-384 permutation, Alzette ARX-box. 256-bit nonce, 128-bit key, 128-bit tag. Pure-ARX sponge AEAD.',
+    defaultKey: '00'.repeat(48),
+    defaultInput: '48656c6c6f',
+    securityStatus: 'recommended',
+    keyPlaceholder: '48 bytes hex (16-byte key + 32-byte nonce)',
+    options: [{ name: 'Associated Data (AD)', id: 'ad', type: 'text', default: '' }]
+  },
+  {
+    id: 'romulus',
+    name: 'Romulus-N',
+    category: 'symmetric',
+    description: 'NIST LWC finalist. AEAD mode built on SKINNY-128-384+ tweakable block cipher. 128-bit key, 128-bit nonce, sponge AEAD mode.',
+    defaultKey: '00'.repeat(32),
+    defaultInput: '48656c6c6f',
+    securityStatus: 'secure',
+    keyPlaceholder: '32 bytes hex (16-byte key + 16-byte nonce)',
+    options: [{ name: 'Associated Data (AD)', id: 'ad', type: 'text', default: '' }]
+  },
+  {
     id: "sha256",
     name: "SHA-256",
     category: "hash",
@@ -977,6 +1065,25 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     keySize: "None (hash function)",
     practicalUseCases: ["Data integrity verification", "Digital signatures", "Cryptographic commitments", "Password hashing (via HMAC/PBKDF2)"],
     recommendedNext: ["hmac", "sha512", "bcrypt"],
+  },
+  {
+    id: 'esch',
+    name: 'ESCH256',
+    category: 'hash',
+    description: 'NIST SP 800-232 LWC standard. SPARKLE-384 permutation sponge, 128-bit rate, 256-bit output. Alzette ARX-box.',
+    defaultKey: '',
+    defaultInput: '',
+    securityStatus: 'recommended',
+  },
+  {
+    id: 'simd',
+    name: 'SIMD',
+    category: 'hash',
+    description: 'SHA-3 finalist. Quasi-cyclic LDPC message expansion over Z/257Z. 4-pipe ARX compression. SIMD-256 and SIMD-512 variants.',
+    defaultKey: '',
+    defaultInput: '',
+    securityStatus: 'legacy',
+    options: [{ name: 'Output Bits', id: 'outputBits', type: 'select', default: 256, choices: [{ label: 'SIMD-256', value: 256 }, { label: 'SIMD-512', value: 512 }] }]
   },
   {
     id: 'shavite3',
@@ -2095,5 +2202,25 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
         ]
       }
     ]
+  },
+  {
+    id: 'opaque',
+    name: 'OPAQUE',
+    category: 'asymmetric',
+    description: 'RFC 9497 Augmented PAKE. OPRF (ristretto255) + Argon2id KSF + 3DH AKE. Server-side zero-knowledge password storage. Single-call API simulates full flow.',
+    defaultKey: '',
+    defaultInput: 'correct-horse-battery-staple',
+    securityStatus: 'recommended',
+    keyPlaceholder: 'Server public key (hex)'
+  },
+  {
+    id: 'blind-rsa',
+    name: 'Blind RSA',
+    category: 'asymmetric',
+    description: 'RFC 9474 Blind RSA Signatures. Client blind + server sign + client unblind protocol. Unlinkable anonymous credentials. Privacy Pass foundation.',
+    defaultKey: '',
+    defaultInput: 'test message',
+    securityStatus: 'recommended',
+    keyPlaceholder: 'Server public key (JSON)',
   },
 ];

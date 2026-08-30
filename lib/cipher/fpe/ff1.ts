@@ -105,6 +105,14 @@ export interface Ff1Step {
   result: number[]
 }
 
+/**
+ * Ff1Result cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/197/final — FIPS 197.
+ */
 export interface Ff1Result {
   output: number[]
   steps: Ff1Step[]
@@ -238,6 +246,16 @@ export const ALPHABETS = {
   base62: '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
 } as const
 
+/**
+ * String To Numerals cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param text Input required by the String To Numerals operation.
+ * @param alphabet Input required by the String To Numerals operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/197/final — FIPS 197.
+ */
 export function stringToNumerals(text: string, alphabet: string): number[] {
   return Array.from(text, (ch) => {
     const idx = alphabet.indexOf(ch)
@@ -246,6 +264,16 @@ export function stringToNumerals(text: string, alphabet: string): number[] {
   })
 }
 
+/**
+ * Numerals To String cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param numerals Input required by the Numerals To String operation.
+ * @param alphabet Input required by the Numerals To String operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/197/final — FIPS 197.
+ */
 export function numeralsToString(numerals: number[], alphabet: string): string {
   return numerals.map((d) => alphabet[d]).join('')
 }

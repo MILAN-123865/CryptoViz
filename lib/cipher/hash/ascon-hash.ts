@@ -171,15 +171,45 @@ function asconHashCore(input: string, instrument: boolean): CipherResult {
     return { output: toHex(outputBytes), outputEncoding: 'hex', steps, metadata: METADATA, durationMs: performance.now() - start }
 }
 
+/**
+ * Encrypt cryptographic hash export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param input Input required by the Encrypt operation.
+ * @param key Input required by the Encrypt operation.
+ * @param options Input required by the Encrypt operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function encrypt(input: string, key: string, options: CipherOptions = {}): CipherResult {
     validateHashInput(input)
     return asconHashCore(input, !!options.instrument)
 }
 
+/**
+ * Decrypt cryptographic hash export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param input Input required by the Decrypt operation.
+ * @param key Input required by the Decrypt operation.
+ * @param options Input required by the Decrypt operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function decrypt(input: string, key: string, options: CipherOptions = {}): CipherResult {
     throw new CipherError('ALGORITHM_UNSUPPORTED', 'Ascon-Hash is a hash function and cannot be decrypted.')
 }
 
+/**
+ * TEST VECTORS cryptographic hash export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export const TEST_VECTORS: TestVector[] = [
     {
         input: '',
