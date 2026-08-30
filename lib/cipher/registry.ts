@@ -2255,4 +2255,14 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     securityStatus: 'recommended',
     keyPlaceholder: 'Server public key (JSON)',
   },
+  {
+    id: 'bbs-plus',
+    name: 'BBS+',
+    category: 'asymmetric',
+    description: 'IRTF CFRG BBS Signatures. Pairing-based (BLS12-381) multi-message signing with zero-knowledge selective disclosure proofs. W3C Verifiable Credentials foundation.',
+    defaultKey: '',
+    defaultInput: '["Alice", "1990", "Engineer"]',
+    securityStatus: 'recommended',
+    options: [{ name: 'Disclosed Indices', id: 'disclosedIndices', type: 'text', default: '[0]' }]
+  },
 ];
