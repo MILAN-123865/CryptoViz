@@ -98,15 +98,24 @@ export default function StandardsLibrary() {
     Official Standard →
   </a>
 
+ fix/twofish-inverse-feistel-decrypt
   <Link href="/docs/standards" className="text-teal-600 font-semibold hover:underline dark:text-teal-400">
     Explore Specifications →
   </Link>
+
+ bugfix/chor-rivest-decryption-fix
+  <Link href="/docs/standards" className="text-teal-600 font-semibold hover:underline dark:text-teal-400">
+    Explore Specifications →
+  </Link>
+
+ main
   <a
     href="/docs/nist-rfc-standards-library"
     className="text-green-600 font-semibold hover:underline"
   >
     Learn More →
   </a>
+ main
 </div>
           </div>
 

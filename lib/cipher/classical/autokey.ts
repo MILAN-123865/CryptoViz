@@ -34,10 +34,16 @@ function prepareText(input: string): string {
   return input.toUpperCase().replace(/[^A-Z]/g, '')
 }
 
-function autokeyCore(input: string, key: string, decrypt: boolean, instrument: boolean): CipherResult {
+function autokeyCore(
+  input: string,
+  key: string,
+  decrypt: boolean,
+  instrument: boolean,
+  options: CipherOptions = {}
+): CipherResult {
   const start = performance.now()
   const cleanKey = prepareKey(key)
-  const text = prepareText(input)
+  const preserveFormatting = !!options.preserveFormatting
 
   const steps: CipherStep[] = []
   if (instrument) {
@@ -56,34 +62,82 @@ function autokeyCore(input: string, key: string, decrypt: boolean, instrument: b
   let output = ''
   const keystream: string[] = cleanKey.split('')
 
-  for (let i = 0; i < text.length; i++) {
-    const p = text[i]
-    let outChar: string
-    let kChar: string
+  if (preserveFormatting) {
+    const plainLetters: string[] = []
+    let alphaIdx = 0
 
-    if (!decrypt) {
-      kChar = i < keystream.length ? keystream[i] : text[i - cleanKey.length]
-      const pIdx = p.charCodeAt(0) - 65
-      const kIdx = kChar.charCodeAt(0) - 65
-      outChar = String.fromCharCode(mod26(pIdx + kIdx) + 65)
-    } else {
-      kChar = keystream[i]
-      const cIdx = p.charCodeAt(0) - 65
-      const kIdx = kChar.charCodeAt(0) - 65
-      outChar = String.fromCharCode(mod26(cIdx - kIdx) + 65)
-      keystream.push(outChar) // recovered plaintext extends the stream
+    for (let i = 0; i < input.length; i++) {
+      const char = input[i]
+      if (!/[a-zA-Z]/.test(char)) {
+        output += char
+        continue
+      }
+
+      const isUpper = char >= 'A' && char <= 'Z'
+      const pUpper = char.toUpperCase()
+      const pIdx = pUpper.charCodeAt(0) - 65
+      let kChar: string
+      let outUpper: string
+
+      if (!decrypt) {
+        kChar = alphaIdx < cleanKey.length ? cleanKey[alphaIdx] : plainLetters[alphaIdx - cleanKey.length]
+        const kIdx = kChar.charCodeAt(0) - 65
+        outUpper = String.fromCharCode(mod26(pIdx + kIdx) + 65)
+        plainLetters.push(pUpper)
+      } else {
+        kChar = keystream[alphaIdx]
+        const kIdx = kChar.charCodeAt(0) - 65
+        outUpper = String.fromCharCode(mod26(pIdx - kIdx) + 65)
+        keystream.push(outUpper)
+      }
+
+      const outChar = isUpper ? outUpper : outUpper.toLowerCase()
+      output += outChar
+
+      if (instrument) {
+        steps.push({
+          index: steps.length,
+          label: `Character ${alphaIdx + 1} — '${char}'`,
+          inputState: char,
+          outputState: outChar,
+          highlight: [i],
+          note: `Key char '${kChar}' (alpha position ${alphaIdx}): ${decrypt ? `'${pUpper}' - '${kChar}'` : `'${pUpper}' + '${kChar}'`} mod 26 = '${outUpper}'`,
+        })
+      }
+
+      alphaIdx++
     }
-    output += outChar
+  } else {
+    const text = prepareText(input)
+    for (let i = 0; i < text.length; i++) {
+      const p = text[i]
+      let outChar: string
+      let kChar: string
 
-    if (instrument) {
-      steps.push({
-        index: steps.length,
-        label: `Character ${i + 1} — '${p}'`,
-        inputState: p,
-        outputState: outChar,
-        highlight: [i],
-        note: `Key char '${kChar}' (position ${i}): ${decrypt ? `'${p}' - '${kChar}'` : `'${p}' + '${kChar}'`} mod 26 = '${outChar}'`,
-      })
+      if (!decrypt) {
+        kChar = i < keystream.length ? keystream[i] : text[i - cleanKey.length]
+        const pIdx = p.charCodeAt(0) - 65
+        const kIdx = kChar.charCodeAt(0) - 65
+        outChar = String.fromCharCode(mod26(pIdx + kIdx) + 65)
+      } else {
+        kChar = keystream[i]
+        const cIdx = p.charCodeAt(0) - 65
+        const kIdx = kChar.charCodeAt(0) - 65
+        outChar = String.fromCharCode(mod26(cIdx - kIdx) + 65)
+        keystream.push(outChar) // recovered plaintext extends the stream
+      }
+      output += outChar
+
+      if (instrument) {
+        steps.push({
+          index: steps.length,
+          label: `Character ${i + 1} — '${p}'`,
+          inputState: p,
+          outputState: outChar,
+          highlight: [i],
+          note: `Key char '${kChar}' (position ${i}): ${decrypt ? `'${p}' - '${kChar}'` : `'${p}' + '${kChar}'`} mod 26 = '${outChar}'`,
+        })
+      }
     }
   }
 
@@ -109,7 +163,7 @@ function autokeyCore(input: string, key: string, decrypt: boolean, instrument: b
  */
 export function encrypt(input: string, key: string, options: CipherOptions = {}): CipherResult {
   validateInput(input)
-  return autokeyCore(input, key, false, !!options.instrument)
+  return autokeyCore(input, key, false, !!options.instrument, options)
 }
 
 /**
@@ -125,7 +179,7 @@ export function encrypt(input: string, key: string, options: CipherOptions = {})
  */
 export function decrypt(input: string, key: string, options: CipherOptions = {}): CipherResult {
   validateInput(input)
-  return autokeyCore(input, key, true, !!options.instrument)
+  return autokeyCore(input, key, true, !!options.instrument, options)
 }
 
 /**

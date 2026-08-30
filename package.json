@@ -10,6 +10,7 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
+    "validate:ci": "node scripts/validate-ci-pipeline.mjs",
     "check:budgets": "node scripts/check-bundle-budgets.mjs",
     "test": "vitest run",
     "test:a11y": "vitest run tests/unit/a11y",
