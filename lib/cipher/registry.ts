@@ -575,6 +575,17 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     keyPlaceholder: '128/192/256-bit key as 32/48/64 hex chars',
   },
   {
+    id: 'tinyjambu',
+    name: 'TinyJAMBU',
+    category: 'symmetric',
+    description: 'NIST LWC finalist. 128-bit NLFSR state, 128/192/256-bit key variants, 96-bit nonce, 64-bit tag. Ultra-small-area authenticated encryption.',
+    defaultKey: '00'.repeat(28),
+    defaultInput: '48656c6c6f',
+    securityStatus: 'secure',
+    keyPlaceholder: '28 bytes hex (16-byte key + 12-byte nonce for TinyJAMBU-128)',
+    options: [{ name: 'Associated Data (AD)', id: 'ad', type: 'text', default: '' }]
+  },
+  {
     id: 'mars',
     name: 'MARS',
     category: 'symmetric',
