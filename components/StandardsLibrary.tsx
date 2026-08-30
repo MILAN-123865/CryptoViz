@@ -98,19 +98,9 @@ export default function StandardsLibrary() {
     Official Standard →
   </a>
 
- bugfix/chor-rivest-decryption-fix
-  <Link href="/docs/standards" className="text-teal-600 font-semibold hover:underline dark:text-teal-400">
-    Explore Specifications →
-  </Link>
-
-  <a
-    href="/docs/nist-rfc-standards-library"
-    className="text-green-600 font-semibold hover:underline"
-  >
-    Learn More →
-  </a>
- main
-</div>
+<Link href="/docs/standards" className="text-teal-600 font-semibold hover:underline dark:text-teal-400">
+  Explore Specifications →
+</Link></div>
           </div>
 
         ))}
