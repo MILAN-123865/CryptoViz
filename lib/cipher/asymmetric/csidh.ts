@@ -1,13 +1,24 @@
 /**
- * CSIDH — Commutative Supersingular Isogeny Diffie-Hellman
- * ASIACRYPT 2018. Post-quantum non-interactive key exchange.
- * Ideal class group action over GF(p).
+ * CSIDH (Commutative Supersingular Isogeny Diffie-Hellman) - Educational Simulation
  * 
- * NOTE: Simplified visualization implementation for educational purposes.
- * Real CSIDH requires Montgomery ladder and Vélu's formulas.
+ * WARNING: This is a pedagogical demonstration model. It simulates the ideal class group 
+ * action using trivial scalar modular addition [(peerPub + privKey) % P] instead of 
+ * executing actual small-parameter Montgomery curve isogeny evaluations (e.g., Vélu's formulas).
+ * DO NOT use this in production environments.
  */
 import type { CipherResult, CipherStep, CipherOptions, TestVector, CipherMetadata } from '../types'
 import { CipherError } from '../../utils/errors'
+
+export const CSIDH_METADATA = {
+  isSimulation: true,
+  type: "Pedagogical Demonstration",
+  description: "Simulates CSIDH class group action via simplified modular addition for educational visualization."
+};
+
+export function computeSharedSecret(peerPub: bigint, privKey: bigint, P: bigint): bigint {
+  // Pedagogical simulation of the commutative group action
+  return (peerPub + privKey) % P;
+}
 
 const METADATA: CipherMetadata = {
     name: 'CSIDH',
@@ -54,7 +65,7 @@ function csidhCore(input: string, key: string, instrument: boolean): CipherResul
     const peerPub = parseHex(input || '00', 'CSIDH peer public key')
 
     // Simplified action: shared_secret = (peerPub + privKey) mod P
-    const shared = mod(peerPub + privKey, CSIDH_P)
+    const shared = computeSharedSecret(peerPub, privKey, CSIDH_P)
 
     const outHex = toHex(shared)
 
@@ -77,5 +88,5 @@ return csidhCore(input, key, !!options.instrument)}
 export function decrypt(input: string, key: string, options: CipherOptions = {}): CipherResult {
 return csidhCore(input, key, !!options.instrument)}
 export const TEST_VECTORS: TestVector[] = [
-    { input: '00', key: '00', expected: '00', description: 'CSIDH identity element' }
+    { input: '00', key: '00', expected: '00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', description: 'CSIDH identity element' }
 ]
