@@ -1067,6 +1067,16 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     recommendedNext: ["hmac", "sha512", "bcrypt"],
   },
   {
+    id: 'parallel-hash',
+    name: 'ParallelHash128',
+    category: 'hash',
+    description: 'NIST SP 800-185 parallel tree hash. cSHAKE128-based. Configurable block size B, variable output length, customization string. High-throughput parallel hashing.',
+    defaultKey: '64:',
+    defaultInput: '',
+    securityStatus: 'recommended',
+    options: [{ name: 'Output Length (bits)', id: 'outputLength', type: 'number', default: 256 }]
+  },
+  {
     id: 'esch',
     name: 'ESCH256',
     category: 'hash',
