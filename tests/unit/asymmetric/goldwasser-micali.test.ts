@@ -33,4 +33,13 @@ describe('Goldwasser-Micali', () => {
         expect(result.metadata.name).toBe('Goldwasser-Micali')
         expect(result.metadata.securityStatus).toBe('secure')
     })
+
+    it('verifies strict round-trip decryption decrypt(encrypt(m, pub), priv) === m for various byte patterns', () => {
+        const testPayloads = ['00', 'ff', 'a5', '3c', '42']
+        for (const pt of testPayloads) {
+            const ct = encrypt(pt, 'mock')
+            const decrypted = decrypt(ct.output, 'mock')
+            expect(decrypted.output).toBe(pt)
+        }
+    })
 })

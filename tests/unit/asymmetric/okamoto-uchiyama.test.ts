@@ -53,4 +53,13 @@ describe('Okamoto-Uchiyama', () => {
         expect(result.metadata.securityStatus).toBe('secure')
         expect(result.metadata.name).toBe('Okamoto-Uchiyama')
     })
+
+    it('asserts round-trip decrypt(encrypt(m)) === m across multiple message inputs', () => {
+        const messages = ['01', '05', '0a', '20', '50']
+        for (const msg of messages) {
+            const encrypted = encrypt(msg, 'mock')
+            const decrypted = decrypt(encrypted.output, 'p_only')
+            expect(decrypted.output).toBe(msg)
+        }
+    })
 })
