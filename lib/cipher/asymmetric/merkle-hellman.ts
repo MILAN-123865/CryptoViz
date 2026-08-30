@@ -140,7 +140,7 @@ export const TEST_VECTORS: TestVector[] = [
   {
     key: '2,3,6,13,27,52,105,210,420,41',
     input: 'A',
-    expected: '', // computed at test-write time — run encrypt() once locally, paste the real output here, don't hand-derive by mistake
+    expected: '333',
     description: "Textbook 8-term superincreasing sequence, single ASCII char 'A' (01000001)",
   },
 ]
