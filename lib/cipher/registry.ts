@@ -1043,6 +1043,17 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     options: [{ name: 'Associated Data (AD)', id: 'ad', type: 'text', default: '' }]
   },
   {
+    id: 'acorn',
+    name: 'ACORN v3',
+    category: 'symmetric',
+    description: 'CAESAR finalist. 293-bit NLFSR stream cipher with majority/choose nonlinear combiners. 128-bit key/nonce, 128-bit tag. Hardware-efficient AEAD.',
+    defaultKey: '00'.repeat(32),
+    defaultInput: '48656c6c6f',
+    securityStatus: 'secure',
+    keyPlaceholder: '32 bytes hex (16-byte key + 16-byte nonce)',
+    options: [{ name: 'Associated Data (AD)', id: 'ad', type: 'text', default: '' }]
+  },
+  {
     id: 'romulus',
     name: 'Romulus-N',
     category: 'symmetric',
