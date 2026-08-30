@@ -110,8 +110,8 @@ function decryptFast(input: string, key: string): string {
   // fullCols == 0 means all columns have numRows cells
   const colHeights = ranks.map((_, colIdx) => {
     if (fullCols === 0) return numRows
-    // Columns with rank < fullCols get an extra row
-    return ranks[colIdx] < fullCols ? numRows : numRows - 1
+    // First fullCols physical columns get an extra row
+    return colIdx < fullCols ? numRows : numRows - 1
   })
 
   // Rebuild columns in read-order
@@ -234,7 +234,7 @@ function decryptInstrumented(input: string, key: string): CipherStep[] {
 
   const colHeights = ranks.map((_, colIdx) => {
     if (fullCols === 0) return numRows
-    return ranks[colIdx] < fullCols ? numRows : numRows - 1
+    return colIdx < fullCols ? numRows : numRows - 1
   })
 
   const readOrder = ranks
