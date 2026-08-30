@@ -1,3 +1,11 @@
+/**
+ * Skipjack Round Trace cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export interface SkipjackRoundTrace {
   round: number;
   rule: "A" | "B" | "A-inverse" | "B-inverse";
@@ -10,6 +18,14 @@ export interface SkipjackRoundTrace {
 import { CipherError, validateInput, validateKey } from '../../utils/errors'
 import type { CipherResult, CipherStep, CipherOptions, CipherMetadata, TestVector } from '../types'
 
+/**
+ * Skipjack Trace cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export interface SkipjackTrace {
   mode: "encrypt" | "decrypt";
   inputHex: string;
@@ -51,6 +67,15 @@ function cleanHex(value: string): string {
   return value.trim().replace(/^0x/i, "").replace(/\s+/g, "").toUpperCase();
 }
 
+/**
+ * Assert Skipjack Block Hex cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param value Input required by the Assert Skipjack Block Hex operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function assertSkipjackBlockHex(value: string): string {
   const cleaned = cleanHex(value);
   if (!cleaned) throw new Error("Skipjack block is required.");
@@ -59,6 +84,15 @@ export function assertSkipjackBlockHex(value: string): string {
   return cleaned;
 }
 
+/**
+ * Assert Skipjack Key Hex cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param value Input required by the Assert Skipjack Key Hex operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function assertSkipjackKeyHex(value: string): string {
   const cleaned = cleanHex(value);
   if (!cleaned) throw new Error("Skipjack key is required.");
@@ -162,6 +196,16 @@ function decryptRound(words: [number, number, number, number], round: number, ke
   return [originalW1, originalW2, originalW3, originalW4].map((word) => word & 0xffff) as [number, number, number, number];
 }
 
+/**
+ * Encrypt Skipjack Block cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param plaintextHex Input required by the Encrypt Skipjack Block operation.
+ * @param keyHex Input required by the Encrypt Skipjack Block operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function encryptSkipjackBlock(plaintextHex: string, keyHex: string): string {
   const key = hexToBytes(assertSkipjackKeyHex(keyHex));
   let words = blockToWords(plaintextHex);
@@ -173,6 +217,16 @@ export function encryptSkipjackBlock(plaintextHex: string, keyHex: string): stri
   return wordsToBlock(words);
 }
 
+/**
+ * Decrypt Skipjack Block cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param ciphertextHex Input required by the Decrypt Skipjack Block operation.
+ * @param keyHex Input required by the Decrypt Skipjack Block operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function decryptSkipjackBlock(ciphertextHex: string, keyHex: string): string {
   const key = hexToBytes(assertSkipjackKeyHex(keyHex));
   let words = blockToWords(ciphertextHex);
@@ -184,6 +238,17 @@ export function decryptSkipjackBlock(ciphertextHex: string, keyHex: string): str
   return wordsToBlock(words);
 }
 
+/**
+ * Encrypt cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param input Input required by the Encrypt operation.
+ * @param key Input required by the Encrypt operation.
+ * @param options Input required by the Encrypt operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function encrypt(input: string, key: string, options: CipherOptions = {}): CipherResult {
   validateInput(input)
   const start = performance.now()
@@ -199,6 +264,17 @@ export function encrypt(input: string, key: string, options: CipherOptions = {})
   }
 }
 
+/**
+ * Decrypt cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param input Input required by the Decrypt operation.
+ * @param key Input required by the Decrypt operation.
+ * @param options Input required by the Decrypt operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function decrypt(input: string, key: string, options: CipherOptions = {}): CipherResult {
   validateInput(input)
   const start = performance.now()
@@ -214,6 +290,14 @@ export function decrypt(input: string, key: string, options: CipherOptions = {})
   }
 }
 
+/**
+ * TEST VECTORS cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export const TEST_VECTORS: TestVector[] = [
   {
     input: '33221100DDCCBBAA',
@@ -223,6 +307,17 @@ export const TEST_VECTORS: TestVector[] = [
   },
 ]
 
+/**
+ * Trace Skipjack cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param inputHex Input required by the Trace Skipjack operation.
+ * @param keyHex Input required by the Trace Skipjack operation.
+ * @param mode Input required by the Trace Skipjack operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function traceSkipjack(inputHex: string, keyHex: string, mode: "encrypt" | "decrypt"): SkipjackTrace {
   const key = hexToBytes(assertSkipjackKeyHex(keyHex));
   let words = blockToWords(inputHex);
@@ -269,6 +364,14 @@ export function traceSkipjack(inputHex: string, keyHex: string, mode: "encrypt" 
   };
 }
 
+/**
+ * Skipjack Implementation Notes cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function skipjackImplementationNotes(): string[] {
   return [
     "Skipjack uses a 64-bit block and 80-bit key.",

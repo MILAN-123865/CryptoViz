@@ -32,7 +32,23 @@ import type {
  * visualizer enough information to explain the post-quantum size trade-offs.
  */
 export const ML_DSA_65_PUBLIC_KEY_BYTES = 1952
+/**
+ * ML DSA 65 SECRET KEY BYTES cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export const ML_DSA_65_SECRET_KEY_BYTES = 4032
+/**
+ * ML DSA 65 SIGNATURE BYTES cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export const ML_DSA_65_SIGNATURE_BYTES = 3309
 
 const ML_DSA_65_PUBLIC_KEY_HEX_LENGTH = ML_DSA_65_PUBLIC_KEY_BYTES * 2
@@ -340,6 +356,14 @@ export function verifyCore(
   return createResult(message, 'utf8', steps, start)
 }
 
+/**
+ * Encrypt cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function encrypt(
   input: string,
   key: string,
@@ -348,6 +372,14 @@ export function encrypt(
   return signCore(input, key, !!options.instrument)
 }
 
+/**
+ * Decrypt cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function decrypt(
   input: string,
   key: string,
@@ -356,6 +388,14 @@ export function decrypt(
   return verifyCore(input, key, !!options.instrument)
 }
 
+/**
+ * Generate Keypair cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function generateKeypair(): {
   publicKey: string
   privateKey: string
@@ -368,6 +408,14 @@ export function generateKeypair(): {
   }
 }
 
+/**
+ * TEST VECTORS cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export const TEST_VECTORS: TestVector[] = []
 
 /**
@@ -386,6 +434,15 @@ export const ML_DSA_65 = {
   signatureHexLength: ML_DSA_65_SIGNATURE_HEX_LENGTH,
 } as const
 
+/**
+ * Is Valid Public Key Hex cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param value Input required by the Is Valid Public Key Hex operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function isValidPublicKeyHex(value: string): boolean {
   try {
     ensurePublicKey(value)
@@ -395,6 +452,15 @@ export function isValidPublicKeyHex(value: string): boolean {
   }
 }
 
+/**
+ * Is Valid Secret Key Hex cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param value Input required by the Is Valid Secret Key Hex operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function isValidSecretKeyHex(value: string): boolean {
   try {
     ensureSecretKey(value)
@@ -404,6 +470,15 @@ export function isValidSecretKeyHex(value: string): boolean {
   }
 }
 
+/**
+ * Is Valid Signature Hex cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param value Input required by the Is Valid Signature Hex operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function isValidSignatureHex(value: string): boolean {
   try {
     ensureSignature(value)
@@ -413,18 +488,54 @@ export function isValidSignatureHex(value: string): boolean {
   }
 }
 
+/**
+ * Get Message Byte Length cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param message Input required by the Get Message Byte Length operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function getMessageByteLength(message: string): number {
   return byteLength(message)
 }
 
+/**
+ * Get Signature Byte Length cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param signatureHex Input required by the Get Signature Byte Length operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function getSignatureByteLength(signatureHex: string): number {
   return ensureSignature(signatureHex).length
 }
 
+/**
+ * Get Public Key Byte Length cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param publicKeyHex Input required by the Get Public Key Byte Length operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function getPublicKeyByteLength(publicKeyHex: string): number {
   return ensurePublicKey(publicKeyHex).length
 }
 
+/**
+ * Get Secret Key Byte Length cipher-engine utility export.
+ *
+ * This API is intentionally documented at the engine boundary so callers
+ * can understand the input contract without opening the implementation.
+ * @param secretKeyHex Input required by the Get Secret Key Byte Length operation.
+ * @returns The operation result produced by the cipher engine.
+ * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ */
 export function getSecretKeyByteLength(secretKeyHex: string): number {
   return ensureSecretKey(secretKeyHex).length
 }

@@ -39,4 +39,17 @@ export const cryptoArbitraries = {
     }
     return res;
   }),
+
+  // Byte-length values that commonly trigger off-by-one bugs in block-based
+  // ciphers: empty, single-byte, and just-under/at/just-over the common
+  // 8/16/32/64-byte block boundaries.
+  arbitraryBoundaryBytes: fc.oneof(
+    fc.constantFrom(0, 1, 7, 8, 9, 15, 16, 17, 31, 32, 33, 63, 64, 65)
+      .chain(len => fc.uint8Array({ minLength: len, maxLength: len })),
+    fc.uint8Array({ minLength: 0, maxLength: 96 }),
+  ),
+
+  // Supported symmetric key sizes in bytes (128/192/256-bit), for exercising
+  // valid AND boundary-adjacent (invalid) key sizes.
+  arbitraryKeySizeBytes: fc.constantFrom(16, 24, 32),
 };

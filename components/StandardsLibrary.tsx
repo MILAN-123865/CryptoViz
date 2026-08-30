@@ -34,19 +34,22 @@ export default function StandardsLibrary() {
       <div className="grid md:grid-cols-2 gap-4">
 
         <input
+          id="standards-search-input"
           type="text"
-          placeholder="🔍 Search standards..."
+          placeholder="Search standards (e.g. FIPS 197, RFC 8446)..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          aria-label="Search cryptographic standards and RFCs"
           className="border rounded-lg px-4 py-2 w-full dark:bg-zinc-900"
         />
-        <Link href="/docs/nist-rfc-standards-library">
-  Read Documentation
+<Link href="/docs/standards" className="inline-flex items-center text-sm font-semibold text-teal-600 dark:text-teal-400 hover:underline">
+  Standards Documentation →
 </Link>
-
         <select
+          id="standards-category-select"
           value={category}
           onChange={(e) => setCategory(e.target.value)}
+          aria-label="Filter standards by category"
           className="border rounded-lg px-4 py-2 dark:bg-zinc-900"
         >
           {categories.map((cat) => (
@@ -95,12 +98,9 @@ export default function StandardsLibrary() {
   </a>
 
   <a
-    href="/docs/nist-rfc-standards-library"
-    className="text-green-600 font-semibold hover:underline"
-  >
-    Learn More →
-  </a>
-</div>
+<Link href="/docs/standards" className="text-teal-600 font-semibold hover:underline dark:text-teal-400">
+  Explore Specifications →
+</Link></div>
           </div>
 
         ))}
