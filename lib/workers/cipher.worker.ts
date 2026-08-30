@@ -557,11 +557,11 @@ function decodeWorkerRequest(data: WorkerRequestMessage): WorkerRequest {
 }
 
 function toErrorDetails(error: unknown): {
-  code?: import("../utils/errors").CipherErrorCode;
+  code?: import("../utils/errors").CipherErrorCode | "INVALID_WORKER_MESSAGE";
   message: string;
 } {
   if (error instanceof CipherError) {
-    return { code: error.code, message: error.message };
+    return { code: error.code as any, message: error.message };
   }
 
   if (error instanceof Error) {

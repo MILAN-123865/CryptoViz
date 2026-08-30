@@ -87,7 +87,7 @@ export function encrypt(input: string, key: string, options: CipherOptions = {})
         outBytes[i] = (state[Math.floor(i / 4)] >> ((3 - (i % 4)) * 8)) & 0xFF
     }
 
-    if (instrument) {
+    if (options.instrument) {
         steps.push({ index: 0, label: 'ESCH256 Hash', inputState: input, outputState: toHex(outBytes), note: 'Sparkle384 sponge. 128-bit rate, 256-bit capacity.', isMilestone: true })
     }
 

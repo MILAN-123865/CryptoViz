@@ -45,7 +45,7 @@ export const ENGLISH_TRIGRAMS: Readonly<Record<string, number>> = {
   THE: 0.0183, ING: 0.0089, AND: 0.0075, HER: 0.0072, HAT: 0.0054,
   HIS: 0.0054, THA: 0.0053, ERE: 0.0046, ATE: 0.0045, FOR: 0.0043,
   ENT: 0.0042, ION: 0.0040, TER: 0.0039, WAS: 0.0038, YOU: 0.0037,
-  HOU: 0.0036, ATS: 0.0033, ALL: 0.0033, VER: 0.0032, HIS: 0.0031,
+  HOU: 0.0036, ATS: 0.0033, ALL: 0.0033, VER: 0.0032, ITH: 0.0031,
 }
 
 // ─── Types ───────────────────────────────────────────────────────────────────

@@ -197,6 +197,7 @@ export class UnifiedReplayEngine {
     const validator = getValidationEngine();
     if (validator.hasValidator(this.state.trace.algorithmId)) {
       const result = validator.validateTrace(
+        this.state.trace.algorithmId,
         this.state.trace,
         this.state.trace.customMetadata
       );
