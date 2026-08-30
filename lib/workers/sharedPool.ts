@@ -10,6 +10,6 @@ export const sharedCipherPool = new WorkerPool(
     const { cipherId, type, input, key, options } = payload;
     const dispatcher = await getDispatcher(cipherId);
     const handler = type === 'encrypt' ? dispatcher.encrypt : dispatcher.decrypt;
-    return await handler(input, key, options);
+    return { result: await handler(input, key, options) };
   }
 )
