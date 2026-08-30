@@ -124,7 +124,11 @@ export function decrypt(input: string, key: string, options: CipherOptions = {})
 }
 
 export const TEST_VECTORS: TestVector[] = [
+ testing/merkle-hellman-vector-fix
+ testing/merkle-hellman-vector-fix
+
  bugfix/chor-rivest-decryption-fix
+ main
     { input: '00', key: '00', expected: '00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', description: 'CSIDH identity element' }
 
     { input: '00', key: '00', expected: '00'.repeat(64), description: 'CSIDH identity element' },
