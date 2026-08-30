@@ -670,6 +670,7 @@ function aesInstrumented(
         })
       }
     }
+  }
 
   steps.push({
     index: steps.length,

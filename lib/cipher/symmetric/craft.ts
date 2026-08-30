@@ -120,7 +120,7 @@ export function encrypt(plaintext: string, key: string, options: CipherOptions =
     // Key whitening (final)
     state = (state ^ k1 ^ T) & 0xFFFFFFFFFFFFFFFFn
 
-    if (instrument) {
+    if (options.instrument) {
         steps.push({ index: 0, label: 'CRAFT Encryption', inputState: plaintext, outputState: toHex(state, 8), note: 'Reflection decryption: decrypt(c, k, t) == encrypt(c, k, twist(t)).', isMilestone: true })
     }
 

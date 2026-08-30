@@ -153,7 +153,7 @@ export function encrypt(plaintext: string, key: string, options: CipherOptions =
     const tk3_final = buildTK3(0x03, counter, false)
     const tag = skinny128_384_plus(K, N, tk3_final, S)
 
-    if (instrument) {
+    if (options.instrument) {
         steps.push({ index: 0, label: 'Romulus-N AEAD', inputState: plaintext, outputState: toHex(new Uint8Array([...ctBytes, ...tag])), note: 'SKINNY-128-384+ TBC sponge mode. Constant-time tag verification.', isMilestone: true })
     }
 
