@@ -44,7 +44,7 @@ function popcount(n: bigint): bigint {
 
 function clockLFSR(state: bigint, mask: bigint, taps: bigint): [bigint, bigint] {
     const bit = popcount(state & taps) & 1n
-    const newState = ((state >> 1n) | (bit << (mask.toString(2).length - 1n))) & mask
+    const newState = ((state >> 1n) | (bit << BigInt(mask.toString(2).length - 1))) & mask
     return [newState, state & 1n]
 }
 
@@ -103,7 +103,7 @@ export function encrypt(plaintext: string, key: string, options: CipherOptions =
             c1 = (sum >> 2n) & 1n
 
             const ptBit = (ptBytes[i] >> bit) & 1
-            const ctBit = Number(ptBit ^ k_t)
+            const ctBit = Number(BigInt(ptBit) ^ k_t)
 
             bitBuffer = (bitBuffer << 1) | ctBit
             bitCount++
@@ -116,7 +116,7 @@ export function encrypt(plaintext: string, key: string, options: CipherOptions =
         }
     }
 
-    if (instrument) {
+    if (options.instrument) {
         steps.push({ index: 0, label: 'E0 Bluetooth Stream Cipher', inputState: plaintext, outputState: toHex(new Uint8Array(ctBytes)), note: '⚠️ BROKEN. 4 LFSRs + summation combiner. Replaced by AES-CCM in Bluetooth LE.', isMilestone: true })
     }
 

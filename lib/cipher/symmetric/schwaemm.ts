@@ -20,6 +20,7 @@ const ALZETTE_C = [0xB7E15162, 0xBF715880, 0x38B4DA56, 0x324E7738, 0xBB1185EB, 0
 const DOMAIN_I_PADDED = 0x01, DOMAIN_I_COMPLETE = 0x02, DOMAIN_M_PADDED = 0x03, DOMAIN_M_COMPLETE = 0x04
 
 function u32(n: number): number { return n >>> 0 }
+function u8(n: number): number { return n & 0xFF }
 function rotr(x: number, n: number): number { return u32((x >>> n) | (x << (32 - n))) }
 
 function alzette(x: number, y: number, c: number): [number, number] {

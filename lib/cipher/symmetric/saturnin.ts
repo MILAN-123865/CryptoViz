@@ -21,6 +21,7 @@ const SBOX: readonly number[] = [0, 1, 8, 13, 15, 6, 7, 4, 14, 3, 9, 10, 5, 12, 
 const SBOX_INV: readonly number[] = (() => { const inv = new Array(16).fill(0); SBOX.forEach((v, i) => inv[v] = i); return inv })()
 
 function u4(n: number): number { return n & 0xF }
+function u8(n: number): number { return n & 0xFF }
 
 function subNibbles(state: number[], inv: boolean): void {
     const box = inv ? SBOX_INV : SBOX

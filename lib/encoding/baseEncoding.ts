@@ -324,6 +324,36 @@ function encodeBase32(input: string): EncodingResult {
   }
 }
 
+function decodeBase32(input: string): EncodingResult {
+  const steps: EncodingStep[] = []
+  const clean = input.trim().toUpperCase()
+  const padding = (clean.match(/=+$/) || [""])[0].length
+  const withoutPad = clean.slice(0, clean.length - padding || undefined)
+
+  const values = withoutPad.split("").map((ch) => {
+    const idx = B32_CHARS.indexOf(ch)
+    return idx >= 0 ? idx : 0
+  })
+  const binary = values.map((v) => v.toString(2).padStart(5, "0"))
+  const allBits = binary.join("")
+  const bytes: number[] = []
+  for (let i = 0; i + 8 <= allBits.length; i += 8) {
+    bytes.push(parseInt(allBits.slice(i, i + 8), 2))
+  }
+  const decoded = new TextDecoder().decode(new Uint8Array(bytes))
+
+  return {
+    input,
+    format: "base32",
+    output: decoded,
+    steps,
+    inputBytes: clean.length,
+    outputBytes: decoded.length,
+    sizeRatio: decoded.length / (clean.length || 1),
+    success: true,
+  }
+}
+
 // ─── Hex ─────────────────────────────────────────────────────────────────────
 
 function encodeHex(input: string): EncodingResult {
