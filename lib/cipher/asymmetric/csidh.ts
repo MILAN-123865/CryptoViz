@@ -22,10 +22,11 @@ export function computeSharedSecret(peerPub: bigint, privKey: bigint, P: bigint)
 
 const METADATA: CipherMetadata = {
     name: 'CSIDH',
-    securityStatus: 'secure',
-    breakingComplexity: 'Post-quantum commutative group action. CSIDH-512 offers ~37 bits quantum security.',
+    securityStatus: 'experimental',
+    breakingComplexity: 'Pedagogical simulation using an integer addition mockup. Real CSIDH requires supersingular curve class group actions over GF(p).',
     yearDesigned: 2018,
     standardBody: 'ASIACRYPT 2018',
+    securityWarning: 'PEDAGOGICAL SIMULATION: This visualizer uses a mock integer addition class group action for educational demonstration. It is not real CSIDH math.',
 }
 
 // CSIDH-512 Prime (511 bits)
@@ -72,10 +73,18 @@ function csidhCore(input: string, key: string, instrument: boolean): CipherResul
     if (instrument) {
         steps.push({
             index: 0,
-            label: 'CSIDH Key Exchange',
+            label: '⚠️ Educational Simulation Disclaimer',
+            inputState: 'Simulation Mode',
+            outputState: 'Mock Class Group Action',
+            note: 'PEDAGOGICAL SIMULATION: This implementation uses a simplified integer addition mockup (peerPub + privKey mod P) to illustrate commutative group action properties. Real CSIDH computes supersingular elliptic curve isogenies over GF(p) using Montgomery ladders and Vélu formulas.',
+            isMilestone: true,
+        })
+        steps.push({
+            index: 1,
+            label: 'CSIDH Commutative Key Exchange',
             inputState: `Peer A: ${toHex(peerPub)}`,
             outputState: `Shared: ${outHex}`,
-            note: `Commutative group action. Alice.apply(Bob) == Bob.apply(Alice).`,
+            note: `Commutative class group action. Alice.apply(Bob) == Bob.apply(Alice). (Simulated via integer addition mod P).`,
             isMilestone: true
         })
     }
@@ -84,39 +93,41 @@ function csidhCore(input: string, key: string, instrument: boolean): CipherResul
 }
 
 /**
- * Encrypt cipher-engine utility export.
- *
- * This API is intentionally documented at the engine boundary so callers
- * can understand the input contract without opening the implementation.
- * @param input Input required by the Encrypt operation.
- * @param key Input required by the Encrypt operation.
- * @param options Input required by the Encrypt operation.
- * @returns The operation result produced by the cipher engine.
- * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
+ * Evaluates pedagogical CSIDH mathematical parameters for educational visualization.
  */
+export function describeCsidhGroupAction(peerPubHex: string, privKeyHex: string): {
+    simulatedSharedHex: string;
+    isIdentity: boolean;
+    primeBits: number;
+    explanation: string;
+} {
+    const privKey = parseHex(privKeyHex || '00', 'CSIDH private key')
+    const peerPub = parseHex(peerPubHex || '00', 'CSIDH peer public key')
+    const shared = mod(peerPub + privKey, CSIDH_P)
+    const simulatedSharedHex = toHex(shared)
+    const isIdentity = shared === 0n
+
+    return {
+        simulatedSharedHex,
+        isIdentity,
+        primeBits: 511,
+        explanation: 'CSIDH utilizes ideal class group actions of O = Z[sqrt(-p)] acting on supersingular curves E over GF(p). Due to commutative property [a]([b]E) = [b]([a]E), Alice and Bob compute isomorphic target curves.',
+    }
+}
+
 export function encrypt(input: string, key: string, options: CipherOptions = {}): CipherResult {
-return csidhCore(input, key, !!options.instrument)}
-/**
- * Decrypt cipher-engine utility export.
- *
- * This API is intentionally documented at the engine boundary so callers
- * can understand the input contract without opening the implementation.
- * @param input Input required by the Decrypt operation.
- * @param key Input required by the Decrypt operation.
- * @param options Input required by the Decrypt operation.
- * @returns The operation result produced by the cipher engine.
- * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
- */
+    return csidhCore(input, key, !!options.instrument)
+}
+
 export function decrypt(input: string, key: string, options: CipherOptions = {}): CipherResult {
-return csidhCore(input, key, !!options.instrument)}
-/**
- * TEST VECTORS cipher-engine utility export.
- *
- * This API is intentionally documented at the engine boundary so callers
- * can understand the input contract without opening the implementation.
- * @returns The operation result produced by the cipher engine.
- * @see https://csrc.nist.gov/pubs/fips/46-3/final — FIPS 46-3.
- */
+    return csidhCore(input, key, !!options.instrument)
+}
+
 export const TEST_VECTORS: TestVector[] = [
+ bugfix/chor-rivest-decryption-fix
     { input: '00', key: '00', expected: '00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', description: 'CSIDH identity element' }
+
+    { input: '00', key: '00', expected: '00'.repeat(64), description: 'CSIDH identity element' },
+    { input: '0a', key: '05', expected: '00'.repeat(63) + '0f', description: 'Pedagogical addition mockup vector (0a + 05 = 0f)' }
+ main
 ]

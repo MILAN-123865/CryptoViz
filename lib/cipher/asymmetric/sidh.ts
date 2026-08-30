@@ -12,9 +12,33 @@ import { CipherError, validateInput } from '../../utils'
 const METADATA: CipherMetadata = {
     name: 'SIDH',
     securityStatus: 'broken',
-    breakingComplexity: 'Fully broken by Castryck-Decru (2022) using auxiliary torsion-point images.',
+    breakingComplexity: 'Fully broken in polynomial time by Wouter Castryck and Thomas Decru (Eurocrypt 2023). Recovers private keys in under 1 hour on a single CPU core.',
     yearDesigned: 2011,
     standardBody: 'NIST PQC Round 4 Alternate (Withdrawn)',
+    securityWarning: 'CRITICAL VULNERABILITY BREAK: SIDH is completely broken due to the Castryck-Decru key-recovery attack. The published auxiliary torsion-point images φ_A(P_B) and φ_A(Q_B) allow efficient computation of endomorphism rings and private isogenies.',
+}
+
+/**
+ * Returns comprehensive cryptanalytic breakdown of the Castryck-Decru break on SIDH/SIKE.
+ */
+export function getCastryckDecruAttackSummary(): {
+    publication: string;
+    authors: string[];
+    venue: string;
+    doiUrl: string;
+    vulnerabilityCause: string;
+    attackMechanism: string;
+    impact: string;
+} {
+    return {
+        publication: 'An Efficient Key Recovery Attack on SIDH',
+        authors: ['Wouter Castryck', 'Thomas Decru'],
+        venue: 'Eurocrypt 2023 (Best Paper Award)',
+        doiUrl: 'https://eprint.iacr.org/2022/975',
+        vulnerabilityCause: 'SIDH public keys explicitly transmit images of auxiliary torsion points φ_A(P_B) and φ_A(Q_B) to allow evaluation by the peer.',
+        attackMechanism: 'Constructs an explicit isogeny of degree (2^a, 3^b) between E0 and EA x EB using Kani’s reduction theorem and genus-2 curve product surfaces.',
+        impact: 'Completely dismantles SIDH and SIKE security; SIKE was formally withdrawn from the NIST PQC standardization process.',
+    }
 }
 
 // Toy supersingular curve arithmetic over GF(p^2)
@@ -55,7 +79,7 @@ function sidhCore(input: string, key: string, doDecrypt: boolean, instrument: bo
     if (instrument) {
         steps.push({
             index: 0,
-            label: 'Parameter Setup',
+            label: 'Parameter Setup (Isogeny Walks)',
             inputState: 'Supersingular curve E0 over GF(p²)',
             outputState: 'Torsion bases {P_A, Q_A}, {P_B, Q_B}',
             note: 'SIDH walks isogeny chains between curves. Party A uses degree-2 steps, Party B uses degree-3.',
@@ -65,10 +89,19 @@ function sidhCore(input: string, key: string, doDecrypt: boolean, instrument: bo
         // THE CRITICAL EXPLANATORY NOTE ABOUT THE BREAK
         steps.push({
             index: 1,
-            label: 'Public Key Exchange (Auxiliary Data)',
+            label: 'Public Key Exchange & Castryck-Decru Break (2022/2023)',
             inputState: 'Secret isogeny φ_A',
             outputState: 'E_A, φ_A(P_B), φ_A(Q_B)',
-            note: 'SECURITY FLAW: The protocol REQUIRES publishing the images of the OTHER party\'s torsion points (φ_A(P_B), φ_A(Q_B)). The 2022 Castryck-Decru attack exploits exactly this auxiliary data to glue curves and recover the secret isogeny in hours.',
+            note: 'CRITICAL BREAK (Eurocrypt 2023 Best Paper): The protocol REQUIRES publishing the images of the OTHER party\'s torsion points (φ_A(P_B), φ_A(Q_B)). Castryck and Decru proved that these auxiliary torsion points allow polynomial-time key recovery using genus-2 product surface computations (Kani’s theorem).',
+            isMilestone: true
+        })
+
+        steps.push({
+            index: 2,
+            label: 'Cryptanalytic Impact & NIST Withdrawal',
+            inputState: 'NIST PQC Candidate SIKE',
+            outputState: 'Withdrawn / Practical Key Recovery',
+            note: 'The Castryck-Decru attack and subsequent extensions (Maino-Martindale, Robert) execute in under an hour on standard CPU hardware, leading to the immediate withdrawal of SIKE from NIST PQC.',
             isMilestone: true
         })
     }
