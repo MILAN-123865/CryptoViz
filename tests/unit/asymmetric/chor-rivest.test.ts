@@ -5,22 +5,30 @@ import { CipherError } from '@/lib/utils'
 describe('Chor-Rivest', () => {
     it('exports test vectors', () => expect(TEST_VECTORS.length).toBeGreaterThan(0))
 
-it('round trips with a supplied private key', () => {
-    const privateKey = JSON.stringify({
-        publicWeights: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        privatePermutation: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-        privateD: 1,
-        generator: [0, 1, 0],
+    it('round trips with default mock key', () => {
+        const msg = 'e0'
+        const ct = encrypt(msg, 'mock')
+        expect(ct.output).toBe('00c6')
+        const decrypted = decrypt(ct.output, 'mock')
+        expect(decrypted.output).toBe(msg)
     })
 
-    const msg = 'e0'
-    const ct = encrypt(msg, privateKey)
+    it('round trips with a supplied private key', () => {
+        const privateKey = JSON.stringify({
+            publicWeights: [241, 212, 87, 89, 18, 323, 105],
+            privatePermutation: [2, 0, 4, 1, 5, 3, 6],
+            privateD: 17,
+            generator: [5, 1, 0],
+        })
 
-    expect(ct.output).toBeDefined()
+        const msg = 'e0'
+        const ct = encrypt(msg, privateKey)
+        expect(ct.output).toBe('00c6')
 
-    const decrypted = decrypt(ct.output, privateKey)
-    expect(decrypted.output).toBeDefined()
-})
+        const decrypted = decrypt(ct.output, privateKey)
+        expect(decrypted.output).toBe(msg)
+    })
+
     it('REJECTS messages violating fixed Hamming weight constraint', () => {
         // 0xFF = 11111111 = 8 bits set (violates FIXED_WEIGHT=3)
         const invalidMsg = 'ff'
@@ -34,12 +42,9 @@ it('round trips with a supplied private key', () => {
     })
 
     it('uses genuine GF(p^h) field-extension arithmetic', () => {
-        // Verified by code inspection: gfMul performs polynomial multiplication
-        // modulo the irreducible polynomial, not simple integer modular arithmetic.
-        // The successful encryption of valid messages confirms this.
         const msg = 'e0'  // Valid weight
         const ct = encrypt(msg, 'mock')
-        expect(ct.output).toBeDefined()
+        expect(ct.output).toBe('00c6')
     })
 
     it('metadata flags unconditional broken status', () => {

@@ -382,7 +382,7 @@ const StepAnimator = memo(function StepAnimator({
         className="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-100 pb-3 dark:border-zinc-800"
         aria-label={`Current step: ${step.label}`}
       >
-        <div className="flex min-w-0 items-center gap-2">
+        <div className="flex min-w-0 items-center gap-2" aria-live="polite" aria-atomic="true">
           <span
             className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-teal-50 text-xs font-bold text-teal-700 dark:bg-teal-950/50 dark:text-teal-400"
             aria-hidden="true"

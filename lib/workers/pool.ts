@@ -45,11 +45,15 @@ export class WorkerPool {
   private sequence = 0
   private interactiveWorker: Worker | null = null
 
+  private fallbackMode = false;
+  private fallbackWorker: Worker | null = null;
+
   constructor(
     private workerFactory: () => Worker,
     private poolSize: number = typeof navigator !== 'undefined'
       ? (navigator.hardwareConcurrency || 4)
       : 4,
+    private fallbackExecutor?: (message: unknown, onProgress?: ProgressCallback) => Promise<unknown> | unknown
   ) {
     this.poolSize = Math.max(1, this.poolSize)
   }
@@ -134,10 +138,71 @@ export class WorkerPool {
   }
 
   private createWorker(): Worker {
-    const worker = this.workerFactory()
-    this.workers.push(worker)
-    this.setupWorker(worker)
-    return worker
+    if (this.fallbackMode && this.fallbackExecutor) {
+      return this.createFallbackWorker();
+    }
+
+    try {
+      if (this.fallbackMode) {
+        throw new DOMException('Sandbox', 'SecurityError');
+      }
+      const worker = this.workerFactory()
+      this.workers.push(worker)
+      this.setupWorker(worker)
+      return worker
+    } catch (error: any) {
+      if ((error?.name === 'SecurityError' || error?.message?.includes('sandbox')) && this.fallbackExecutor) {
+        this.fallbackMode = true;
+        return this.createFallbackWorker();
+      }
+      throw error;
+    }
+  }
+
+  private createFallbackWorker(): Worker {
+    
+    // Create a pseudo-Worker that executes inline
+    const worker = {
+      postMessage: async (message: any) => {
+        // Run asynchronously to simulate worker message passing
+        setTimeout(async () => {
+          try {
+            const result = await this.fallbackExecutor!(message, (progressPayload) => {
+              worker.onmessage?.({
+                data: {
+                  type: 'PROGRESS',
+                  payload: progressPayload
+                }
+              } as MessageEvent);
+            });
+            worker.onmessage?.({
+              data: {
+                type: "DONE",
+                payload: result
+              }
+            } as MessageEvent);
+          } catch (err: any) {
+            worker.onmessage?.({
+              data: {
+                type: "ERROR",
+                payload: { message: err?.message || String(err) }
+              }
+            } as MessageEvent);
+          }
+        }, 0);
+      },
+      terminate: () => {},
+      onmessage: null as any,
+      onerror: null as any,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      dispatchEvent: () => true
+    } as unknown as Worker;
+    
+    this.fallbackWorker = worker;
+    this.workers.push(worker);
+    this.setupWorker(worker);
+    return worker;
   }
 
   private setupWorker(worker: Worker) {

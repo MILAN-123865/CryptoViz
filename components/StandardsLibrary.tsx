@@ -42,9 +42,10 @@ export default function StandardsLibrary() {
           aria-label="Search cryptographic standards and RFCs"
           className="border rounded-lg px-4 py-2 w-full dark:bg-zinc-900"
         />
-<Link href="/docs/standards" className="inline-flex items-center text-sm font-semibold text-teal-600 dark:text-teal-400 hover:underline">
-  Standards Documentation →
+        <Link href="/docs/nist-rfc-standards-library">
+  Read Documentation
 </Link>
+
         <select
           id="standards-category-select"
           value={category}

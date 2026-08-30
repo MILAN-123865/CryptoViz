@@ -243,12 +243,29 @@ export default function CipherLayout({ cipher }: CipherLayoutProps) {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          {cipher.id === "csidh" || result?.metadata?.securityWarning ? (
+            <span className="rounded-full border border-purple-500/40 bg-purple-500/10 px-2.5 py-0.5 text-xs font-semibold text-purple-600 dark:text-purple-300">
+              Pedagogical Simulation
+            </span>
+          ) : null}
           <CipherLifecycleBadge status={cipher.securityStatus} size="sm" />
           <span className="rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-0.5 text-xs font-medium text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300">
             {cipher.category}
           </span>
         </div>
       </header>
+
+      {cipher.id === "csidh" || result?.metadata?.securityWarning ? (
+        <div role="alert" className="rounded-xl border border-purple-500/40 bg-purple-500/10 p-4 text-sm text-purple-900 dark:text-purple-200">
+          <p className="font-bold flex items-center gap-2">
+            <span>🎓</span> Educational Simulation Disclaimer
+          </p>
+          <p className="mt-1 leading-relaxed">
+            {result?.metadata?.securityWarning ||
+              "This visualizer demonstrates CSIDH concepts using a simplified mock integer addition class group action. Real CSIDH requires Montgomery ladder evaluations and Vélu's formulas on supersingular curves over GF(p)."}
+          </p>
+        </div>
+      ) : null}
 
       <div className="grid grid-cols-1 items-start gap-5 md:gap-6 lg:grid-cols-12 lg:gap-8">
         <div className="flex flex-col gap-6 lg:col-span-5">

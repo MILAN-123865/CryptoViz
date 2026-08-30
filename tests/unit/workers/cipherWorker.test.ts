@@ -48,7 +48,7 @@ describe("Worker Communication Suite", () => {
 
   it("returns a structured error for malformed runtime messages", async () => {
     const addEventListenerSpy = vi.spyOn(globalThis as any, "addEventListener");
-    const postMessageSpy = vi.spyOn(globalThis as any, "postMessage").mockImplementation(() => {});
+    const postMessageSpy = vi.spyOn(globalThis as any, "postMessage").mockImplementation((data) => { structuredClone(data); });
 
     await import("@/lib/workers/cipher.worker");
     const messageCall = addEventListenerSpy.mock.calls.find(call => call[0] === "message");
@@ -77,7 +77,7 @@ describe("Worker Communication Suite", () => {
   it("should throw CipherError with ALGORITHM_UNSUPPORTED for unknown cipher IDs", async () => {
     // Setup global spies before importing the worker (which runs immediately)
     const addEventListenerSpy = vi.spyOn(globalThis as any, "addEventListener");
-    const postMessageSpy = vi.spyOn(globalThis as any, "postMessage").mockImplementation(() => {});
+    const postMessageSpy = vi.spyOn(globalThis as any, "postMessage").mockImplementation((data) => { structuredClone(data); });
 
     // Dynamically import the worker to execute its top-level event registration
     await import("@/lib/workers/cipher.worker");
