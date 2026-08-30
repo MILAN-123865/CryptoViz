@@ -23,4 +23,11 @@ describe("service-worker release lifecycle", () => {
     expect(source).toContain("CRYPTOVIZ_SW_SKIP_WAITING");
     expect(source).toContain("protocolVersion: PROTOCOL_VERSION");
   });
+
+  it("does not include missing /globals.css in PRECACHE_URLS", () => {
+    expect(source).not.toContain('"/globals.css"');
+    expect(source).toContain('"/"');
+    expect(source).toContain('"/icon.svg"');
+    expect(source).toContain('"/theme-init.js"');
+  });
 });

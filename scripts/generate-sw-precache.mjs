@@ -21,7 +21,7 @@ const protocolVersion = 1;
 export function generatePrecacheList(
   appDirectory = path.join(root, "app"),
 ) {
-  const routes = new Set(["/", "/globals.css", "/icon.svg", "/theme-init.js"]);
+  const routes = new Set(["/", "/icon.svg", "/theme-init.js"]);
 
   const visit = (directory, segments = []) => {
     for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
