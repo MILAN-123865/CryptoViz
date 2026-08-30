@@ -97,7 +97,6 @@ export default function StandardsLibrary() {
     Official Standard →
   </a>
 
-  <a
 <Link href="/docs/standards" className="text-teal-600 font-semibold hover:underline dark:text-teal-400">
   Explore Specifications →
 </Link></div>
