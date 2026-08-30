@@ -1054,6 +1054,17 @@ export const CIPHER_REGISTRY: CipherDefinition[] = [
     options: [{ name: 'Associated Data (AD)', id: 'ad', type: 'text', default: '' }]
   },
   {
+    id: 'xoodyak',
+    name: 'Xoodyak',
+    category: 'symmetric',
+    description: 'NIST LWC finalist. Xoodoo permutation Cyclist mode AEAD. 128-bit key, 128-bit nonce, 128-bit tag. Unified hash+AEAD primitive.',
+    defaultKey: '00'.repeat(32),
+    defaultInput: '48656c6c6f',
+    securityStatus: 'secure',
+    keyPlaceholder: '32 bytes hex (16-byte key + 16-byte nonce)',
+    options: [{ name: 'Associated Data (AD)', id: 'ad', type: 'text', default: '' }]
+  },
+  {
     id: "sha256",
     name: "SHA-256",
     category: "hash",
