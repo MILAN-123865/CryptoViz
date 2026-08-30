@@ -128,6 +128,7 @@ export interface CipherOptions {
   keyLength?: number;
   info?: string;
   instrument?: boolean;
+  preserveFormatting?: boolean;
   signal?: AbortSignal;
   hexInput?: boolean;
   rounds?: number;
