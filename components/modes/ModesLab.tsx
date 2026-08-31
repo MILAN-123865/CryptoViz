@@ -102,7 +102,7 @@ export default function ModesLab() {
           />
           <p className="font-mono text-[11px] text-zinc-500 dark:text-zinc-500" aria-label={`Plaintext with byte ${safeIndex} highlighted`}>
             {text.slice(0, safeIndex)}
-            <span aria-hidden="true" className="rounded bg-amber-200 px-0.5 text-zinc-900 dark:bg-amber-500/40 dark:text-amber-100">
+            <span aria-hidden="true" className="rounded bg-[var(--diff-highlight-bg)] px-0.5 text-[var(--diff-highlight-fg)]">
               {text.slice(safeIndex, safeIndex + 1) || '·'}
             </span>
             {text.slice(safeIndex + 1)}
@@ -134,7 +134,7 @@ export default function ModesLab() {
                   key={`byte-${i}-${b}`}
                   className={`rounded px-1 py-0.5 font-mono text-[11px] ${
                     row.diff[i]
-                      ? 'bg-amber-200 text-zinc-900 dark:bg-amber-500/40 dark:text-amber-100'
+                      ? 'bg-[var(--diff-highlight-bg)] text-[var(--diff-highlight-fg)]'
                       : 'bg-zinc-100 text-zinc-500 dark:bg-zinc-800/60 dark:text-zinc-400'
                   }`}
                 >
