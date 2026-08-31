@@ -1,3 +1,12 @@
+import DOMPurify from "dompurify";
+import { JSDOM } from "jsdom";
+
+const domWindow =
+  typeof window !== "undefined"
+    ? (window as unknown as Window & typeof globalThis)
+    : (new JSDOM("").window as unknown as Window & typeof globalThis);
+const purifier = DOMPurify(domWindow);
+
 export type SanitizedInputKind =
   | "plain-text"
   | "hex"
@@ -14,6 +23,8 @@ export interface SanitizationOptions {
   collapseWhitespace?: boolean;
   preserveCase?: boolean;
   escapeHtml?: boolean;
+  allowedTags?: string[];
+  allowedAttributes?: string[];
 }
 
 export interface SanitizationResult {
@@ -94,17 +105,18 @@ export function sanitizePlainText(value: unknown, options: SanitizationOptions =
 
   let val = result.value;
 
-  // 1. Remove dangerous HTML tags completely
-  val = val.replace(/<\/?(script|img|svg|iframe|object|embed|body|form|input)[^>]*>/gi, "");
-
-  // 2. Remove dangerous event listener attributes
-  val = val.replace(/(on[a-z]+)\s*=\s*("[^"]*"|'[^']*'|[^>\s]*)/gi, "");
-
-  // 3. Neutralize dangerous URL protocols
-  val = val.replace(/(javascript|data|vbscript)\s*:/gi, "$1_blocked:");
-
-  // 4. Escape HTML if requested (default is true)
-  if (options.escapeHtml !== false) {
+  if (options.escapeHtml === false) {
+    const purifyConfig = {
+      ALLOWED_TAGS: options.allowedTags || ["b", "i", "em", "strong", "p", "br", "span"],
+      ALLOWED_ATTR: options.allowedAttributes || ["class", "id"],
+      FORCE_BODY: true,
+      RETURN_DOM: false,
+    };
+    val = purifier.sanitize(val, purifyConfig);
+  } else {
+    // Neutralize dangerous event listener attributes and URL protocols for plain-text escaping
+    val = val.replace(/(on[a-z]+)\s*=\s*("[^"]*"|'[^']*'|[^>\s]*)/gi, "");
+    val = val.replace(/(javascript|data|vbscript)\s*:/gi, "$1_blocked:");
     val = escapeHtml(val);
   }
 
@@ -233,7 +245,7 @@ export function sanitizeMarkdown(value: unknown, maxLength = DEFAULT_MAX_LENGTH)
   });
 
   const withoutDangerousLinks = plain.value.replace(
-    /\]\(\s*(javascript:|data:text\/html|vbscript:)[^)]+\)/gi,
+    /\]\(\s*(javascript:|javascript_blocked:|data:text\/html|vbscript:)[^)]+\)/gi,
     "](#)",
   );
   const withoutRawHtml = withoutDangerousLinks.replace(/&lt;\/?(script|iframe|object|embed|style)[^&]*&gt;/gi, "");
